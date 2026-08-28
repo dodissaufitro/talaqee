@@ -7,6 +7,16 @@ const config: CapacitorConfig = {
   server: {
     url: 'http://182.16.255.93:8083',
     cleartext: true
+  },
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 100,
+      launchAutoHide: true,
+      launchFadeOutDuration: 200,
+      backgroundColor: "#ffffff",
+      androidSplashResourceName: "splash",
+      showSpinner: false,
+    },
   }
 };
 
