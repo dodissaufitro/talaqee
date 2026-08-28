@@ -10,16 +10,20 @@ use App\Http\Controllers\Admin\NavigationItemController;
 use App\Http\Controllers\Admin\PlaceholderController;
 
 Route::get('/', function () {
-    $categories = Category::all();
-    $popularBooks = Book::with(['author', 'category'])->latest()->get();
+    $categories = \Illuminate\Support\Facades\Cache::remember('homepage_categories', 3600, function () {
+        return Category::all();
+    });
+    $popularBooks = Book::with(['author', 'category'])->latest()->take(10)->get();
 
     $koleksiBuku = Book::with('author')->take(4)->get();
     $koleksiVideo = \App\Models\Video::with('author')->take(3)->get();
     $koleksiAudio = \App\Models\Audio::take(3)->get(); // Adjust relationships if needed
     
-    $banners = \App\Models\Banner::where('is_active', true)
-                ->orderBy('sort_order')
-                ->get();
+    $banners = \Illuminate\Support\Facades\Cache::remember('homepage_banners', 3600, function () {
+        return \App\Models\Banner::where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->get();
+    });
     
     $terakhirDibaca = null;
     if (auth()->check()) {
