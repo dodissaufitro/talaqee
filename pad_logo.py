@@ -34,5 +34,5 @@ def create_padded_image(input_path, output_path, canvas_size, scale_factor):
 if __name__ == "__main__":
     input_file = "public/logo/logo_app.talaqee.png"
     # Splash should be 2732x2732, icon 1024x1024
-    create_padded_image(input_file, "assets/splash.png", 2732, 0.4) # Logo takes up 40% of splash
-    create_padded_image(input_file, "assets/icon.png", 1024, 0.4)   # Logo takes up 70% of icon
+    create_padded_image(input_file, "assets/splash.png", 2732, 0.55) # Logo takes up 40% of splash
+    create_padded_image(input_file, "assets/icon.png", 1024, 0.55)   # Logo takes up 70% of icon

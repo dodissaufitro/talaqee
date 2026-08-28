@@ -11,9 +11,11 @@ class KatalogController extends Controller
 {
     public function index()
     {
-        $categories = Category::all();
-        $popularBooks = Book::with(['author', 'category'])->where('is_popular', true)->get();
-        $bukuTerbaru = Book::with(['author', 'category'])->latest()->get();
+        $categories = \Illuminate\Support\Facades\Cache::remember('katalog_categories', 3600, function () {
+            return Category::all();
+        });
+        $popularBooks = Book::with(['author', 'category'])->where('is_popular', true)->take(20)->get();
+        $bukuTerbaru = Book::with(['author', 'category'])->latest()->take(40)->get();
 
         return Inertia::render('Katalog/Index', [
             'categories' => $categories,

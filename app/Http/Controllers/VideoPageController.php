@@ -8,7 +8,9 @@ class VideoPageController extends Controller
 {
     public function index()
     {
-        $categories = \App\Models\Category::withCount('videos')->get();
+        $categories = \Illuminate\Support\Facades\Cache::remember('categories_with_video_count', 3600, function () {
+            return \App\Models\Category::withCount('videos')->get();
+        });
         $recentVideos = \App\Models\Video::with('author', 'category')->orderBy('created_at', 'desc')->take(15)->get();
         $popularVideos = \App\Models\Video::with('author', 'category')->orderBy('total_views', 'desc')->take(15)->get();
 
