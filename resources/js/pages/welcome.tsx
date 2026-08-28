@@ -338,10 +338,10 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                     </div>
                     <div className="flex items-center gap-3">
                         {user && (
-                            <div className="flex items-center gap-1.5 bg-[#FFFBEB] border border-[#FEF3C7] px-2.5 py-1.5 rounded-full shadow-sm">
+                            <Link href="/akun/topup" className="flex items-center gap-1.5 bg-[#FFFBEB] border border-[#FEF3C7] px-2.5 py-1.5 rounded-full shadow-sm hover:bg-yellow-50 transition-colors">
                                 <div className="w-4 h-4 bg-[#F59E0B] rounded-full flex items-center justify-center text-white text-[9px] font-bold">C</div>
                                 <span className="text-[11px] font-bold text-[#D97706]">{user.coin_balance || 0}</span>
-                            </div>
+                            </Link>
                         )}
                         <NotificationBell />
                     </div>

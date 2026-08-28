@@ -68,6 +68,36 @@ interface AudioProps {
 }
 
 export default function AudioIndex({ categories, audios, setorans = [], surahs = [] }: AudioProps) {
+    const [isFavorited, setIsFavorited] = useState(false);
+
+    const handleFavorite = () => {
+        setIsFavorited(!isFavorited);
+    };
+
+    const handleDownload = () => {
+        alert('Memulai unduhan rekaman...');
+    };
+
+    const handleShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Rekaman Hafalan',
+                    text: 'Dengarkan rekaman hafalan ini di Talaqee',
+                    url: window.location.href,
+                });
+            } catch (error) {
+                console.log('Error sharing', error);
+            }
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert('Tautan disalin ke clipboard!');
+        }
+    };
+
+    const handlePlaylist = () => {
+        alert('Ditambahkan ke playlist Anda');
+    };
     
     // Formatting Helpers
     const formatDuration = (seconds: number) => {
@@ -211,19 +241,19 @@ export default function AudioIndex({ categories, audios, setorans = [], surahs =
 
                 {/* Actions Grid */}
                 <div className="px-5 grid grid-cols-4 gap-2 mb-8">
-                    <button className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#F1F5F9] bg-white shadow-sm">
-                        <Heart className="w-4 h-4 text-red-500" />
+                    <button onClick={handleFavorite} className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl border ${isFavorited ? 'border-red-100 bg-red-50' : 'border-[#F1F5F9] bg-white'} shadow-sm transition-colors`}>
+                        <Heart className={`w-4 h-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-red-500'}`} />
                         <span className="text-[10px] font-semibold text-[#475569]">Favorit</span>
                     </button>
-                    <button className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#F1F5F9] bg-white shadow-sm">
+                    <button onClick={handleDownload} className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#F1F5F9] bg-white shadow-sm active:bg-gray-50 transition-colors">
                         <Download className="w-4 h-4 text-emerald-500" />
                         <span className="text-[10px] font-semibold text-[#475569]">Unduh</span>
                     </button>
-                    <button className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#F1F5F9] bg-white shadow-sm">
+                    <button onClick={handleShare} className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#F1F5F9] bg-white shadow-sm active:bg-gray-50 transition-colors">
                         <Share2 className="w-4 h-4 text-blue-500" />
                         <span className="text-[10px] font-semibold text-[#475569]">Bagikan</span>
                     </button>
-                    <button className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#F1F5F9] bg-white shadow-sm">
+                    <button onClick={handlePlaylist} className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#F1F5F9] bg-white shadow-sm active:bg-gray-50 transition-colors">
                         <ListPlus className="w-4 h-4 text-orange-500" />
                         <span className="text-[10px] font-semibold text-[#475569]">Playlist</span>
                     </button>
@@ -315,20 +345,7 @@ export default function AudioIndex({ categories, audios, setorans = [], surahs =
 
 
 
-                {/* Mini Player Floating */}
-                <div className="fixed bottom-[80px] left-4 right-4 bg-white rounded-2xl p-3 shadow-[0_4px_24px_rgba(0,0,0,0.12)] border border-[#F1F5F9] flex items-center gap-3 z-50">
-                    <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0">
-                        <img src="/images/katalog/book1.png" alt="Cover" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <h4 className="text-[13px] font-extrabold text-[#1E293B] mb-0.5 truncate">Menjadi Hamba yang Bersyukur</h4>
-                        <p className="text-[11px] text-[#64748B] truncate">Ust. Hanan Attaki, Lc</p>
-                    </div>
-                    <div className="flex items-center gap-4 pr-1 shrink-0">
-                        <button><Pause className="w-5 h-5 text-[#1E293B]" fill="currentColor" /></button>
-                        <button><SkipForward className="w-5 h-5 text-[#1E293B]" fill="currentColor" /></button>
-                    </div>
-                </div>
+
 
                 {/* Bottom Navigation (Replacing Koin with Rekaman) */}
                 <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#F1F5F9] z-50">

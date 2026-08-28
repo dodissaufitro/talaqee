@@ -19,9 +19,17 @@ class VideoPageController extends Controller
         ]);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $video = \App\Models\Video::with('author', 'category')->find($id);
+
+        if ($video) {
+            $viewedSessionKey = 'viewed_video_' . $video->id;
+            if (!$request->session()->has($viewedSessionKey)) {
+                $video->increment('total_views');
+                $request->session()->put($viewedSessionKey, true);
+            }
+        }
 
         // Jika video tidak ditemukan, tampilkan dengan data kosong (komponen punya default)
         $relatedVideos = \App\Models\Video::with('author')

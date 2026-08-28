@@ -4,7 +4,7 @@ import {
     ArrowLeft, Bookmark, Share2, Play, Pause, Maximize2,
     ThumbsUp, Download, List, Share, Eye, Calendar, User,
     MoreVertical, ChevronDown, ChevronUp, Home, LayoutGrid,
-    PlaySquare, CircleUserRound, Headphones
+    PlaySquare, CircleUserRound, Headphones, Search
 } from 'lucide-react';
 
 interface Author {
@@ -27,6 +27,7 @@ interface Video {
     duration: number;
     total_views: number;
     created_at: string;
+    likes_count?: number;
     author?: Author;
     category?: Category;
 }
@@ -42,10 +43,13 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
     const [showFullDesc, setShowFullDesc] = useState(false);
     const [liked, setLiked] = useState(false);
     const [bookmarked, setBookmarked] = useState(false);
+    const [saved, setSaved] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
     const mobileVideoRef = useRef<HTMLVideoElement>(null);
     const desktopVideoRef = useRef<HTMLVideoElement>(null);
 
-    const togglePlay = (ref: React.RefObject<HTMLVideoElement>) => {
+    const togglePlay = (ref: React.RefObject<HTMLVideoElement | null>) => {
         if (ref.current) {
             if (ref.current.paused) {
                 ref.current.play();
@@ -66,6 +70,80 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
         return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
 
+    const currentVideo = video || {
+        id: 1,
+        title: 'Menjaga Hati Agar Tetap Tenang',
+        description: 'Hati yang tenang adalah kunci hidup bahagia. Dalam kajian ini, kita akan membahas bagaimana cara menjaga hati dari kegelisahan dan bagaimana cara untuk selalu bersyukur kepada Allah SWT.',
+        thumbnail: '/images/katalog/video1.png',
+        video_url: '',
+        duration: 1935,
+        total_views: 12500,
+        created_at: '2024-05-12T00:00:00Z',
+        likes_count: 0,
+        author: { id: 1, name: 'Ust. Hanan Attaki, Lc' },
+        category: { id: 1, name: 'Kajian', slug: 'kajian' },
+    };
+
+    const showToast = (message: string) => {
+        setToastMessage(message);
+        setTimeout(() => setToastMessage(null), 3000);
+    };
+
+    React.useEffect(() => {
+        const storedLike = localStorage.getItem(`talaqee_video_${currentVideo.id}_liked`);
+        const storedSave = localStorage.getItem(`talaqee_video_${currentVideo.id}_saved`);
+        const storedBookmark = localStorage.getItem(`talaqee_video_${currentVideo.id}_bookmarked`);
+        
+        if (storedLike) setLiked(storedLike === 'true');
+        if (storedSave) setSaved(storedSave === 'true');
+        if (storedBookmark) setBookmarked(storedBookmark === 'true');
+    }, [currentVideo.id]);
+
+    const handleLike = () => {
+        const newState = !liked;
+        setLiked(newState);
+        localStorage.setItem(`talaqee_video_${currentVideo.id}_liked`, newState.toString());
+    };
+
+    const handleShare = () => {
+        if (navigator.share) {
+            navigator.share({
+                title: currentVideo.title || 'Video Kajian',
+                text: 'Simak kajian ini di Talaqee!',
+                url: window.location.href,
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            showToast('Tautan berhasil disalin!');
+        }
+    };
+
+    const handleDownload = () => {
+        const url = currentVideo.video_url ? (currentVideo.video_url.startsWith('http') ? currentVideo.video_url : `/storage/${currentVideo.video_url}`) : "https://www.w3schools.com/html/mov_bbb.mp4";
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Talaqee_Video_${currentVideo.id}.mp4`;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('Memulai unduhan video...');
+    };
+
+    const handleSave = () => {
+        const newState = !saved;
+        setSaved(newState);
+        localStorage.setItem(`talaqee_video_${currentVideo.id}_saved`, newState.toString());
+        showToast(newState ? 'Kajian berhasil disimpan ke playlist!' : 'Kajian dihapus dari playlist.');
+    };
+
+    const handleBookmark = () => {
+        const newState = !bookmarked;
+        setBookmarked(newState);
+        localStorage.setItem(`talaqee_video_${currentVideo.id}_bookmarked`, newState.toString());
+        showToast(newState ? 'Kajian berhasil ditambahkan ke markah!' : 'Kajian dihapus dari markah.');
+    };
+
     const formatViews = (views: number) => {
         if (!views) return '0';
         if (views >= 1000000) return (views / 1000000).toFixed(1) + 'M';
@@ -79,27 +157,26 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
         return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     };
 
-    const currentVideo = video || {
-        id: 1,
-        title: 'Menjaga Hati Agar Tetap Tenang',
-        description: 'Hati yang tenang adalah kunci hidup bahagia. Dalam kajian ini, kita akan membahas bagaimana cara menjaga hati dari kegelisahan dan bagaimana cara untuk selalu bersyukur kepada Allah SWT.',
-        thumbnail: '/images/katalog/video1.png',
-        video_url: '',
-        duration: 1935,
-        total_views: 12500,
-        created_at: '2024-05-12T00:00:00Z',
-        author: { id: 1, name: 'Ust. Hanan Attaki, Lc' },
-        category: { id: 1, name: 'Kajian', slug: 'kajian' },
-    };
-
     const dummyList = [
         { num: 2, title: 'Sabar dalam Menghadapi Ujian', speaker: 'Ust. Hanan Attaki, Lc', views: '15.2K', duration: '28:40', img: '/images/katalog/video2.png' },
         { num: 3, title: 'Ikhlas dalam Beramal', speaker: 'Ust. Hanan Attaki, Lc', views: '9.8K', duration: '29:10', img: '/images/katalog/video3.png' },
     ];
 
+    const filteredRelatedVideos = relatedVideos.filter(v => 
+        v.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        (v.author?.name || '').toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <>
             <Head title={currentVideo.title} />
+
+            {/* Toast Notification */}
+            {toastMessage && (
+                <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] px-4 py-2 bg-gray-900 text-white text-sm rounded-full shadow-lg font-medium transition-all animate-in fade-in slide-in-from-top-5">
+                    {toastMessage}
+                </div>
+            )}
 
             {/* ─── MOBILE ─── */}
             <div className="block md:hidden bg-white min-h-screen pb-20 font-sans">
@@ -115,14 +192,14 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
                         </span>
                     </div>
                     <div className="flex items-center gap-4">
-                        <button onClick={() => setBookmarked(!bookmarked)}>
+                        <button onClick={handleBookmark}>
                             <Bookmark
                                 className="w-[22px] h-[22px]"
                                 strokeWidth={2}
                                 style={{ color: bookmarked ? '#2563EB' : '#374151', fill: bookmarked ? '#2563EB' : 'none' }}
                             />
                         </button>
-                        <button>
+                        <button onClick={handleShare}>
                             <Share2 className="w-[22px] h-[22px] text-gray-700" strokeWidth={2} />
                         </button>
                     </div>
@@ -187,7 +264,7 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
                         <div className="flex items-center gap-1.5">
                             <Eye className="w-3.5 h-3.5 text-gray-400" />
                             <span className="text-[11px] text-gray-500 font-medium">
-                                {formatViews(currentVideo.total_views || 12500)} ditonton
+                                {formatViews(currentVideo.total_views || 0)} ditonton
                             </span>
                         </div>
                     </div>
@@ -196,10 +273,10 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
                 {/* Action Buttons */}
                 <div className="flex items-center justify-between px-7 py-3">
                     {[
-                        { icon: <ThumbsUp className="w-5 h-5" strokeWidth={1.5} style={{ fill: liked ? '#374151' : 'none', color: '#374151' }} />, label: liked ? '1.3K' : '1.2K', action: () => setLiked(!liked) },
-                        { icon: <Download className="w-5 h-5 text-gray-700" strokeWidth={1.5} />, label: 'Unduh', action: () => {} },
-                        { icon: <List className="w-5 h-5 text-gray-700" strokeWidth={1.5} />, label: 'Simpan', action: () => {} },
-                        { icon: <Share className="w-5 h-5 text-gray-700" strokeWidth={1.5} />, label: 'Bagikan', action: () => {} },
+                        { icon: <ThumbsUp className="w-5 h-5" strokeWidth={1.5} style={{ fill: liked ? '#374151' : 'none', color: '#374151' }} />, label: formatViews((currentVideo.likes_count || 0) + (liked ? 1 : 0)), action: handleLike },
+                        { icon: <Download className="w-5 h-5 text-gray-700" strokeWidth={1.5} />, label: 'Unduh', action: handleDownload },
+                        { icon: <List className="w-5 h-5" strokeWidth={1.5} style={{ color: saved ? '#2563EB' : '#374151' }} />, label: 'Simpan', action: handleSave },
+                        { icon: <Share className="w-5 h-5 text-gray-700" strokeWidth={1.5} />, label: 'Bagikan', action: handleShare },
                     ].map((btn, i) => (
                         <button key={i} onClick={btn.action} className="flex flex-col items-center gap-2 group">
                             <div className="w-[52px] h-[52px] rounded-full border border-gray-100 flex items-center justify-center bg-gray-50 group-hover:bg-gray-100 transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
@@ -210,24 +287,7 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
                     ))}
                 </div>
 
-                {/* Coin Banner */}
-                <div className="px-5 my-5">
-                    <div className="rounded-[16px] px-4 py-4 flex items-center gap-3 border border-[#E5E7EB] bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
-                        <div className="w-[42px] h-[42px] bg-[#FBBF24] rounded-full flex items-center justify-center shrink-0">
-                            <span className="text-white text-[18px] font-extrabold">C</span>
-                        </div>
-                        <div className="flex-1 min-w-0 pr-2">
-                            <p className="text-[13px] font-bold text-gray-900 mb-0.5">Dapatkan Koin</p>
-                            <p className="text-[10px] text-gray-500 leading-[1.4]">
-                                Tonton kajian sampai selesai<br />dan dapatkan 5 koin
-                            </p>
-                        </div>
-                        <button className="bg-[#3B82F6] hover:bg-blue-700 text-white text-[14px] font-extrabold px-5 py-2.5 rounded-[12px] flex items-center gap-1.5 shrink-0 transition-colors shadow-sm shadow-blue-200">
-                            +5
-                            <div className="w-3.5 h-3.5 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[8px] font-bold">C</div>
-                        </button>
-                    </div>
-                </div>
+
 
                 {/* Deskripsi */}
                 <div className="px-5 mb-6">
@@ -247,6 +307,20 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
                             </button>
                         )}
                     </p>
+                </div>
+
+                {/* Search Bar Mobile */}
+                <div className="px-5 mb-4">
+                    <div className="relative">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input 
+                            type="text" 
+                            placeholder="Cari kajian atau ustadz..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-[13px] focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] outline-none transition-colors" 
+                        />
+                    </div>
                 </div>
 
                 {/* Daftar Kajian */}
@@ -280,7 +354,7 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
                         </div>
 
                         {/* Related videos */}
-                        {relatedVideos.map((v, i) => (
+                        {filteredRelatedVideos.map((v, i) => (
                             <Link href={`/videos/${v.id}`} key={v.id} className="flex items-center gap-3 px-0.5 group">
                                 <div className="relative shrink-0 w-[110px] h-[66px] rounded-xl overflow-hidden bg-gray-100 shadow-sm border border-gray-100">
                                     <img src={v.thumbnail || '/images/katalog/video2.png'} alt={v.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
@@ -383,18 +457,33 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
                             <span>·</span>
                             <span>{formatDate(currentVideo.created_at)}</span>
                             <span>·</span>
-                            <span>{formatViews(currentVideo.total_views || 12500)} ditonton</span>
+                            <span>{formatViews(currentVideo.total_views || 0)} ditonton</span>
                         </div>
-                        <div className="flex items-center gap-3 mb-6">
-                            <button onClick={() => setLiked(!liked)} className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-colors ${liked ? 'bg-[#EEF2FF] text-[#6366F1]' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-                                <ThumbsUp size={16} /> 1.2K Suka
-                            </button>
-                            <button className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
-                                <Download size={16} /> Unduh
-                            </button>
-                            <button className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
-                                <Share size={16} /> Bagikan
-                            </button>
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <button onClick={handleLike} className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-colors ${liked ? 'bg-[#EEF2FF] text-[#6366F1]' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                                    <ThumbsUp size={16} /> {formatViews((currentVideo.likes_count || 0) + (liked ? 1 : 0))} Suka
+                                </button>
+                                <button onClick={handleDownload} className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+                                    <Download size={16} /> Unduh
+                                </button>
+                                <button onClick={handleShare} className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+                                    <Share size={16} /> Bagikan
+                                </button>
+                            </div>
+                            {/* Right Actions */}
+                            <div className="flex items-center gap-4">
+                                <div className="relative hidden md:block">
+                                    <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Cari video..." 
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pl-9 pr-4 py-2 w-48 lg:w-64 text-sm border border-gray-200 rounded-full focus:outline-none focus:border-[#7e57c2] focus:ring-1 focus:ring-[#7e57c2] bg-gray-50 transition-all"
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div className="bg-white rounded-2xl p-5 border border-gray-100">
                             <h2 className="font-bold text-gray-900 mb-2">Deskripsi</h2>
@@ -428,10 +517,10 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
                                 </div>
 
                                 {/* Related videos */}
-                                {relatedVideos.slice(0, 9).map((v, i) => (
+                                {filteredRelatedVideos.slice(0, 9).map((v, i) => (
                                     <Link href={`/videos/${v.id}`} key={v.id} className="flex gap-3 group">
                                         <div className="relative shrink-0 w-[120px] h-[72px] rounded-xl overflow-hidden bg-gray-100">
-                                            <img src={v.thumbnail_url || '/images/katalog/video1.png'} alt={v.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                            <img src={v.thumbnail ? (v.thumbnail.startsWith('http') || v.thumbnail.startsWith('/') ? v.thumbnail : `/storage/${v.thumbnail}`) : "/images/placeholders/video-thumb.jpg"} alt={v.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                                             <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[9px] px-1 py-0.5 rounded">{formatDuration(v.duration)}</div>
                                         </div>
                                         <div className="flex-1 min-w-0">

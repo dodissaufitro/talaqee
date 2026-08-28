@@ -21,6 +21,7 @@ interface Video {
     duration: number;
     total_views: number;
     created_at: string;
+    likes_count?: number;
     author?: Author;
     category?: Category;
 }
@@ -52,6 +53,7 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
     const [showFullDesc, setShowFullDesc] = useState(false);
     const [liked, setLiked] = useState(false);
     const [bookmarked, setBookmarked] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const videoRef = useRef<HTMLVideoElement>(null);
 
     const togglePlay = () => {
@@ -80,6 +82,7 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
         duration: 1935,
         total_views: 12500,
         created_at: '2024-05-12T00:00:00Z',
+        likes_count: 0,
         author: { id: 1, name: 'Ust. Hanan Attaki, Lc' },
         category: { id: 1, name: 'Kajian', slug: 'kajian' },
     };
@@ -138,6 +141,18 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
         if (lowerName.includes('anak')) return <Smile size={16} />;
         return <BookOpen size={16} />;
     };
+
+    const filteredRecentVideos = recentVideos.filter(v => {
+        const matchesCategory = selectedCategory === 'semua' || v.category?.slug === selectedCategory;
+        const matchesSearch = v.title.toLowerCase().includes(searchQuery.toLowerCase()) || (v.author?.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
+
+    const filteredPopularVideos = popularVideos.filter(v => {
+        const matchesCategory = selectedCategory === 'semua' || v.category?.slug === selectedCategory;
+        const matchesSearch = v.title.toLowerCase().includes(searchQuery.toLowerCase()) || (v.author?.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
 
     return (
         <>
@@ -228,7 +243,7 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                         <div className="flex items-center gap-1.5">
                             <Eye className="w-3.5 h-3.5 text-gray-400" />
                             <span className="text-[11px] text-gray-500 font-medium">
-                                {formatViews(currentVideo.total_views || 12500)} ditonton
+                                {formatViews(currentVideo.total_views || 0)} ditonton
                             </span>
                         </div>
                     </div>
@@ -237,7 +252,7 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                 {/* Action Buttons */}
                 <div className="flex items-center justify-between px-7 py-3">
                     {[
-                        { icon: <ThumbsUp className="w-5 h-5" strokeWidth={1.5} style={{ fill: liked ? '#374151' : 'none', color: '#374151' }} />, label: liked ? '1.3K' : '1.2K', action: () => setLiked(!liked) },
+                        { icon: <ThumbsUp className="w-5 h-5" strokeWidth={1.5} style={{ fill: liked ? '#374151' : 'none', color: '#374151' }} />, label: formatViews((currentVideo.likes_count || 0) + (liked ? 1 : 0)), action: () => setLiked(!liked) },
                         { icon: <Download className="w-5 h-5 text-gray-700" strokeWidth={1.5} />, label: 'Unduh', action: () => {} },
                         { icon: <List className="w-5 h-5 text-gray-700" strokeWidth={1.5} />, label: 'Simpan', action: () => {} },
                         { icon: <Share className="w-5 h-5 text-gray-700" strokeWidth={1.5} />, label: 'Bagikan', action: () => {} },
@@ -251,24 +266,7 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                     ))}
                 </div>
 
-                {/* Coin Banner */}
-                <div className="px-5 my-5">
-                    <div className="rounded-[16px] px-4 py-4 flex items-center gap-3 border border-[#E5E7EB] bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
-                        <div className="w-[42px] h-[42px] bg-[#FBBF24] rounded-full flex items-center justify-center shrink-0">
-                            <span className="text-white text-[18px] font-extrabold">C</span>
-                        </div>
-                        <div className="flex-1 min-w-0 pr-2">
-                            <p className="text-[13px] font-bold text-gray-900 mb-0.5">Dapatkan Koin</p>
-                            <p className="text-[10px] text-gray-500 leading-[1.4]">
-                                Tonton kajian sampai selesai<br />dan dapatkan 5 koin
-                            </p>
-                        </div>
-                        <button className="bg-[#3B82F6] hover:bg-blue-700 text-white text-[14px] font-extrabold px-5 py-2.5 rounded-[12px] flex items-center gap-1.5 shrink-0 transition-colors shadow-sm shadow-blue-200">
-                            +5
-                            <div className="w-3.5 h-3.5 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[8px] font-bold">C</div>
-                        </button>
-                    </div>
-                </div>
+
 
                 {/* Deskripsi */}
                 <div className="px-5 mb-6">
@@ -288,6 +286,20 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                             </button>
                         )}
                     </p>
+                </div>
+
+                {/* Search Bar Mobile */}
+                <div className="px-5 mb-4">
+                    <div className="relative">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input 
+                            type="text" 
+                            placeholder="Cari kajian atau ustadz..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-[13px] focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] outline-none transition-colors" 
+                        />
+                    </div>
                 </div>
 
                 {/* Daftar Kajian */}
@@ -321,7 +333,7 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                         </div>
 
                         {/* Related videos */}
-                        {recentVideos.slice(1).map((v, i) => (
+                        {filteredRecentVideos.slice(1).map((v, i) => (
                             <Link href={`/videos/${v.id}`} key={v.id} className="flex items-center gap-3 px-0.5 group">
                                 <div className="relative shrink-0 w-[110px] h-[66px] rounded-xl overflow-hidden bg-gray-100 shadow-sm border border-gray-100">
                                     <img src={getImageUrl(v.thumbnail, '/images/katalog/video2.png')} alt={v.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
@@ -396,9 +408,16 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-4">
-                        <button className="text-gray-500 hover:text-gray-900 transition-colors p-2">
-                            <Search size={20} />
-                        </button>
+                        <div className="relative hidden md:block">
+                            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input 
+                                type="text" 
+                                placeholder="Cari video..." 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-9 pr-4 py-2 w-48 lg:w-64 text-sm border border-gray-200 rounded-full focus:outline-none focus:border-[#7e57c2] focus:ring-1 focus:ring-[#7e57c2] bg-gray-50 transition-all"
+                            />
+                        </div>
                         <Link href={route('login')} className="px-5 py-2.5 text-sm font-semibold text-[#7e57c2] bg-white border-2 border-[#f3eefe] hover:bg-[#f3eefe] rounded-xl transition-colors">
                             Masuk
                         </Link>
@@ -572,7 +591,7 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                         </div>
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                            {recentVideos.length > 0 ? recentVideos.map(video => (
+                            {filteredRecentVideos.length > 0 ? filteredRecentVideos.map(video => (
                                 <Link href={`/videos/${video.id}`} key={video.id} className="group flex flex-col">
                                     <div className="aspect-video bg-gray-200 rounded-xl overflow-hidden relative mb-3">
                                         <img 
@@ -619,7 +638,7 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                         </div>
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                            {popularVideos.length > 0 ? popularVideos.map(video => (
+                            {filteredPopularVideos.length > 0 ? filteredPopularVideos.map(video => (
                                 <Link href={`/videos/${video.id}`} key={video.id} className="group flex flex-col">
                                     <div className="aspect-video bg-gray-200 rounded-xl overflow-hidden relative mb-3">
                                         <img 

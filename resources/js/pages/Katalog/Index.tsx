@@ -73,11 +73,11 @@ export default function Katalog(props: KatalogProps) {
                                     <p className="text-[12px] text-[#64748B] mt-1 font-medium truncate">Temukan ribuan konten inspiratif</p>
                                 </div>
                                 <div className="flex items-center gap-3 shrink-0">
-                                    <div className="flex items-center gap-2 bg-white rounded-full px-2.5 py-1.5 border border-[#E2E8F0] shadow-sm">
+                                    <Link href="/akun/topup" className="flex items-center gap-2 bg-white rounded-full px-2.5 py-1.5 border border-[#E2E8F0] shadow-sm hover:bg-gray-50 transition-colors">
                                         <div className="w-5 h-5 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[10px] font-bold">C</div>
                                         <span className="font-extrabold text-[12px] text-[#1E293B]">{user?.coin_balance || 0}</span>
                                         <Plus className="w-4 h-4 text-[#3B82F6] font-bold" />
-                                    </div>
+                                    </Link>
                                     <button className="text-[#1E293B] relative pl-1">
                                         <Bell className="w-6 h-6 stroke-[1.5]" />
                                         <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
