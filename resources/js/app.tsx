@@ -34,3 +34,16 @@ createInertiaApp({
 
 // This will set light / dark mode on load...
 initializeTheme();
+
+// Handle Android hardware back button
+import { App as CapacitorApp } from '@capacitor/app';
+
+if (typeof window !== 'undefined') {
+    CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+        if (canGoBack) {
+            window.history.back();
+        } else {
+            CapacitorApp.exitApp();
+        }
+    });
+}

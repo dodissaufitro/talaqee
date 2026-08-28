@@ -13,11 +13,19 @@ Route::get('/', function () {
     $categories = \Illuminate\Support\Facades\Cache::remember('homepage_categories', 3600, function () {
         return Category::all();
     });
-    $popularBooks = Book::with(['author', 'category'])->latest()->take(10)->get();
+    $popularBooks = \Illuminate\Support\Facades\Cache::remember('homepage_popular_books', 1800, function () {
+        return Book::with(['author', 'category'])->latest()->take(10)->get();
+    });
 
-    $koleksiBuku = Book::with('author')->take(4)->get();
-    $koleksiVideo = \App\Models\Video::with('author')->take(3)->get();
-    $koleksiAudio = \App\Models\Audio::take(3)->get(); // Adjust relationships if needed
+    $koleksiBuku = \Illuminate\Support\Facades\Cache::remember('homepage_koleksi_buku', 1800, function () {
+        return Book::with('author')->take(4)->get();
+    });
+    $koleksiVideo = \Illuminate\Support\Facades\Cache::remember('homepage_koleksi_video', 1800, function () {
+        return \App\Models\Video::with('author')->take(3)->get();
+    });
+    $koleksiAudio = \Illuminate\Support\Facades\Cache::remember('homepage_koleksi_audio', 1800, function () {
+        return \App\Models\Audio::take(3)->get();
+    });
     
     $banners = \Illuminate\Support\Facades\Cache::remember('homepage_banners', 3600, function () {
         return \App\Models\Banner::where('is_active', true)
