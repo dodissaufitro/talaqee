@@ -228,7 +228,7 @@ export default function Katalog(props: KatalogProps) {
                         </div>
 
                         {/* Terakhir Dibaca / Lanjutkan Membaca */}
-                        <div className="px-6 pb-6">
+                        <div className="px-6 pb-3">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-[16px] font-extrabold text-[#1E293B]">Terakhir Dibaca</h3>
                             </div>
@@ -264,8 +264,8 @@ export default function Katalog(props: KatalogProps) {
                         </div>
 
                         {/* Buku Pilihan */}
-                        <div className="pb-8">
-                            <div className="px-6 flex items-center justify-between mb-4">
+                        <div className="pb-3">
+                            <div className="px-6 flex items-center justify-between mb-3">
                                 <h3 className="text-[16px] font-extrabold text-[#1E293B]">Buku Pilihan</h3>
                                 {filteredPilihan.length > 4 && (
                                     <button 
@@ -299,8 +299,8 @@ export default function Katalog(props: KatalogProps) {
                         </div>
 
                         {/* Buku Terbaru */}
-                        <div className="pb-8">
-                            <div className="px-6 flex items-center justify-between mb-4">
+                        <div className="pb-3">
+                            <div className="px-6 flex items-center justify-between mb-3">
                                 <h3 className="text-[16px] font-extrabold text-[#1E293B]">Buku Terbaru</h3>
                             </div>
                             

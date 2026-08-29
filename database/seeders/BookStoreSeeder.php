@@ -15,27 +15,26 @@ class BookStoreSeeder extends Seeder
      */
     public function run(): void
     {
-        // Prevent duplication if already seeded
-        if (Category::count() > 0) return;
-
         $categories = [
-            ['name' => 'Fiksi', 'icon' => 'BookOpen'],
-            ['name' => 'Non-Fiksi', 'icon' => 'FileText'],
-            ['name' => 'Pendidikan', 'icon' => 'GraduationCap'],
-            ['name' => 'Bisnis & Ekonomi', 'icon' => 'BarChart'],
-            ['name' => 'Anak-anak', 'icon' => 'Smile'],
-            ['name' => 'Komik & Manga', 'icon' => 'MessageCircle'],
-            ['name' => 'Agama & Spiritualitas', 'icon' => 'Book'],
-            ['name' => 'Sains & Teknologi', 'icon' => 'Atom'],
+            ['name' => 'Fiksi', 'icon' => 'Feather'],
+            ['name' => 'Non-Fiksi', 'icon' => 'Bookmark'],
+            ['name' => 'Pendidikan', 'icon' => 'Library'],
+            ['name' => 'Bisnis & Ekonomi', 'icon' => 'Globe'],
+            ['name' => 'Anak-anak', 'icon' => 'Star'],
+            ['name' => 'Komik & Manga', 'icon' => 'Zap'],
+            ['name' => 'Agama & Spiritualitas', 'icon' => 'Moon'],
+            ['name' => 'Sains & Teknologi', 'icon' => 'Compass'],
         ];
 
         $categoryModels = [];
         foreach ($categories as $cat) {
-            $categoryModels[$cat['name']] = Category::create([
-                'name' => $cat['name'],
-                'slug' => Str::slug($cat['name']),
-                'icon' => $cat['icon']
-            ]);
+            $categoryModels[$cat['name']] = Category::firstOrCreate(
+                ['name' => $cat['name']],
+                [
+                    'slug' => Str::slug($cat['name']),
+                    'icon' => $cat['icon']
+                ]
+            );
         }
 
         $booksData = [
@@ -55,17 +54,19 @@ class BookStoreSeeder extends Seeder
                 'slug' => Str::slug($data['author'])
             ]);
 
-            Book::create([
-                'title' => $data['title'],
-                'slug' => Str::slug($data['title']),
-                'author_id' => $author->id,
-                'category_id' => $categoryModels[$data['cat']]->id,
-                'rating' => $data['rating'],
-                'total_reviews' => $data['reviews'],
-                'total_coin' => $data['price'], // We use total_coin to represent the price
-                'is_popular' => true,
-                'cover' => '/images/books/' . Str::slug($data['title']) . '.jpg' // Placeholder for image paths
-            ]);
+            Book::firstOrCreate(
+                ['title' => $data['title']],
+                [
+                    'slug' => Str::slug($data['title']),
+                    'author_id' => $author->id,
+                    'category_id' => $categoryModels[$data['cat']]->id,
+                    'rating' => $data['rating'],
+                    'total_reviews' => $data['reviews'],
+                    'total_coin' => $data['price'], // We use total_coin to represent the price
+                    'is_popular' => true,
+                    'cover' => 'https://picsum.photos/seed/' . Str::slug($data['title']) . '/600/800'
+                ]
+            );
         }
     }
 }

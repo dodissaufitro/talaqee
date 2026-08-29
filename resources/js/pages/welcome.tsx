@@ -7,6 +7,7 @@ import {
     Bell, List, PlaySquare, Headphones, Play, Home, LayoutGrid, CircleUserRound, Library, MoreVertical, Bookmark, Filter, Crown, ChevronLeft, ShoppingCart
 } from 'lucide-react';
 import NotificationBell from '@/components/NotificationBell';
+import JadwalSholat from '@/components/JadwalSholat';
 
 interface Book {
     id: number;
@@ -360,70 +361,10 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                     </div>
                 </div>
 
-                {/* Banners Slider */}
-                <div className="px-5 mb-6">
-                    <div className="flex overflow-x-auto gap-4 snap-x snap-mandatory hide-scrollbar pb-1">
-                        {banners.length > 0 ? banners.map((banner) => (
-                            <Link href={banner.link_url || '#'} key={banner.id} className="min-w-full snap-center scroll-ml-5">
-                                <div className="w-full aspect-[2.2/1] rounded-2xl overflow-hidden relative group shadow-sm bg-gray-100">
-                                    <img
-                                        src={banner.image_path.startsWith('http') || banner.image_path.startsWith('/') ? banner.image_path : `/storage/${banner.image_path}`}
-                                        alt={banner.title?.replace(/(<([^>]+)>)/gi, "") || 'Banner'}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                                    />
-                                </div>
-                            </Link>
-                        )) : (
-                            <div className="w-full aspect-[2.2/1] bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400 text-[12px] shadow-sm">
-                                Belum ada banner
-                            </div>
-                        )}
-                    </div>
-                </div>
 
-                {/* Lanjutkan Belajar (Terakhir Dibaca) */}
-                <div className="px-5 mb-8">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-[15px] font-bold text-gray-900">Lanjutkan Belajar</h3>
-                    </div>
 
-                    {terakhirDibaca ? (
-                        <div className="bg-white border border-gray-100 rounded-[20px] p-3 shadow-sm flex gap-4 items-center relative overflow-hidden">
-                            <div className="w-[64px] aspect-[3/4] shrink-0 rounded-xl overflow-hidden bg-gray-100 relative z-10 border border-gray-50 shadow-sm">
-                                <img src={terakhirDibaca.cover ? (terakhirDibaca.cover.startsWith('http') || terakhirDibaca.cover.startsWith('/') ? terakhirDibaca.cover : `/storage/${terakhirDibaca.cover}`) : "/images/placeholders/book-cover.svg"} alt={terakhirDibaca.title} className="w-full h-full object-cover" />
-                            </div>
-                            <div className="flex-1 relative z-10">
-                                <h4 className="font-bold text-[13px] text-gray-900 leading-tight mb-1 line-clamp-1">{terakhirDibaca.title}</h4>
-                                <p className="text-[10px] font-medium text-gray-500 mb-2">{terakhirDibaca.author}</p>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                        <div className="h-full bg-blue-600 rounded-full" style={{ width: `${terakhirDibaca.progress_percent}%` }}></div>
-                                    </div>
-                                    <span className="text-[9px] font-bold text-blue-600">{terakhirDibaca.progress_percent}%</span>
-                                </div>
-                                <p className="text-[9px] text-gray-400 font-medium">{terakhirDibaca.chapter_info}</p>
-                            </div>
-                            <button className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 relative z-10 shadow-sm hover:bg-blue-100 transition-colors">
-                                <Play className="w-4 h-4 ml-0.5 fill-current" />
-                            </button>
-                            {/* Decorative background accent */}
-                            <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-blue-50/50 to-transparent z-0"></div>
-                        </div>
-                    ) : (
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100/50 rounded-[20px] p-4 flex gap-4 items-center">
-                            <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center shrink-0 text-blue-500">
-                                <BookOpen className="w-6 h-6 stroke-[1.5]" />
-                            </div>
-                            <div className="flex-1">
-                                <h4 className="font-bold text-[13px] text-gray-900 mb-0.5">Mulai Belajar</h4>
-                                <p className="text-[10px] text-gray-600 leading-tight">Pilih buku atau video kajian pertama Anda hari ini.</p>
-                            </div>
-                            <Link href={route('katalog.index')} className="bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-sm">
-                                Jelajahi
-                            </Link>
-                        </div>
-                    )}
-                </div>
+                {/* Jadwal Sholat */}
+                <JadwalSholat />
 
                 {/* Buku Rekomendasi */}
                 <div className="mb-8">
