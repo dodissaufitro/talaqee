@@ -70,6 +70,19 @@ class BookController extends Controller
 
         $book = Book::create($validated);
 
+        // Notifikasi ke semua user
+        $users = \App\Models\User::all();
+        foreach($users as $u) {
+            \App\Models\Notification::create([
+                'user_id' => $u->id,
+                'title' => 'Buku Baru: ' . $book->title,
+                'message' => 'Buku baru telah ditambahkan ke katalog. Baca sekarang!',
+                'type' => 'new_book',
+                'action_url' => '/buku/' . $book->id,
+                'is_read' => false
+            ]);
+        }
+
         if ($request->filled('chapters')) {
             $chapters = json_decode($request->chapters, true);
             if (is_array($chapters)) {

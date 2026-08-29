@@ -2,15 +2,18 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import React, { useState } from 'react';
 import {
     Search, Bell, Plus, BookOpen, Video, Headphones, Medal, Grip,
-    ChevronRight, PlaySquare, Home, LayoutGrid, CircleUserRound, CircleDollarSign
+    ChevronRight, PlaySquare, Home, LayoutGrid, CircleUserRound, CircleDollarSign,
+    Heart, Star, Shield, Globe, Sun, Moon, Flame, Zap, Feather, Compass, Bookmark, Library
 } from 'lucide-react';
 import Welcome from '../welcome';
+import NotificationBell from '@/components/NotificationBell';
 
 interface Category {
     id: number;
     name: string;
     slug: string;
-    icon: string;
+    icon?: string | null;
+    color?: string | null;
 }
 
 interface Book {
@@ -78,10 +81,7 @@ export default function Katalog(props: KatalogProps) {
                                         <span className="font-extrabold text-[12px] text-[#1E293B]">{user?.coin_balance || 0}</span>
                                         <Plus className="w-4 h-4 text-[#3B82F6] font-bold" />
                                     </Link>
-                                    <button className="text-[#1E293B] relative pl-1">
-                                        <Bell className="w-6 h-6 stroke-[1.5]" />
-                                        <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                                    </button>
+                                    <NotificationBell />
                                 </div>
                             </div>
                         </div>
@@ -100,33 +100,92 @@ export default function Katalog(props: KatalogProps) {
                             </div>
                         </div>
 
-                        {/* Categories (6 in a row) */}
-                        <div className="pb-6 grid grid-cols-6 gap-2 px-6">
-                            {[
-                                { id: 'semua', label: 'Semua', icon: BookOpen, color: '#6366F1', bg: '#EEF2FF' },
-                                { id: 'aqidah', label: 'Aqidah', icon: BookOpen, color: '#10B981', bg: '#ECFDF5' },
-                                { id: 'fiqih', label: 'Fiqih', icon: BookOpen, color: '#F59E0B', bg: '#FFFBEB' },
-                                { id: 'akhlak', label: 'Akhlak', icon: BookOpen, color: '#3B82F6', bg: '#EFF6FF' },
-                                { id: 'terpopuler', label: 'Populer', icon: Medal, color: '#F43F5E', bg: '#FFF1F2' },
-                                { id: 'lainnya', label: 'Lainnya', icon: LayoutGrid, color: '#A855F7', bg: '#FAF5FF' },
-                            ].map((cat) => {
-                                const isActive = selectedCategory === cat.id;
-                                return (
-                                <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className="flex flex-col items-center gap-1.5 w-full">
-                                    <div className={`w-full aspect-square rounded-full flex items-center justify-center shadow-sm max-w-[48px] transition-all ${isActive ? 'ring-2 ring-offset-1' : ''}`} style={{ backgroundColor: cat.bg, outlineColor: cat.color }}>
-                                        <cat.icon className="w-4 h-4 md:w-5 md:h-5 stroke-[1.5]" style={{ color: cat.color }} />
-                                    </div>
-                                    <div className="flex flex-col items-center w-full">
-                                        <span className="text-[9px] font-bold text-center leading-tight w-full truncate px-0.5" style={{ color: isActive ? '#6366F1' : '#475569' }}>
-                                            {cat.label}
-                                        </span>
-                                        {isActive && (
-                                            <div className="w-3 h-[2px] bg-[#6366F1] mt-0.5 rounded-full"></div>
-                                        )}
-                                    </div>
-                                </button>
-                                );
-                            })}
+                        {/* Categories */}
+                        <div className="pb-6 pt-2 flex overflow-x-auto gap-2 px-6 hide-scrollbar snap-x snap-mandatory">
+                            {(() => {
+                                const dynamicCategories = [
+                                    { id: 'semua', label: 'Semua', icon: BookOpen, color: '#6366F1', bg: '#EEF2FF' },
+                                    ...props.categories.map(cat => {
+                                        let iconName = cat.icon;
+                                        let hexColor = cat.color;
+
+                                        // Fallback based on name if icon is null from production DB
+                                        if (!iconName) {
+                                            const lower = cat.name.toLowerCase();
+                                            if (lower.includes('aqidah')) { iconName = 'Shield'; hexColor = '#10B981'; }
+                                            else if (lower.includes('akhlak')) { iconName = 'Heart'; hexColor = '#3B82F6'; }
+                                            else if (lower.includes('non-fiksi') || lower.includes('non fiksi')) { iconName = 'Bookmark'; hexColor = '#3B82F6'; }
+                                            else if (lower.includes('fiksi')) { iconName = 'Feather'; hexColor = '#F43F5E'; }
+                                            else if (lower.includes('bisnis')) { iconName = 'Globe'; hexColor = '#F59E0B'; }
+                                            else if (lower.includes('anak')) { iconName = 'Star'; hexColor = '#8B5CF6'; }
+                                            else if (lower.includes('komik')) { iconName = 'Zap'; hexColor = '#EC4899'; }
+                                            else if (lower.includes('sains')) { iconName = 'Compass'; hexColor = '#06B6D4'; }
+                                            else if (lower.includes('sejarah')) { iconName = 'Globe'; hexColor = '#8B5CF6'; }
+                                            else { iconName = 'BookOpen'; hexColor = '#10B981'; }
+                                        }
+
+                                        let IconComponent = BookOpen;
+                                        switch (iconName) {
+                                            case 'Book': IconComponent = BookOpen; break;
+                                            case 'BookOpen': IconComponent = BookOpen; break;
+                                            case 'Bookmark': IconComponent = Bookmark; break;
+                                            case 'Library': IconComponent = Library; break;
+                                            case 'Heart': IconComponent = Heart; break;
+                                            case 'Star': IconComponent = Star; break;
+                                            case 'Medal': IconComponent = Medal; break;
+                                            case 'Shield': IconComponent = Shield; break;
+                                            case 'Globe': IconComponent = Globe; break;
+                                            case 'Sun': IconComponent = Sun; break;
+                                            case 'Moon': IconComponent = Moon; break;
+                                            case 'Flame': IconComponent = Flame; break;
+                                            case 'Zap': IconComponent = Zap; break;
+                                            case 'Feather': IconComponent = Feather; break;
+                                            case 'Compass': IconComponent = Compass; break;
+                                            case 'LayoutGrid': IconComponent = LayoutGrid; break;
+                                            case 'Video': IconComponent = Video; break;
+                                            case 'Headphones': IconComponent = Headphones; break;
+                                            default: IconComponent = BookOpen; break;
+                                        }
+
+                                        // Ensure a valid color is used
+                                        const finalColor = hexColor || '#10B981';
+                                        
+                                        // Simple heuristic to create a light background color from the solid hex by applying low opacity
+                                        // But here we can just use a generic light gray or matching very light background since we can't easily parse hex in basic JS without a lib. 
+                                        // Actually, we can use the opacity tailwind hack or just set it to #f3f4f6 (gray-100) or similar.
+                                        // For now, let's use a very light color or just the emerald one since we control the hex anyway.
+                                        // To make it look good, let's use a standard light background.
+                                        const bg = `${finalColor}1A`; // 10% opacity hex
+
+                                        return {
+                                            id: cat.slug,
+                                            label: cat.name,
+                                            icon: IconComponent,
+                                            color: finalColor,
+                                            bg: bg
+                                        };
+                                    })
+                                ];
+
+                                return dynamicCategories.map((cat) => {
+                                    const isActive = selectedCategory === cat.id;
+                                    return (
+                                        <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className="flex flex-col items-center gap-1.5 min-w-[60px] snap-center">
+                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-sm transition-all ${isActive ? 'ring-2 ring-offset-1' : ''}`} style={{ backgroundColor: cat.bg, outlineColor: cat.color }}>
+                                                <cat.icon className="w-5 h-5 stroke-[1.5]" style={{ color: cat.color }} />
+                                            </div>
+                                            <div className="flex flex-col items-center w-full">
+                                                <span className="text-[10px] font-bold text-center leading-tight w-full truncate px-0.5" style={{ color: isActive ? '#6366F1' : '#475569' }}>
+                                                    {cat.label}
+                                                </span>
+                                                {isActive && (
+                                                    <div className="w-4 h-[2px] bg-[#6366F1] mt-0.5 rounded-full"></div>
+                                                )}
+                                            </div>
+                                        </button>
+                                    );
+                                });
+                            })()}
                         </div>
 
                         {/* Banner */}
