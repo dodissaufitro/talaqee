@@ -94,20 +94,26 @@ class GoogleAuthController extends Controller
                     
                     return redirect()->intended('/');
                 } else {
-                    // Jika user belum ada, daftarkan
-                    $user = User::create([
-                        'name' => $name,
-                        'email' => $email,
-                        'google_id' => $googleId,
-                        'avatar' => $avatar,
-                        'password' => bcrypt(\Illuminate\Support\Str::random(16))
+                    // Jika user belum ada, kirim OTP
+                    $otp = rand(100000, 999999);
+
+                    // Send OTP via Email
+                    \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\OtpMail($otp));
+
+                    // Save data to session
+                    session([
+                        'google_register' => [
+                            'name' => $name,
+                            'email' => $email,
+                            'google_id' => $googleId,
+                            'avatar' => $avatar,
+                        ],
+                        'google_otp' => $otp,
+                        'google_otp_expires_at' => now()->addMinutes(5)
                     ]);
-                    // Secara default assign role 'customer'
-                    $user->assignRole('customer');
 
-                    Auth::login($user);
-
-                    return redirect()->intended('/');
+                    // Redirect to OTP verification page
+                    return redirect()->route('google.otp.form');
                 }
             } else {
                 return back()->withErrors(['email' => 'Token Google tidak valid']);
