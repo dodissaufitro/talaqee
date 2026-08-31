@@ -112,8 +112,12 @@ class GoogleAuthController extends Controller
             } else {
                 return response()->json(['error' => 'Token Google tidak valid'], 401);
             }
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Gagal memverifikasi token: ' . $e->getMessage()], 500);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'Server Error: ' . $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
         }
     }
 }
