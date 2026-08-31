@@ -33,26 +33,19 @@ class GoogleAuthController extends Controller
 
                 Auth::login($user);
             } else {
-                // Create a 6-digit OTP
-                $otp = rand(100000, 999999);
-
-                // Send OTP via Email
-                \Illuminate\Support\Facades\Mail::to($googleUser->getEmail())->send(new \App\Mail\OtpMail($otp));
-
-                // Save data to session
-                session([
-                    'google_register' => [
-                        'name' => $googleUser->getName(),
-                        'email' => $googleUser->getEmail(),
-                        'google_id' => $googleUser->getId(),
-                        'avatar' => $googleUser->getAvatar(),
-                    ],
-                    'google_otp' => $otp,
-                    'google_otp_expires_at' => now()->addMinutes(5)
+                // Jika user belum ada, daftarkan dan auto-login (bypass OTP)
+                $user = User::create([
+                    'name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'password' => bcrypt(\Illuminate\Support\Str::random(16))
                 ]);
+                
+                // Secara default assign role 'customer'
+                $user->assignRole('customer');
 
-                // Redirect to OTP verification page
-                return redirect()->route('google.otp.form');
+                Auth::login($user);
             }
 
             return redirect()->route('home');
@@ -94,26 +87,21 @@ class GoogleAuthController extends Controller
                     
                     return redirect()->intended('/');
                 } else {
-                    // Jika user belum ada, kirim OTP
-                    $otp = rand(100000, 999999);
-
-                    // Send OTP via Email
-                    \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\OtpMail($otp));
-
-                    // Save data to session
-                    session([
-                        'google_register' => [
-                            'name' => $name,
-                            'email' => $email,
-                            'google_id' => $googleId,
-                            'avatar' => $avatar,
-                        ],
-                        'google_otp' => $otp,
-                        'google_otp_expires_at' => now()->addMinutes(5)
+                    // Jika user belum ada, daftarkan dan auto-login (bypass OTP)
+                    $user = User::create([
+                        'name' => $name,
+                        'email' => $email,
+                        'google_id' => $googleId,
+                        'avatar' => $avatar,
+                        'password' => bcrypt(\Illuminate\Support\Str::random(16))
                     ]);
+                    
+                    // Secara default assign role 'customer'
+                    $user->assignRole('customer');
 
-                    // Redirect to OTP verification page
-                    return redirect()->route('google.otp.form');
+                    Auth::login($user);
+
+                    return redirect()->intended('/');
                 }
             } else {
                 return back()->withErrors(['email' => 'Token Google tidak valid']);
