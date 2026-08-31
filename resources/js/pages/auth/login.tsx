@@ -2,6 +2,7 @@ import { Head, useForm, Link } from '@inertiajs/react';
 import { LoaderCircle, User, Lock, Eye, EyeOff, BookOpen, Bookmark, Coins, Globe, Mail, Star, ShieldCheck } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
+import axios from 'axios';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { router } from '@inertiajs/react';
 
@@ -38,12 +39,25 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 });
                 const user = await GoogleAuth.signIn();
                 const idToken = user.authentication.idToken;
-                router.post(route('google.native.login'), { idToken });
+                
+                try {
+                    const response = await axios.post(route('google.native.login'), { idToken });
+                    if (response.data && response.data.redirect) {
+                        window.location.href = response.data.redirect;
+                    } else {
+                        window.location.href = '/';
+                    }
+                } catch (err: any) {
+                    const errorMsg = err.response?.data?.error || err.message || 'Unknown error occurred';
+                    console.error("Backend Error:", err);
+                    alert("Gagal memverifikasi login Google: " + errorMsg);
+                }
             } else {
                 window.location.href = '/auth/google';
             }
         } catch (error) {
             console.error('Google Sign-In Error:', error);
+            alert("Google Sign-In Dibatalkan atau Gagal: " + JSON.stringify(error));
         }
     };
 
