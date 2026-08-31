@@ -67,7 +67,7 @@ class GoogleAuthController extends Controller
         $idToken = $request->input('idToken');
 
         if (!$idToken) {
-            return response()->json(['error' => 'idToken tidak ditemukan'], 400);
+            return back()->withErrors(['email' => 'Token Google tidak ditemukan.']);
         }
 
         try {
@@ -92,10 +92,7 @@ class GoogleAuthController extends Controller
 
                     Auth::login($user);
                     
-                    return response()->json([
-                        'message' => 'Login berhasil',
-                        'redirect' => '/'
-                    ]);
+                    return redirect()->intended('/');
                 } else {
                     // Jika user belum ada, daftarkan
                     $user = User::create([
@@ -110,16 +107,13 @@ class GoogleAuthController extends Controller
 
                     Auth::login($user);
 
-                    return response()->json([
-                        'message' => 'Registrasi berhasil',
-                        'redirect' => '/'
-                    ]);
+                    return redirect()->intended('/');
                 }
             } else {
-                return response()->json(['error' => 'Token tidak valid'], 401);
+                return back()->withErrors(['email' => 'Token Google tidak valid']);
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Gagal memverifikasi token: ' . $e->getMessage()], 500);
+            return back()->withErrors(['email' => 'Gagal memverifikasi token: ' . $e->getMessage()]);
         }
     }
 }
