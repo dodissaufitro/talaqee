@@ -12,17 +12,17 @@ class AudioPageController extends Controller
             return \App\Models\Category::withCount('videos')->get();
         });
         
-        $audios = \App\Models\Audio::with(['category', 'user'])
+        $audios = auth()->check() ? \App\Models\Audio::with(['category', 'user'])
             ->where('user_id', auth()->id())
             ->orderBy('created_at', 'desc')
             ->take(30)
-            ->get();
+            ->get() : collect();
             
-        $setorans = \App\Models\UserRecording::with(['ayah.surah'])
+        $setorans = auth()->check() ? \App\Models\UserRecording::with(['ayah.surah'])
             ->where('user_id', auth()->id())
             ->orderBy('created_at', 'desc')
             ->take(30)
-            ->get();
+            ->get() : collect();
 
         $surahs = \Illuminate\Support\Facades\Cache::remember('all_surahs', 3600 * 24, function () {
             return \App\Models\Surah::orderBy('number')->get();

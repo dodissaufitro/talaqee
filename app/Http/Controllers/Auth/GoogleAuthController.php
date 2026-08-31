@@ -61,4 +61,65 @@ class GoogleAuthController extends Controller
             return redirect()->route('login')->with('error', 'Terjadi kesalahan saat login menggunakan Google.');
         }
     }
+
+    public function nativeLogin(Request $request)
+    {
+        $idToken = $request->input('idToken');
+
+        if (!$idToken) {
+            return response()->json(['error' => 'idToken tidak ditemukan'], 400);
+        }
+
+        try {
+            $client = new \Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+            $payload = $client->verifyIdToken($idToken);
+
+            if ($payload) {
+                $email = $payload['email'];
+                $googleId = $payload['sub'];
+                $name = $payload['name'];
+                $avatar = $payload['picture'];
+
+                $user = User::where('email', $email)->first();
+
+                if ($user) {
+                    $updateData = [];
+                    if (!$user->google_id) {
+                        $updateData['google_id'] = $googleId;
+                    }
+                    $updateData['avatar'] = $avatar;
+                    $user->update($updateData);
+
+                    Auth::login($user);
+                    
+                    return response()->json([
+                        'message' => 'Login berhasil',
+                        'redirect' => '/'
+                    ]);
+                } else {
+                    // Jika user belum ada, daftarkan
+                    $user = User::create([
+                        'name' => $name,
+                        'email' => $email,
+                        'google_id' => $googleId,
+                        'avatar' => $avatar,
+                        'password' => bcrypt(\Illuminate\Support\Str::random(16))
+                    ]);
+                    // Secara default assign role 'customer'
+                    $user->assignRole('customer');
+
+                    Auth::login($user);
+
+                    return response()->json([
+                        'message' => 'Registrasi berhasil',
+                        'redirect' => '/'
+                    ]);
+                }
+            } else {
+                return response()->json(['error' => 'Token tidak valid'], 401);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Gagal memverifikasi token: ' . $e->getMessage()], 500);
+        }
+    }
 }

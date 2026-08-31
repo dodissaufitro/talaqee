@@ -117,13 +117,12 @@ Route::get('/refund-policy', function () {
 Route::get('/katalog', [\App\Http\Controllers\KatalogController::class, 'index'])->name('katalog.index');
 
 Route::get('/videos', [\App\Http\Controllers\VideoPageController::class, 'index'])->name('videos.index');
+Route::get('/audios', [\App\Http\Controllers\AudioPageController::class, 'index'])->name('audios.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/akun', function () {
         return Inertia::render('Akun/Index');
     })->name('akun.index');
-
-    Route::get('/audios', [\App\Http\Controllers\AudioPageController::class, 'index'])->name('audios.index');
 
     Route::get('/akun/edit-profil', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('akun.edit-profil');
     Route::put('/akun/edit-profil', [\App\Http\Controllers\ProfileController::class, 'update'])->name('akun.edit-profil.update');
@@ -217,11 +216,13 @@ Route::get('auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthControl
 // OTP Routes
 Route::get('auth/google/otp', [\App\Http\Controllers\Auth\OtpController::class, 'show'])->name('google.otp.form');
 Route::post('auth/google/otp', [\App\Http\Controllers\Auth\OtpController::class, 'verify'])->name('google.otp.verify');
+Route::post('auth/google/native', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'nativeLogin'])->name('google.native.login');
 
 // Alquran Routes
+Route::get('/alquran', [\App\Http\Controllers\QuranController::class, 'index'])->name('alquran.index');
+Route::get('/alquran/{surah}', [\App\Http\Controllers\QuranController::class, 'show'])->name('alquran.show');
+
 Route::middleware(['auth'])->group(function () {
-    Route::get('/alquran', [\App\Http\Controllers\QuranController::class, 'index'])->name('alquran.index');
-    Route::get('/alquran/{surah}', [\App\Http\Controllers\QuranController::class, 'show'])->name('alquran.show');
     Route::post('/alquran/recording', [\App\Http\Controllers\RecordingController::class, 'store'])->name('alquran.recording.store');
 });
 
