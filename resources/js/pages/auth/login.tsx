@@ -41,7 +41,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 const idToken = user.authentication.idToken;
                 
                 try {
-                    const response = await axios.post(route('google.native.login'), { idToken });
+                    const response = await axios.post('/auth/google/native', { idToken });
                     if (response.data && response.data.redirect) {
                         window.location.href = response.data.redirect;
                     } else {
