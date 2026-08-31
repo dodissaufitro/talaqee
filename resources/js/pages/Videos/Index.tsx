@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import React, { useState, useRef } from 'react';
 import {
     ArrowLeft, Bookmark, Share2, Play, Pause, Maximize2,
@@ -7,6 +7,7 @@ import {
     PlaySquare, CircleUserRound, Search, BookOpen, Heart, Activity, Globe, Users, Smile, Shield,
     Quote, ArrowRight, Star, Headphones
 } from 'lucide-react';
+import WebDesktopNav from '@/components/WebDesktopNav';
 
 interface Author {
     name: string;
@@ -41,6 +42,7 @@ interface VideoProps {
 }
 
 export default function VideoIndex({ categories, recentVideos, popularVideos }: VideoProps) {
+    const { auth } = usePage<any>().props;
     const getImageUrl = (path?: string | null, fallback: string = '/images/placeholders/video-thumb.svg') => {
         if (!path) return fallback;
         if (path.startsWith('http') || path.startsWith('/')) return path;
@@ -390,43 +392,7 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
             <Head title="Video Kajian - Talaqee" />
 
             {/* Top Navigation */}
-            <nav className="bg-white sticky top-0 z-50">
-                <div className="w-full px-6 md:px-12 lg:px-20 py-4 flex items-center justify-between">
-                    {/* Logo */}
-                    <Link href={route('home')} className="flex items-center gap-2">
-                        <img src="/logo/logo_app.talaqee.png" alt="Talaqee Logo" className="h-10 w-auto object-contain" />
-                    </Link>
-
-                    <div className="hidden lg:flex items-center gap-8 text-sm font-medium">
-                        <Link href={route('home')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Beranda</Link>
-                        <Link href={route('katalog.index')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Katalog</Link>
-                        <Link href={route('videos.index')} className="text-[#7e57c2] border-b-2 border-[#7e57c2] py-4">Video Kajian</Link>
-                        <Link href={route('audios.index')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Rekaman Audio</Link>
-                        <Link href="#" className="text-gray-600 hover:text-[#7e57c2] transition-colors">Tentang Kami</Link>
-                        <Link href={route('faq.index')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">FAQ</Link>
-                    </div>
-
-                    {/* Right Actions */}
-                    <div className="flex items-center gap-4">
-                        <div className="relative hidden md:block">
-                            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input 
-                                type="text" 
-                                placeholder="Cari video..." 
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 pr-4 py-2 w-48 lg:w-64 text-sm border border-gray-200 rounded-full focus:outline-none focus:border-[#7e57c2] focus:ring-1 focus:ring-[#7e57c2] bg-gray-50 transition-all"
-                            />
-                        </div>
-                        <Link href={route('login')} className="px-5 py-2.5 text-sm font-semibold text-[#7e57c2] bg-white border-2 border-[#f3eefe] hover:bg-[#f3eefe] rounded-xl transition-colors">
-                            Masuk
-                        </Link>
-                        <Link href={route('register')} className="px-5 py-2.5 text-sm font-semibold text-white bg-[#7e57c2] hover:bg-[#6b48a8] rounded-xl transition-colors shadow-sm shadow-indigo-200">
-                            Daftar Gratis
-                        </Link>
-                    </div>
-                </div>
-            </nav>
+            <WebDesktopNav />
 
             {/* Hero Section */}
             <div className="relative bg-white overflow-hidden pb-10">

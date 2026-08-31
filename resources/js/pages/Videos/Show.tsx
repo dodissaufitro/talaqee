@@ -1,11 +1,12 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import React, { useState, useRef } from 'react';
 import {
     ArrowLeft, Bookmark, Share2, Play, Pause, Maximize2,
-    ThumbsUp, Download, List, Share, Eye, Calendar, User,
-    MoreVertical, ChevronDown, ChevronUp, Home, LayoutGrid,
+    ThumbsUp, Download, MessageSquare, Plus, CheckCircle, Info, FileText,
+    List, Share, Eye, Calendar, User, MoreVertical, ChevronDown, ChevronUp, Home, LayoutGrid,
     PlaySquare, CircleUserRound, Headphones, Search
 } from 'lucide-react';
+import WebDesktopNav from '@/components/WebDesktopNav';
 
 interface Author {
     id: number;
@@ -38,6 +39,7 @@ interface ShowProps {
 }
 
 export default function VideoShow({ video, relatedVideos }: ShowProps) {
+    const { auth } = usePage<any>().props;
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(26);
     const [showFullDesc, setShowFullDesc] = useState(false);
@@ -407,17 +409,7 @@ export default function VideoShow({ video, relatedVideos }: ShowProps) {
 
             {/* ─── DESKTOP ─── */}
             <div className="hidden md:block min-h-screen bg-gray-50">
-                <nav className="bg-white sticky top-0 z-50 border-b border-gray-100">
-                    <div className="w-full px-6 md:px-12 lg:px-20 py-4 flex items-center gap-6">
-                        <Link href="/videos" className="flex items-center gap-2 text-gray-600 hover:text-[#7e57c2] transition-colors">
-                            <ArrowLeft size={18} />
-                            <span className="text-sm font-medium">Kembali</span>
-                        </Link>
-                        <span className="text-gray-300">|</span>
-                        <span className="text-sm text-gray-500">{currentVideo.category?.name || 'Kajian Islam'}</span>
-                    </div>
-                </nav>
-
+                <WebDesktopNav />
                 <div className="w-full px-6 md:px-12 lg:px-20 py-10 flex flex-col lg:flex-row gap-8">
                     <div className="flex-1 min-w-0">
                         <div className="relative aspect-video bg-black rounded-2xl overflow-hidden mb-6 shadow-sm border border-gray-100">

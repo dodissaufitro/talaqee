@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { 
     BookOpen, Search, Grid, User, CreditCard, PlaySquare, Settings, Info, Headset, Phone, MessageCircle, Mail, ChevronDown, ChevronUp
 } from 'lucide-react';
+import WebDesktopNav from '@/components/WebDesktopNav';
 
 interface FaqCategory {
     id: string;
@@ -101,34 +102,7 @@ export default function FaqIndex({ faqs = [] }: { faqs: any[] }) {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:block bg-white sticky top-0 z-50 shadow-sm shadow-gray-100">
-                <div className="w-full px-6 md:px-12 lg:px-20 py-4 flex items-center justify-between">
-                    <Link href={route('home')} className="flex items-center gap-2">
-                        <img src="/logo/logo_app.talaqee.png" alt="Talaqee Logo" className="h-10 w-auto object-contain" />
-                    </Link>
-
-                    <div className="hidden lg:flex items-center gap-8 text-sm font-medium">
-                        <Link href={route('home')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Beranda</Link>
-                        <Link href={route('katalog.index')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Katalog</Link>
-                        <Link href={route('videos.index')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Video Kajian</Link>
-                        <Link href={route('audios.index')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Rekaman Audio</Link>
-                        <Link href="#" className="text-gray-600 hover:text-[#7e57c2] transition-colors">Tentang Kami</Link>
-                        <Link href={route('faq.index')} className="text-[#7e57c2] border-b-2 border-[#7e57c2] py-4">FAQ</Link>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <button className="text-gray-500 hover:text-gray-900 transition-colors p-2">
-                            <Search size={20} />
-                        </button>
-                        <Link href={route('login')} className="px-5 py-2.5 text-sm font-semibold text-[#7e57c2] bg-white border-2 border-[#f3eefe] hover:bg-[#f3eefe] rounded-xl transition-colors">
-                            Masuk
-                        </Link>
-                        <Link href={route('register')} className="px-5 py-2.5 text-sm font-semibold text-white bg-[#7e57c2] hover:bg-[#6b48a8] rounded-xl transition-colors shadow-sm shadow-indigo-200">
-                            Daftar Gratis
-                        </Link>
-                    </div>
-                </div>
-            </nav>
+            <WebDesktopNav />
 
             {/* Hero Section */}
             <div className="relative bg-[#f8f5ff] overflow-hidden pt-20 pb-16 border-b border-[#e9dfff]">
