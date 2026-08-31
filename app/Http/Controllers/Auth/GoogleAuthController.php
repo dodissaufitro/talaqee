@@ -42,8 +42,8 @@ class GoogleAuthController extends Controller
                     'password' => bcrypt(\Illuminate\Support\Str::random(16))
                 ]);
                 
-                // Secara default assign role 'customer'
-                $user->assignRole('customer');
+                // Secara default assign role 'user'
+                $user->assignRole('user');
 
                 Auth::login($user);
             }
@@ -99,8 +99,8 @@ class GoogleAuthController extends Controller
                         'password' => bcrypt(\Illuminate\Support\Str::random(16))
                     ]);
                     
-                    // Secara default assign role 'customer'
-                    $user->assignRole('customer');
+                    // Secara default assign role 'user'
+                    $user->assignRole('user');
 
                     Auth::login($user);
 
