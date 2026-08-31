@@ -114,11 +114,11 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
 
                         <div className="hidden lg:flex items-center gap-8 text-sm font-medium">
                             <Link href={route('home')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Beranda</Link>
-                            <Link href={route('katalog.index')} className="text-[#7e57c2] border-b-2 border-[#7e57c2] py-4">Katalog</Link>
+                            <Link href={route('katalog.index')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Katalog</Link>
                             <Link href={route('videos.index')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Video Kajian</Link>
                             <Link href={route('audios.index')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Rekaman Audio</Link>
-                            <Link href="#" className="text-gray-600 hover:text-[#7e57c2] transition-colors">Tentang Kami</Link>
                             <Link href={route('faq.index')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">FAQ</Link>
+                            <Link href={route('refund.policy')} className="text-gray-600 hover:text-[#7e57c2] transition-colors">Refund Policy</Link>
                         </div>
 
                         {/* Right Actions */}
