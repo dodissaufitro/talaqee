@@ -358,7 +358,7 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                             { id: 'katalog', label: 'Kategori', icon: LayoutGrid, route: '/katalog' },
                             { id: 'video', label: 'Video Saya', icon: PlaySquare, route: '/videos', active: true },
                             { id: 'rekaman', label: 'Rekaman', icon: Headphones, route: '/audios' },
-                            { id: 'akun', label: 'Akun', icon: CircleUserRound, route: '/akun' },
+                            { id: 'akun', label: 'Akun', icon: CircleUserRound, route: (typeof auth !== 'undefined' && auth?.user) ? '/akun' : '/login' },
                         ].map((item) => (
                             <Link prefetch={['mount', 'hover']} href={item.route} key={item.id} className="flex flex-col items-center justify-center w-16 gap-1.5 relative mt-1">
                                 {item.active ? (

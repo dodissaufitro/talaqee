@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Talaqee',
   webDir: 'public',
   server: {
-    url: 'http://182.16.255.93:8083',
+    url: 'https://app.talaqee.com/',
     cleartext: true
   },
   plugins: {

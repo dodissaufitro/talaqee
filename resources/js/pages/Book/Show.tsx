@@ -451,7 +451,7 @@ export default function Show({ book, chapters = [], purchased_chapter_ids = [] }
                         { id: 'katalog', label: 'Katalog', icon: LayoutGrid, active: true, route: '/katalog' },
                         { id: 'video', label: 'Video Saya', icon: PlaySquare, route: '/videos' },
                         { id: 'rekaman', label: 'Rekaman', icon: Headphones, route: '/audios' },
-                        { id: 'akun', label: 'Akun', icon: CircleUserRound, route: '/akun' }
+                        { id: 'akun', label: 'Akun', icon: CircleUserRound, route: (typeof auth !== 'undefined' && auth?.user) ? '/akun' : '/login' }
                     ].map((item) => {
                         const Icon = item.icon as React.ElementType;
                         return (
