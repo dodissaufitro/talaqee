@@ -31,6 +31,11 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const handleGoogleLogin = async () => {
         try {
             if (Capacitor.isNativePlatform()) {
+                GoogleAuth.initialize({
+                    clientId: '799984616839-2ur3dn8u55rbdsibesfe9td9pf92du6u.apps.googleusercontent.com',
+                    scopes: ['profile', 'email'],
+                    grantOfflineAccess: true,
+                });
                 const user = await GoogleAuth.signIn();
                 const idToken = user.authentication.idToken;
                 router.post(route('google.native.login'), { idToken });
