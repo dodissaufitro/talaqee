@@ -142,7 +142,7 @@ const AyahRow = ({ ayah, surahName, surahId }: { ayah: Ayah, surahName: string, 
 
             {/* Teks Arab */}
             <div className="text-center mb-2">
-                <p className="text-[22px] text-gray-900" style={{ fontFamily: "'Scheherazade New', serif, 'Amiri', Arial", lineHeight: '1.6' }}>
+                <p className="text-[28px] text-gray-900" style={{ fontFamily: "'Amiri Quran', 'Scheherazade New', serif", lineHeight: '2' }}>
                     {ayah.number_in_surah === 1 && surahId !== 1 && surahId !== 9 
                         ? ayah.text.replace(new RegExp(`^\\uFEFF?بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\\s*(?:۞\\s*)?`), '') 
                         : ayah.text}
@@ -319,7 +319,7 @@ export default function Show({ surah }: Props) {
                     </div>
 
                     <div className="relative z-10 py-10 px-5 text-center flex flex-col items-center justify-center">
-                        <h1 className="text-[42px] font-bold text-[#1E293B] mb-2 drop-shadow-sm" style={{ fontFamily: "'Scheherazade New', serif, Arial", lineHeight: '1.4' }}>
+                        <h1 className="text-[46px] font-bold text-[#1E293B] mb-2 drop-shadow-sm" style={{ fontFamily: "'Amiri Quran', 'Scheherazade New', serif", lineHeight: '1.6' }}>
                             {surah.name}
                         </h1>
                         <h2 className="text-[15px] font-semibold text-[#5C5AE6] tracking-wide">
@@ -333,7 +333,7 @@ export default function Show({ surah }: Props) {
                     {/* Bismillah Banner for non-Fatihah/Tawbah */}
                     {surah.id !== 1 && surah.id !== 9 && (
                         <div className="bg-white rounded-xl p-4 mb-4 shadow-sm border border-indigo-50 flex items-center justify-center">
-                            <p className="text-[24px] text-[#5C5AE6]" style={{ fontFamily: "'Scheherazade New', serif, 'Amiri', Arial", lineHeight: '1.6' }}>
+                            <p className="text-[28px] text-[#5C5AE6]" style={{ fontFamily: "'Amiri Quran', 'Scheherazade New', serif", lineHeight: '2' }}>
                                 بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                             </p>
                         </div>
@@ -397,7 +397,7 @@ export default function Show({ surah }: Props) {
                                 </div>
 
                                 <div className="relative z-10 py-16 px-10 text-center flex flex-col items-center justify-center">
-                                    <h1 className="text-5xl md:text-6xl font-bold text-[#1E293B] mb-4 drop-shadow-sm" style={{ fontFamily: "'Scheherazade New', serif, Arial", lineHeight: '1.4' }}>
+                                    <h1 className="text-5xl md:text-6xl font-bold text-[#1E293B] mb-4 drop-shadow-sm" style={{ fontFamily: "'Amiri Quran', 'Scheherazade New', serif", lineHeight: '1.6' }}>
                                         {surah.name}
                                     </h1>
                                     <h2 className="text-xl font-semibold text-[#5C5AE6] tracking-wide">

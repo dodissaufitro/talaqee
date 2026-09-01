@@ -45,7 +45,7 @@ export default function Index({ surahs }: Props) {
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xl font-arabic" style={{ fontFamily: "'Scheherazade New', serif, Arial" }}>{surah.name}</p>
+                                            <p className="text-2xl font-arabic" style={{ fontFamily: "'Amiri Quran', 'Scheherazade New', serif" }}>{surah.name}</p>
                                         </div>
                                     </Link>
                                 ))}
