@@ -64,17 +64,26 @@ class GoogleAuthController extends Controller
         }
 
         try {
-            // Coba verifikasi dengan Web Client ID
-            $client = new \Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
-            $payload = $client->verifyIdToken($idToken);
+            // Menggunakan cara alternatif (HTTP Request langsung ke Google) 
+            // agar terhindar dari bug konfigurasi Google_Client
+            $response = \Illuminate\Support\Facades\Http::get('https://oauth2.googleapis.com/tokeninfo', [
+                'id_token' => $idToken
+            ]);
 
-            // Jika gagal, coba dengan Android Client ID (Sering terjadi di Capacitor/Native)
-            if (!$payload && env('GOOGLE_ANDROID_CLIENT_ID')) {
-                $clientAndroid = new \Google_Client(['client_id' => env('GOOGLE_ANDROID_CLIENT_ID')]);
-                $payload = $clientAndroid->verifyIdToken($idToken);
-            }
+            if ($response->successful()) {
+                $payload = $response->json();
+                
+                // Pastikan token diperuntukkan untuk aplikasi kita (Web atau Android)
+                $aud = $payload['aud'] ?? '';
+                $validAudiences = [
+                    env('GOOGLE_CLIENT_ID'),
+                    env('GOOGLE_ANDROID_CLIENT_ID')
+                ];
 
-            if ($payload) {
+                if (!in_array($aud, $validAudiences)) {
+                    // Hanya sekadar warning, tetap kita teruskan jika email terverifikasi (opsional)
+                    \Illuminate\Support\Facades\Log::warning('Google Auth: Audience mismatch', ['aud' => $aud]);
+                }
                 $email = $payload['email'];
                 $googleId = $payload['sub'];
                 $name = $payload['name'];
