@@ -114,6 +114,15 @@ Route::get('/refund-policy', function () {
         'policyContent' => $page ? $page->content : ''
     ]);
 })->name('refund.policy');
+
+Route::get('/terms', function () {
+    return Inertia::render('Terms');
+})->name('terms');
+
+Route::get('/kontak', function () {
+    return Inertia::render('Contact');
+})->name('kontak');
+
 Route::get('/katalog', [\App\Http\Controllers\KatalogController::class, 'index'])->name('katalog.index');
 
 Route::get('/videos', [\App\Http\Controllers\VideoPageController::class, 'index'])->name('videos.index');

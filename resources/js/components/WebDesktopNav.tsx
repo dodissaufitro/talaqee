@@ -22,6 +22,8 @@ export default function WebDesktopNav() {
                     <Link href={route('audios.index')} className={route().current('audios.*') ? "text-[#7e57c2] border-b-2 border-[#7e57c2] py-4" : "text-gray-600 hover:text-[#7e57c2] transition-colors"}>Rekaman Audio</Link>
                     <Link href={route('faq.index')} className={route().current('faq.*') ? "text-[#7e57c2] border-b-2 border-[#7e57c2] py-4" : "text-gray-600 hover:text-[#7e57c2] transition-colors"}>FAQ</Link>
                     <Link href={route('refund.policy')} className={route().current('refund.policy') ? "text-[#7e57c2] border-b-2 border-[#7e57c2] py-4" : "text-gray-600 hover:text-[#7e57c2] transition-colors"}>Refund Policy</Link>
+                    <Link href={route('terms')} className={route().current('terms') ? "text-[#7e57c2] border-b-2 border-[#7e57c2] py-4" : "text-gray-600 hover:text-[#7e57c2] transition-colors"}>Syarat & Ketentuan</Link>
+                    <Link href={route('kontak')} className={route().current('kontak') ? "text-[#7e57c2] border-b-2 border-[#7e57c2] py-4" : "text-gray-600 hover:text-[#7e57c2] transition-colors"}>Kontak</Link>
                 </div>
 
                 {/* Right Actions */}

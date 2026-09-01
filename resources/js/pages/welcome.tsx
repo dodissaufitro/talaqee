@@ -290,6 +290,22 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                         </button>
                     </div>
                 </div>
+
+                {/* Footer Desktop */}
+                <footer className="w-full bg-white border-t border-gray-100 py-8 mt-10">
+                    <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-2">
+                            <img src="/logo/logo_app.talaqee.png" alt="Talaqee Logo" className="h-8 w-auto object-contain grayscale opacity-60" />
+                            <span className="text-sm text-gray-400">© 2026 Talaqee. All rights reserved.</span>
+                        </div>
+                        <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
+                            <Link href={route('faq.index')} className="hover:text-[#7e57c2] transition-colors">FAQ</Link>
+                            <Link href={route('refund.policy')} className="hover:text-[#7e57c2] transition-colors">Refund Policy</Link>
+                            <Link href={route('terms')} className="hover:text-[#7e57c2] transition-colors">Syarat & Ketentuan</Link>
+                            <Link href={route('kontak')} className="hover:text-[#7e57c2] transition-colors">Kontak</Link>
+                        </div>
+                    </div>
+                </footer>
             </div>
 
             {/* ─── MOBILE VIEW (BookStore Beranda) ─── */}
@@ -435,8 +451,16 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                     </div>
                 </div>
 
-
-
+                {/* Footer Mobile */}
+                <div className="px-5 mb-8 text-center">
+                    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mb-3 text-[11px] font-bold text-gray-500">
+                        <Link href={route('faq.index')} className="hover:text-blue-600">FAQ</Link>
+                        <Link href={route('refund.policy')} className="hover:text-blue-600">Refund Policy</Link>
+                        <Link href={route('terms')} className="hover:text-blue-600">Syarat & Ketentuan</Link>
+                        <Link href={route('kontak')} className="hover:text-blue-600">Kontak</Link>
+                    </div>
+                    <p className="text-[10px] text-gray-400">© 2026 Talaqee. All rights reserved.</p>
+                </div>
 
                 {/* Bottom Navigation */}
                 <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#F1F5F9] md:max-w-md md:mx-auto z-50">
