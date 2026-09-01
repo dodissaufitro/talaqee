@@ -64,8 +64,15 @@ class GoogleAuthController extends Controller
         }
 
         try {
+            // Coba verifikasi dengan Web Client ID
             $client = new \Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
             $payload = $client->verifyIdToken($idToken);
+
+            // Jika gagal, coba dengan Android Client ID (Sering terjadi di Capacitor/Native)
+            if (!$payload && env('GOOGLE_ANDROID_CLIENT_ID')) {
+                $clientAndroid = new \Google_Client(['client_id' => env('GOOGLE_ANDROID_CLIENT_ID')]);
+                $payload = $clientAndroid->verifyIdToken($idToken);
+            }
 
             if ($payload) {
                 $email = $payload['email'];
