@@ -58,20 +58,39 @@ class GoogleAuthController extends Controller
     public function nativeLogin(Request $request)
     {
         $idToken = $request->input('idToken');
+        $accessToken = $request->input('accessToken');
 
-        if (!$idToken) {
-            return response()->json(['error' => 'idToken tidak ditemukan'], 400);
+        if (!$idToken && !$accessToken) {
+            return response()->json(['error' => 'Token tidak ditemukan (idToken dan accessToken kosong)'], 400);
         }
 
         try {
-            // Menggunakan cara alternatif (HTTP Request langsung ke Google) 
-            // agar terhindar dari bug konfigurasi Google_Client
-            $response = \Illuminate\Support\Facades\Http::get('https://oauth2.googleapis.com/tokeninfo', [
-                'id_token' => $idToken
-            ]);
+            $payload = null;
+            $tokenSource = '';
 
-            if ($response->successful()) {
-                $payload = $response->json();
+            // 1. Coba verifikasi id_token
+            if ($idToken) {
+                $response = \Illuminate\Support\Facades\Http::get('https://oauth2.googleapis.com/tokeninfo', [
+                    'id_token' => $idToken
+                ]);
+                if ($response->successful()) {
+                    $payload = $response->json();
+                    $tokenSource = 'id_token';
+                }
+            }
+
+            // 2. Jika id_token gagal/kosong, coba verifikasi access_token
+            if (!$payload && $accessToken) {
+                $response2 = \Illuminate\Support\Facades\Http::get('https://oauth2.googleapis.com/tokeninfo', [
+                    'access_token' => $accessToken
+                ]);
+                if ($response2->successful()) {
+                    $payload = $response2->json();
+                    $tokenSource = 'access_token';
+                }
+            }
+
+            if ($payload) {
                 
                 // Pastikan token diperuntukkan untuk aplikasi kita (Web atau Android)
                 $aud = $payload['aud'] ?? '';
@@ -84,10 +103,14 @@ class GoogleAuthController extends Controller
                     // Hanya sekadar warning, tetap kita teruskan jika email terverifikasi (opsional)
                     \Illuminate\Support\Facades\Log::warning('Google Auth: Audience mismatch', ['aud' => $aud]);
                 }
-                $email = $payload['email'];
-                $googleId = $payload['sub'];
-                $name = $payload['name'];
-                $avatar = $payload['picture'];
+                $email = $payload['email'] ?? null;
+                $googleId = $payload['sub'] ?? $payload['user_id'] ?? null;
+                $name = $payload['name'] ?? 'User'; // nama mungkin tidak ada di tokeninfo access_token
+                $avatar = $payload['picture'] ?? null;
+
+                if (!$email) {
+                    return response()->json(['error' => 'Email tidak ditemukan di token'], 401);
+                }
 
                 $user = User::where('email', $email)->first();
 
@@ -126,7 +149,11 @@ class GoogleAuthController extends Controller
                     ]);
                 }
             } else {
-                return response()->json(['error' => 'Token Google tidak valid'], 401);
+                return response()->json([
+                    'error' => 'Token Google tidak valid',
+                    'google_response' => $response->json(),
+                    'id_token_prefix' => substr($idToken, 0, 15) . '...'
+                ], 401);
             }
         } catch (\Throwable $e) {
             return response()->json([
