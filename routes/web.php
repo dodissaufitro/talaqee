@@ -128,6 +128,9 @@ Route::get('/katalog', [\App\Http\Controllers\KatalogController::class, 'index']
 Route::get('/videos', [\App\Http\Controllers\VideoPageController::class, 'index'])->name('videos.index');
 Route::get('/audios', [\App\Http\Controllers\AudioPageController::class, 'index'])->name('audios.index');
 
+// iPaymu Webhook Callback (Must be outside auth middleware)
+Route::post('/akun/topup/callback', [\App\Http\Controllers\TopUpController::class, 'callback'])->name('topup.callback');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/akun', function () {
         return Inertia::render('Akun/Index');
@@ -149,7 +152,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/akun/topup/checkout', [\App\Http\Controllers\TopUpController::class, 'checkout'])->name('topup.checkout');
     Route::get('/akun/topup/success', [\App\Http\Controllers\TopUpController::class, 'success'])->name('topup.success');
     Route::get('/akun/topup/cancel', [\App\Http\Controllers\TopUpController::class, 'cancel'])->name('topup.cancel');
-    Route::post('/akun/topup/callback', [\App\Http\Controllers\TopUpController::class, 'callback'])->name('topup.callback');
 
     Route::get('/akun/topup', function () {
         return Inertia::render('Akun/TopUp');
