@@ -39,9 +39,10 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 });
                 const user = await GoogleAuth.signIn();
                 const idToken = user.authentication.idToken;
+                const accessToken = user.authentication.accessToken;
                 
                 try {
-                    const response = await axios.post('/auth/google/native', { idToken });
+                    const response = await axios.post('/auth/google/native', { idToken, accessToken });
                     if (response.data && response.data.redirect) {
                         window.location.href = response.data.redirect;
                     } else {
