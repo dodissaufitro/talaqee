@@ -55,6 +55,7 @@ export default function Show({ book, chapters = [], purchased_chapter_ids = [] }
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [selectedCoinPackage, setSelectedCoinPackage] = useState<number | null>(250);
     const [userRating, setUserRating] = useState(5);
+    const [reviewText, setReviewText] = useState('');
 
     const displayChapters = chapters;
 
@@ -366,11 +367,10 @@ export default function Show({ book, chapters = [], purchased_chapter_ids = [] }
                 {auth?.user ? (
                     <form onSubmit={(e) => {
                         e.preventDefault();
-                        const fd = new FormData(e.currentTarget);
                         router.post(`/buku/${book.id}/review`, {
-                            rating: fd.get('rating'),
-                            review: fd.get('review')
-                        }, { preserveScroll: true, onSuccess: () => { (e.target as HTMLFormElement).reset(); } });
+                            rating: userRating,
+                            review: reviewText
+                        }, { preserveScroll: true, onSuccess: () => { setReviewText(''); setUserRating(5); } });
                     }} className="mb-6 bg-gray-50 rounded-xl p-4 border border-gray-100">
                         <h4 className="text-[13px] font-bold text-gray-900 mb-3">Tulis Ulasan Anda</h4>
                         
@@ -388,11 +388,18 @@ export default function Show({ book, chapters = [], purchased_chapter_ids = [] }
                                     </button>
                                 ))}
                             </div>
-                            <input type="hidden" name="rating" value={userRating} />
                         </div>
                         <div className="mb-4">
                             <label className="block text-[11px] font-medium text-gray-700 mb-1.5">Komentar</label>
-                            <textarea name="review" rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:ring-1 focus:ring-blue-500 outline-none" placeholder="Tuliskan pendapat Anda tentang buku ini..." required></textarea>
+                            <textarea 
+                                name="review" 
+                                rows={3} 
+                                value={reviewText}
+                                onChange={(e) => setReviewText(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 resize-none focus:ring-1 focus:ring-blue-500 outline-none" 
+                                placeholder="Tuliskan pendapat Anda tentang buku ini..." 
+                                required
+                            ></textarea>
                         </div>
                         <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[12px] px-5 py-2.5 rounded-lg transition-colors w-full sm:w-auto text-center shadow-sm">
                             Kirim Ulasan
