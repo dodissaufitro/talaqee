@@ -38,7 +38,7 @@ export default function WebDesktopNav() {
                     </div>
                     
                     {user ? (
-                        <Link href={route('dashboard')} className="px-5 py-2.5 text-sm font-semibold text-white bg-[#7e57c2] hover:bg-[#6b48a8] rounded-xl transition-colors shadow-sm shadow-indigo-200">
+                        <Link href={route('akun.index')} className="px-5 py-2.5 text-sm font-semibold text-white bg-[#7e57c2] hover:bg-[#6b48a8] rounded-xl transition-colors shadow-sm shadow-indigo-200">
                             Dashboard
                         </Link>
                     ) : (
