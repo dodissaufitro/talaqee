@@ -400,120 +400,120 @@ export default function AudioIndex({ categories, audios, setorans = [], surahs =
             <WebDesktopNav />
 
             {/* Hero Section */}
-            <div className="relative bg-white overflow-hidden pb-12 pt-16">
+            <div className="relative bg-white pt-14 pb-[130px] overflow-hidden">
                 {/* Background Image / Pattern */}
-                <div className="absolute top-0 right-0 w-full md:w-3/4 h-full hidden md:block">
-                    {/* Abstract Soundwave Graphic behind Mosque */}
-                    <div className="absolute inset-0 z-0 flex items-center justify-center opacity-30">
-                        {Array.from({length: 100}).map((_, i) => (
-                            <div key={i} className="w-1.5 mx-0.5 bg-[#7e57c2] rounded-full" style={{ height: `${Math.sin(i*0.2) * 50 + 50}%` }}></div>
-                        ))}
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent z-10"></div>
-                    <img src="/images/mosque_hero.png" alt="Mosque" className="absolute top-0 right-0 w-2/3 h-full object-cover object-left-top opacity-50 z-10" />
+                <div className="absolute top-0 right-0 w-full md:w-[65%] h-full hidden md:block pointer-events-none">
+                    <img 
+                        src="/images/mosque_hero.png" 
+                        alt="Mosque" 
+                        className="w-full h-full object-cover object-[center_right] opacity-95"
+                        style={{
+                            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
+                            maskImage: 'linear-gradient(to right, transparent 0%, black 40%)'
+                        }}
+                    />
                 </div>
 
-                <div className="w-full px-6 md:px-12 lg:px-20 relative z-20 flex flex-col md:flex-row gap-12 items-center">
+                {/* Wavy bottom */}
+                <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20">
+                    <svg viewBox="0 0 1440 120" className="w-full h-[60px] md:h-[100px] block" preserveAspectRatio="none">
+                        <path d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,42.7C1120,32,1280,32,1360,32L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z" fill="#f9fafb"></path>
+                    </svg>
+                </div>
+
+                <div className="w-full px-6 md:px-10 lg:px-16 relative z-30 flex flex-col md:flex-row gap-10 items-center max-w-[1600px] mx-auto">
+                    
                     {/* Left: Titles & Search */}
                     <div className="w-full md:w-1/2">
-                        <h1 className="text-4xl md:text-[42px] font-extrabold text-[#1f2937] leading-tight mb-3">
+                        <h1 className="text-[40px] lg:text-[46px] font-extrabold text-[#111827] leading-tight mb-2 tracking-tight">
                             Rekaman Audio
                         </h1>
-                        <p className="text-gray-600 text-lg mb-8 font-medium">
+                        <p className="text-slate-500 text-[15px] mb-8 font-medium">
                             Dengarkan kajian ilmiah kapan saja dan di mana saja
                         </p>
 
-                        <div className="relative bg-white p-2 rounded-2xl shadow-lg shadow-gray-200/50 flex items-center border border-gray-100 max-w-xl">
-                            <div className="pl-4 pr-3 text-gray-400">
-                                <Search size={20} />
+                        {/* Search Bar */}
+                        <div className="relative bg-white border border-gray-200 rounded-[10px] flex items-center p-1.5 shadow-[0_2px_10px_rgb(0,0,0,0.03)] max-w-[460px]">
+                            <div className="pl-3 pr-2 text-slate-400">
+                                <Search size={18} strokeWidth={2.5} />
                             </div>
                             <input 
                                 type="text" 
                                 placeholder="Cari rekaman audio, ustadz, atau topik..."
-                                className="w-full border-none focus:ring-0 text-gray-700 bg-transparent py-3 placeholder:text-gray-400 text-base"
+                                className="w-full border-none focus:ring-0 text-slate-700 bg-transparent py-2 placeholder:text-slate-400 text-[14px] outline-none"
                             />
-                            <button className="bg-[#7e57c2] hover:bg-[#6b48a8] text-white px-8 py-3.5 rounded-xl font-semibold transition-colors shrink-0">
+                            <button className="bg-[#6c40e6] hover:bg-[#5b32cc] text-white px-7 py-2.5 rounded-[8px] text-[14px] font-semibold transition-colors shrink-0">
                                 Cari
                             </button>
                         </div>
                     </div>
 
                     {/* Right: Quote Block */}
-                    <div className="w-full md:w-1/2 flex justify-end">
-                        <div className="max-w-sm mr-10 relative">
-                            <Quote size={40} className="text-[#7e57c2] absolute -top-4 -left-6 opacity-80" fill="currentColor" />
-                            <p className="text-lg font-medium text-gray-800 leading-relaxed relative z-10">
-                                Ilmu adalah warisan para nabi. Ambillah ilmu sebelum hilang, yaitu dengan wafatnya para ulama.
+                    <div className="w-full md:w-1/2 flex justify-start md:pl-10 mt-8 md:mt-0">
+                        <div className="max-w-[320px]">
+                            <div className="text-[#8155ff] mb-4">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 9C10 6.23858 7.76142 4 5 4C2.23858 4 0 6.23858 0 9C0 11.2312 1.45892 13.1207 3.48627 13.7915C2.65809 15.656 0.817366 17.1593 0.771965 17.1952C0.334057 17.5413 0.25875 18.1778 0.604886 18.6157C0.951022 19.0536 1.58756 19.1289 2.02547 18.7828C2.17647 18.6635 4.90807 16.4867 6.46328 13.1585C8.61111 12.027 10 9.7717 10 9ZM24 9C24 6.23858 21.7614 4 19 4C16.2386 4 14 6.23858 14 9C14 11.2312 15.4589 13.1207 17.4863 13.7915C16.6581 15.656 14.8174 17.1593 14.772 17.1952C14.3341 17.5413 14.2588 18.1778 14.6049 18.6157C14.951 19.0536 15.5876 19.1289 16.0255 18.7828C16.1765 18.6635 18.9081 16.4867 20.4633 13.1585C22.6111 12.027 24 9.7717 24 9Z" />
+                                </svg>
+                            </div>
+                            <p className="text-[15px] font-medium text-slate-700 leading-[1.6]">
+                                Ilmu adalah warisan para nabi.<br/>
+                                Ambillah ilmu sebelum hilang,<br/>
+                                yaitu dengan wafatnya<br/>
+                                para ulama.
                             </p>
-                            <p className="text-[#7e57c2] font-semibold mt-3 text-sm relative z-10">
+                            <p className="text-[#8155ff] font-semibold mt-4 text-[12px]">
                                 (HR. Ibnu Majah)
                             </p>
                         </div>
                     </div>
+
                 </div>
             </div>
 
-            {/* Horizontal Categories Pills */}
-            <div className="bg-white border-b border-gray-100 py-4 shadow-sm mb-10 sticky top-[73px] z-40">
-                <div className="w-full px-6 md:px-12 lg:px-20 flex items-center gap-3 overflow-x-auto scrollbar-hide">
-                    <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#f3eefe] text-[#7e57c2] font-semibold border border-[#e9dfff] shrink-0">
-                        <Activity size={18} />
-                        <span className="text-sm">Semua</span>
-                    </button>
-                    
-                    {categories.map((cat, idx) => {
-                        const colors = [
-                            'text-emerald-600', 'text-blue-600', 'text-orange-600', 'text-teal-600',
-                            'text-rose-600', 'text-indigo-600', 'text-amber-600', 'text-sky-600'
-                        ];
-                        const color = colors[idx % colors.length];
-                        
-                        return (
-                            <button key={cat.id} className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-gray-50 text-gray-600 font-medium border border-gray-200 shrink-0 transition-colors">
-                                <div className={color}>{getCategoryIcon(cat.name)}</div>
-                                <span className="text-sm">{cat.name}</span>
-                            </button>
-                        )
-                    })}
-
-                    <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-gray-50 text-gray-600 font-medium border border-gray-200 shrink-0 transition-colors">
-                        <MoreVertical size={18} className="rotate-90" />
-                        <span className="text-sm">Lainnya</span>
-                    </button>
-                </div>
-            </div>
-
-            {/* Main Content (2 Columns) */}
-            <div className="w-full px-6 md:px-12 lg:px-20 flex flex-col md:flex-row gap-10">
+            {/* Main Content */}
+            <div className="w-full px-6 md:px-10 lg:px-16 py-8 flex flex-col lg:flex-row gap-8 max-w-[1600px] mx-auto">
                 
                 {/* Left Sidebar (Filters) */}
-                <div className="w-full md:w-64 shrink-0 space-y-8">
+                <div className="w-full lg:w-[260px] shrink-0 space-y-8">
+                    
                     {/* Kategori */}
-                    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                        <h3 className="font-bold text-gray-900 mb-4 px-2">Kategori</h3>
-                        <div className="space-y-1">
-                            <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors bg-[#f3eefe] text-[#7e57c2] font-semibold">
+                    <div>
+                        <h3 className="font-bold text-gray-900 mb-3 text-[15px] px-1">Kategori</h3>
+                        <div className="bg-white rounded-2xl py-2.5 border border-gray-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)] space-y-0.5">
+                            <button 
+                                className="w-full flex items-center justify-between px-4 py-2.5 transition-colors bg-[#f4f0ff] border-l-2 border-[#6c40e6] text-[#6c40e6]"
+                            >
                                 <div className="flex items-center gap-3">
-                                    <Activity size={16} />
-                                    <span className="text-sm">Semua Kategori</span>
+                                    <Activity size={16} className="text-[#6c40e6]" strokeWidth={2.5} />
+                                    <span className="text-[13px] font-bold">Semua Kategori</span>
                                 </div>
-                                <span className="text-xs bg-white px-2 py-0.5 rounded-md">256</span>
+                                <span className="text-[12px] font-semibold text-[#6c40e6]">
+                                    256
+                                </span>
                             </button>
 
                             {categories.map((cat, idx) => {
                                 const colors = [
                                     'text-emerald-500', 'text-blue-500', 'text-orange-500', 'text-teal-500',
-                                    'text-rose-500', 'text-indigo-500', 'text-amber-500', 'text-sky-500'
+                                    'text-rose-500', 'text-indigo-500', 'text-amber-500', 'text-sky-500', 'text-fuchsia-500'
                                 ];
                                 const color = colors[idx % colors.length];
 
                                 return (
-                                    <button key={cat.id} className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors text-gray-600 hover:bg-gray-50">
+                                    <button 
+                                        key={cat.id}
+                                        className="w-full flex items-center justify-between px-4 py-2.5 transition-colors text-gray-600 hover:bg-gray-50 border-l-2 border-transparent"
+                                    >
                                         <div className="flex items-center gap-3">
-                                            <div className={color}>{getCategoryIcon(cat.name)}</div>
-                                            <span className="text-sm">{cat.name}</span>
+                                            <div className={color}>
+                                                {getCategoryIcon(cat.name)}
+                                            </div>
+                                            <span className="text-[13px] font-medium">{cat.name}</span>
                                         </div>
-                                        <span className="text-xs text-gray-400">{cat.videos_count || Math.floor(Math.random() * 40) + 10}</span>
+                                        <span className="text-[12px] font-semibold text-gray-400">
+                                            {cat.videos_count || Math.floor(Math.random() * 30) + 5}
+                                        </span>
                                     </button>
                                 );
                             })}
@@ -521,92 +521,95 @@ export default function AudioIndex({ categories, audios, setorans = [], surahs =
                     </div>
 
                     {/* Filter */}
-                    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                        <h3 className="font-bold text-gray-900 mb-4 px-2">Filter</h3>
-                        
-                        <div className="mb-6 px-2">
-                            <h4 className="text-sm font-semibold text-gray-700 mb-3">Durasi</h4>
-                            <div className="space-y-3">
-                                <label className="flex items-center justify-between cursor-pointer group">
-                                    <div className="flex items-center gap-3">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#7e57c2] focus:ring-[#7e57c2]" />
-                                        <span className="text-sm text-gray-600 group-hover:text-gray-900">Pendek (&lt; 15 menit)</span>
-                                    </div>
-                                    <span className="text-xs text-gray-400">68</span>
-                                </label>
-                                <label className="flex items-center justify-between cursor-pointer group">
-                                    <div className="flex items-center gap-3">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#7e57c2] focus:ring-[#7e57c2]" />
-                                        <span className="text-sm text-gray-600 group-hover:text-gray-900">Sedang (15 - 60 menit)</span>
-                                    </div>
-                                    <span className="text-xs text-gray-400">132</span>
-                                </label>
-                                <label className="flex items-center justify-between cursor-pointer group">
-                                    <div className="flex items-center gap-3">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#7e57c2] focus:ring-[#7e57c2]" />
-                                        <span className="text-sm text-gray-600 group-hover:text-gray-900">Panjang (&gt; 60 menit)</span>
-                                    </div>
-                                    <span className="text-xs text-gray-400">56</span>
-                                </label>
+                    <div>
+                        <h3 className="font-bold text-gray-900 mb-3 text-[15px] px-1">Filter</h3>
+                        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)]">
+                            
+                            <div className="mb-6">
+                                <h4 className="text-[13px] font-bold text-gray-900 mb-3">Durasi</h4>
+                                <div className="space-y-3.5">
+                                    <label className="flex items-center justify-between cursor-pointer group">
+                                        <div className="flex items-center gap-3">
+                                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#6c40e6] focus:ring-[#6c40e6]" />
+                                            <span className="text-[13px] text-gray-600 font-medium group-hover:text-gray-900">Pendek (&lt; 15 menit)</span>
+                                        </div>
+                                        <span className="text-[12px] text-gray-400">68</span>
+                                    </label>
+                                    <label className="flex items-center justify-between cursor-pointer group">
+                                        <div className="flex items-center gap-3">
+                                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#6c40e6] focus:ring-[#6c40e6]" />
+                                            <span className="text-[13px] text-gray-600 font-medium group-hover:text-gray-900">Sedang (15 - 60 menit)</span>
+                                        </div>
+                                        <span className="text-[12px] text-gray-400">132</span>
+                                    </label>
+                                    <label className="flex items-center justify-between cursor-pointer group">
+                                        <div className="flex items-center gap-3">
+                                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#6c40e6] focus:ring-[#6c40e6]" />
+                                            <span className="text-[13px] text-gray-600 font-medium group-hover:text-gray-900">Panjang (&gt; 60 menit)</span>
+                                        </div>
+                                        <span className="text-[12px] text-gray-400">56</span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="px-2">
-                            <h4 className="text-sm font-semibold text-gray-700 mb-3">Urutkan</h4>
-                            <div className="relative">
-                                <select className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:ring-[#7e57c2] focus:border-[#7e57c2] outline-none cursor-pointer">
-                                    <option>Terbaru</option>
-                                    <option>Terpopuler</option>
-                                    <option>Durasi (Terpanjang)</option>
-                                    <option>Durasi (Terpendek)</option>
-                                </select>
-                                <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                            <div>
+                                <h4 className="text-[13px] font-bold text-gray-900 mb-3">Urutkan</h4>
+                                <div className="relative">
+                                    <select className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-[13px] font-medium text-gray-700 focus:ring-[#6c40e6] focus:border-[#6c40e6] outline-none cursor-pointer">
+                                        <option>Terbaru</option>
+                                        <option>Terpopuler</option>
+                                        <option>Durasi (Terpanjang)</option>
+                                        <option>Durasi (Terpendek)</option>
+                                    </select>
+                                    <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 {/* Right Content (Audio List) */}
-                <div className="flex-1">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-gray-900">Terbaru</h2>
-                        <Link href="#" className="flex items-center gap-1 text-sm font-semibold text-[#7e57c2] hover:text-[#6b48a8] transition-colors">
-                            Lihat Semua <ArrowRight size={16} />
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-5">
+                        <h2 className="text-[18px] font-bold text-gray-900">Terbaru</h2>
+                        <Link href="#" className="flex items-center gap-1 text-[13px] font-semibold text-[#6c40e6] hover:text-[#5b32cc] transition-colors">
+                            Lihat Semua <ArrowRight size={14} />
                         </Link>
                     </div>
                     
-                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-2 flex flex-col mb-8">
+                    <div className="bg-white rounded-[20px] border border-gray-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)] p-2 flex flex-col mb-8">
                         {audios.length > 0 ? audios.map((audio, index) => (
-                            <div key={audio.id} className={`flex items-center gap-5 p-4 rounded-2xl hover:bg-gray-50 transition-colors group ${index !== audios.length - 1 ? 'border-b border-gray-50' : ''}`}>
+                            <div key={audio.id} className={`flex items-center gap-5 p-4 rounded-[14px] hover:bg-slate-50 transition-colors group ${index !== audios.length - 1 ? 'border-b border-gray-50' : ''}`}>
                                 
                                 {/* Image & Play Button */}
-                                <div className="relative w-32 h-20 rounded-xl overflow-hidden bg-gray-200 shrink-0 shadow-sm">
+                                <div className="relative w-28 h-20 rounded-[10px] overflow-hidden bg-gray-200 shrink-0 shadow-sm">
                                     <img 
                                         src={audio.cover || '/images/placeholders/video-thumb.svg'} 
                                         alt={audio.title}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
                                 </div>
-                                <button className="w-10 h-10 rounded-full bg-[#7e57c2] text-white flex items-center justify-center shrink-0 shadow-md shadow-[#7e57c2]/30 hover:bg-[#6b48a8] hover:scale-105 transition-all -ml-10 z-10">
+                                <button className="w-10 h-10 rounded-full bg-[#6c40e6] text-white flex items-center justify-center shrink-0 shadow-md shadow-[#6c40e6]/30 hover:bg-[#5b32cc] hover:scale-105 transition-all -ml-10 z-10">
                                     <Play size={18} className="ml-1" fill="currentColor" />
                                 </button>
 
                                 {/* Info */}
-                                <div className="flex-1 min-w-0 pr-4 border-r border-gray-100">
-                                    <h3 className="font-bold text-gray-900 text-[15px] leading-tight mb-1 group-hover:text-[#7e57c2] transition-colors truncate">
+                                <div className="flex-1 min-w-0 pr-4 lg:border-r border-gray-100">
+                                    <h3 className="font-bold text-gray-900 text-[14px] leading-tight mb-1 group-hover:text-[#6c40e6] transition-colors truncate">
                                         {audio.title}
                                     </h3>
-                                    <p className="text-sm text-gray-500 mb-1.5 truncate">
+                                    <p className="text-[13px] text-gray-500 mb-1.5 truncate">
                                         {audio.author?.name || 'Ustadz Anonim'}
                                     </p>
-                                    <div className="flex items-center gap-3 text-xs text-gray-400">
+                                    <div className="flex items-center gap-3 text-[11px] font-medium text-gray-400">
                                         <span className="flex items-center gap-1.5">
-                                            <Activity size={14} /> {formatPlays(audio.total_plays || Math.floor(Math.random() * 20000) + 1000)} plays
+                                            <Activity size={12} /> {formatPlays(audio.total_plays || Math.floor(Math.random() * 20000) + 1000)} plays
                                         </span>
                                         <span>•</span>
                                         <span>{timeAgo(audio.created_at || new Date().toISOString())}</span>
                                         {audio.category && (
-                                            <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-[#f3eefe] text-[#7e57c2]">
+                                            <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-[#f4f0ff] text-[#6c40e6]">
                                                 {audio.category.name}
                                             </span>
                                         )}
@@ -614,19 +617,19 @@ export default function AudioIndex({ categories, audios, setorans = [], surahs =
                                 </div>
 
                                 {/* Soundwave */}
-                                <div className="w-48 shrink-0 hidden lg:block pr-4">
+                                <div className="w-48 shrink-0 hidden lg:block pr-4 opacity-50 group-hover:opacity-100 transition-opacity">
                                     {generateSoundwave(audio.id, false)}
                                 </div>
 
                                 {/* Actions & Duration */}
-                                <div className="flex items-center gap-5 shrink-0 pl-2">
-                                    <span className="text-sm font-bold text-gray-700 w-12 text-center">
+                                <div className="flex items-center gap-4 shrink-0 pl-2">
+                                    <span className="text-[13px] font-bold text-gray-700 w-10 text-center">
                                         {formatDuration(audio.duration || Math.floor(Math.random() * 3000) + 600)}
                                     </span>
-                                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#7e57c2] hover:bg-[#f3eefe] transition-colors border border-transparent hover:border-[#e9dfff]">
-                                        <Download size={16} />
+                                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#6c40e6] hover:bg-[#f4f0ff] transition-colors border border-transparent">
+                                        <Download size={16} strokeWidth={2.5} />
                                     </button>
-                                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors">
+                                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-slate-100 transition-colors">
                                         <MoreVertical size={16} />
                                     </button>
                                 </div>
@@ -634,22 +637,22 @@ export default function AudioIndex({ categories, audios, setorans = [], surahs =
                             </div>
                         )) : (
                             Array(5).fill(null).map((_, index) => (
-                                <div key={index} className={`flex items-center gap-5 p-4 rounded-2xl hover:bg-gray-50 transition-colors group ${index !== 4 ? 'border-b border-gray-50' : ''}`}>
-                                    <div className="relative w-32 h-20 rounded-xl overflow-hidden bg-slate-800 shrink-0 shadow-sm"></div>
-                                    <button className="w-10 h-10 rounded-full bg-[#7e57c2] text-white flex items-center justify-center shrink-0 shadow-md -ml-10 z-10"><Play size={18} className="ml-1" fill="currentColor" /></button>
-                                    <div className="flex-1 min-w-0 pr-4 border-r border-gray-100">
-                                        <h3 className="font-bold text-gray-900 text-[15px] mb-1">Tafsir Surat Al-Fatihah Ayat 1-7</h3>
-                                        <p className="text-sm text-gray-500 mb-1.5">Ustadz Dr. Firanda Andirja, MA</p>
-                                        <div className="flex items-center gap-3 text-xs text-gray-400">
+                                <div key={index} className={`flex items-center gap-5 p-4 rounded-[14px] hover:bg-slate-50 transition-colors group ${index !== 4 ? 'border-b border-gray-50' : ''}`}>
+                                    <div className="relative w-28 h-20 rounded-[10px] overflow-hidden bg-slate-800 shrink-0 shadow-sm"></div>
+                                    <button className="w-10 h-10 rounded-full bg-[#6c40e6] text-white flex items-center justify-center shrink-0 shadow-md shadow-[#6c40e6]/30 hover:bg-[#5b32cc] -ml-10 z-10"><Play size={18} className="ml-1" fill="currentColor" /></button>
+                                    <div className="flex-1 min-w-0 pr-4 lg:border-r border-gray-100">
+                                        <h3 className="font-bold text-gray-900 text-[14px] mb-1 truncate">Tafsir Surat Al-Fatihah Ayat 1-7</h3>
+                                        <p className="text-[13px] text-gray-500 mb-1.5 truncate">Ustadz Dr. Firanda Andirja, MA</p>
+                                        <div className="flex items-center gap-3 text-[11px] font-medium text-gray-400">
                                             <span>23.4K plays</span><span>•</span><span>2 hari yang lalu</span>
-                                            <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-[#f3eefe] text-[#7e57c2]">Tafsir</span>
+                                            <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-[#f4f0ff] text-[#6c40e6]">Tafsir</span>
                                         </div>
                                     </div>
-                                    <div className="w-48 shrink-0 hidden lg:block pr-4">{generateSoundwave(index)}</div>
-                                    <div className="flex items-center gap-5 shrink-0 pl-2">
-                                        <span className="text-sm font-bold text-gray-700 w-12 text-center">45:12</span>
-                                        <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#7e57c2]"><Download size={16} /></button>
-                                        <button className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400"><MoreVertical size={16} /></button>
+                                    <div className="w-48 shrink-0 hidden lg:block pr-4 opacity-50 group-hover:opacity-100 transition-opacity">{generateSoundwave(index)}</div>
+                                    <div className="flex items-center gap-4 shrink-0 pl-2">
+                                        <span className="text-[13px] font-bold text-gray-700 w-10 text-center">45:12</span>
+                                        <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#6c40e6] hover:bg-[#f4f0ff]"><Download size={16} strokeWidth={2.5} /></button>
+                                        <button className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-slate-100"><MoreVertical size={16} /></button>
                                     </div>
                                 </div>
                             ))
@@ -657,8 +660,8 @@ export default function AudioIndex({ categories, audios, setorans = [], surahs =
                     </div>
 
                     <div className="flex justify-center">
-                        <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-gray-200 shadow-sm text-sm font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
-                            Muat Lebih Banyak <ChevronDown size={18} />
+                        <button className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm text-[13px] font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">
+                            Muat Lebih Banyak <ChevronDown size={16} strokeWidth={2.5} />
                         </button>
                     </div>
                 </div>

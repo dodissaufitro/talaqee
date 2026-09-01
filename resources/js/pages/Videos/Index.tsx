@@ -395,48 +395,69 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
             <WebDesktopNav />
 
             {/* Hero Section */}
-            <div className="relative bg-white overflow-hidden pb-10">
+            <div className="relative bg-white pt-14 pb-[130px] overflow-hidden">
                 {/* Background Image / Pattern */}
-                <div className="absolute top-0 right-0 w-3/4 h-full hidden md:block">
-                    <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent z-10"></div>
-                    <img src="/images/mosque_hero.png" alt="Islamic Mosque Background" className="w-full h-full object-cover object-left-top opacity-70" />
+                <div className="absolute top-0 right-0 w-full md:w-[65%] h-full hidden md:block pointer-events-none">
+                    <img 
+                        src="/images/mosque_hero.png" 
+                        alt="Mosque" 
+                        className="w-full h-full object-cover object-[center_right] opacity-95"
+                        style={{
+                            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
+                            maskImage: 'linear-gradient(to right, transparent 0%, black 40%)'
+                        }}
+                    />
                 </div>
 
-                <div className="w-full px-6 md:px-12 lg:px-20 pt-16 pb-8 relative z-20 flex flex-col md:flex-row gap-12 items-center">
+                {/* Wavy bottom */}
+                <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20">
+                    <svg viewBox="0 0 1440 120" className="w-full h-[60px] md:h-[100px] block" preserveAspectRatio="none">
+                        <path d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,42.7C1120,32,1280,32,1360,32L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z" fill="#f9fafb"></path>
+                    </svg>
+                </div>
+
+                <div className="w-full px-6 md:px-10 lg:px-16 relative z-30 flex flex-col md:flex-row gap-10 items-center max-w-[1600px] mx-auto">
                     
                     {/* Left: Titles & Search */}
                     <div className="w-full md:w-1/2">
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-[#1f2937] leading-tight mb-3">
+                        <h1 className="text-[40px] lg:text-[46px] font-extrabold text-[#111827] leading-tight mb-2 tracking-tight">
                             Video Kajian
                         </h1>
-                        <p className="text-gray-600 text-lg mb-8">
+                        <p className="text-slate-500 text-[15px] mb-8 font-medium">
                             Tonton kajian ilmiah dari para ustadz pilihan
                         </p>
 
                         {/* Search Bar */}
-                        <div className="relative bg-white p-2 rounded-2xl shadow-lg shadow-gray-200/50 flex items-center border border-gray-100 max-w-xl">
-                            <div className="pl-4 pr-3 text-gray-400">
-                                <Search size={20} />
+                        <div className="relative bg-white border border-gray-200 rounded-[10px] flex items-center p-1.5 shadow-[0_2px_10px_rgb(0,0,0,0.03)] max-w-[460px]">
+                            <div className="pl-3 pr-2 text-slate-400">
+                                <Search size={18} strokeWidth={2.5} />
                             </div>
                             <input 
                                 type="text" 
                                 placeholder="Cari video kajian, ustadz, atau topik..."
-                                className="w-full border-none focus:ring-0 text-gray-700 bg-transparent py-3 placeholder:text-gray-400 text-base"
+                                className="w-full border-none focus:ring-0 text-slate-700 bg-transparent py-2 placeholder:text-slate-400 text-[14px] outline-none"
                             />
-                            <button className="bg-[#7e57c2] hover:bg-[#6b48a8] text-white px-8 py-3.5 rounded-xl font-semibold transition-colors shrink-0">
+                            <button className="bg-[#6c40e6] hover:bg-[#5b32cc] text-white px-7 py-2.5 rounded-[8px] text-[14px] font-semibold transition-colors shrink-0">
                                 Cari
                             </button>
                         </div>
                     </div>
 
                     {/* Right: Quote Block */}
-                    <div className="w-full md:w-1/2 flex justify-end">
-                        <div className="max-w-md">
-                            <Quote size={40} className="text-[#7e57c2] opacity-40 mb-4" />
-                            <p className="text-lg md:text-xl font-medium text-gray-800 leading-relaxed">
-                                Barang siapa menempuh jalan untuk mencari ilmu, Allah akan mudahkan baginya jalan menuju surga.
+                    <div className="w-full md:w-1/2 flex justify-start md:pl-10 mt-8 md:mt-0">
+                        <div className="max-w-[320px]">
+                            <div className="text-[#8155ff] mb-4">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 9C10 6.23858 7.76142 4 5 4C2.23858 4 0 6.23858 0 9C0 11.2312 1.45892 13.1207 3.48627 13.7915C2.65809 15.656 0.817366 17.1593 0.771965 17.1952C0.334057 17.5413 0.25875 18.1778 0.604886 18.6157C0.951022 19.0536 1.58756 19.1289 2.02547 18.7828C2.17647 18.6635 4.90807 16.4867 6.46328 13.1585C8.61111 12.027 10 9.7717 10 9ZM24 9C24 6.23858 21.7614 4 19 4C16.2386 4 14 6.23858 14 9C14 11.2312 15.4589 13.1207 17.4863 13.7915C16.6581 15.656 14.8174 17.1593 14.772 17.1952C14.3341 17.5413 14.2588 18.1778 14.6049 18.6157C14.951 19.0536 15.5876 19.1289 16.0255 18.7828C16.1765 18.6635 18.9081 16.4867 20.4633 13.1585C22.6111 12.027 24 9.7717 24 9Z" />
+                                </svg>
+                            </div>
+                            <p className="text-[15px] font-medium text-slate-700 leading-[1.6]">
+                                Barang siapa menempuh<br/>
+                                jalan untuk mencari ilmu,<br/>
+                                Allah akan mudahkan baginya<br/>
+                                jalan menuju surga.
                             </p>
-                            <p className="text-[#7e57c2] font-semibold mt-4 text-sm">
+                            <p className="text-[#8155ff] font-semibold mt-4 text-[12px]">
                                 (HR. Muslim)
                             </p>
                         </div>
@@ -445,26 +466,26 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                 </div>
             </div>
 
-            {/* Main Content (2 Columns) */}
-            <div className="w-full px-6 md:px-12 lg:px-20 py-12 flex flex-col md:flex-row gap-10">
+            {/* Main Content */}
+            <div className="w-full px-6 md:px-10 lg:px-16 py-8 flex flex-col lg:flex-row gap-8 max-w-[1600px] mx-auto">
                 
                 {/* Left Sidebar (Filters) */}
-                <div className="w-full md:w-64 shrink-0 space-y-8">
+                <div className="w-full lg:w-[260px] shrink-0 space-y-8">
                     
                     {/* Kategori */}
-                    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                        <h3 className="font-bold text-gray-900 mb-4 px-2">Kategori</h3>
-                        <div className="space-y-1">
+                    <div>
+                        <h3 className="font-bold text-gray-900 mb-3 text-[15px] px-1">Kategori</h3>
+                        <div className="bg-white rounded-2xl py-2.5 border border-gray-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)] space-y-0.5">
                             <button 
                                 onClick={() => setSelectedCategory('semua')}
-                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors ${selectedCategory === 'semua' ? 'bg-[#f3eefe] text-[#7e57c2] font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                className={`w-full flex items-center justify-between px-4 py-2.5 transition-colors ${selectedCategory === 'semua' ? 'bg-[#f4f0ff] border-l-2 border-[#6038cc] text-[#6038cc]' : 'text-gray-600 hover:bg-gray-50 border-l-2 border-transparent'}`}
                             >
                                 <div className="flex items-center gap-3">
-                                    <Activity size={16} className={selectedCategory === 'semua' ? 'text-[#7e57c2]' : 'text-gray-400'} />
-                                    <span className="text-sm">Semua Kategori</span>
+                                    <Activity size={16} className={selectedCategory === 'semua' ? 'text-[#6038cc]' : 'text-gray-400'} strokeWidth={2.5} />
+                                    <span className={`text-[13px] ${selectedCategory === 'semua' ? 'font-bold' : 'font-medium'}`}>Semua Kategori</span>
                                 </div>
-                                <span className={`text-xs ${selectedCategory === 'semua' ? 'text-[#7e57c2]' : 'text-gray-400'}`}>
-                                    {categories.reduce((acc, curr) => acc + (curr.videos_count || 0), 0) + 128} {/* 128 is dummy total */}
+                                <span className={`text-[12px] font-semibold ${selectedCategory === 'semua' ? 'text-[#6038cc]' : 'text-gray-400'}`}>
+                                    128
                                 </span>
                             </button>
 
@@ -480,15 +501,15 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                                     <button 
                                         key={cat.id}
                                         onClick={() => setSelectedCategory(cat.slug)}
-                                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors ${active ? 'bg-[#f3eefe] text-[#7e57c2] font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                        className={`w-full flex items-center justify-between px-4 py-2.5 transition-colors ${active ? 'bg-[#f4f0ff] border-l-2 border-[#6038cc] text-[#6038cc]' : 'text-gray-600 hover:bg-gray-50 border-l-2 border-transparent'}`}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={active ? 'text-[#7e57c2]' : color}>
+                                            <div className={active ? 'text-[#6038cc]' : color}>
                                                 {getCategoryIcon(cat.name)}
                                             </div>
-                                            <span className="text-sm">{cat.name}</span>
+                                            <span className={`text-[13px] ${active ? 'font-bold' : 'font-medium'}`}>{cat.name}</span>
                                         </div>
-                                        <span className={`text-xs ${active ? 'text-[#7e57c2]' : 'text-gray-400'}`}>
+                                        <span className={`text-[12px] font-semibold ${active ? 'text-[#6038cc]' : 'text-gray-400'}`}>
                                             {cat.videos_count || Math.floor(Math.random() * 30) + 5}
                                         </span>
                                     </button>
@@ -498,46 +519,48 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                     </div>
 
                     {/* Filter */}
-                    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                        <h3 className="font-bold text-gray-900 mb-4 px-2">Filter</h3>
-                        
-                        <div className="mb-6 px-2">
-                            <h4 className="text-sm font-semibold text-gray-700 mb-3">Durasi</h4>
-                            <div className="space-y-3">
-                                <label className="flex items-center justify-between cursor-pointer group">
-                                    <div className="flex items-center gap-3">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#7e57c2] focus:ring-[#7e57c2]" />
-                                        <span className="text-sm text-gray-600 group-hover:text-gray-900">Pendek (&lt; 15 menit)</span>
-                                    </div>
-                                    <span className="text-xs text-gray-400">32</span>
-                                </label>
-                                <label className="flex items-center justify-between cursor-pointer group">
-                                    <div className="flex items-center gap-3">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#7e57c2] focus:ring-[#7e57c2]" />
-                                        <span className="text-sm text-gray-600 group-hover:text-gray-900">Sedang (15 - 60 menit)</span>
-                                    </div>
-                                    <span className="text-xs text-gray-400">68</span>
-                                </label>
-                                <label className="flex items-center justify-between cursor-pointer group">
-                                    <div className="flex items-center gap-3">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#7e57c2] focus:ring-[#7e57c2]" />
-                                        <span className="text-sm text-gray-600 group-hover:text-gray-900">Panjang (&gt; 60 menit)</span>
-                                    </div>
-                                    <span className="text-xs text-gray-400">28</span>
-                                </label>
+                    <div>
+                        <h3 className="font-bold text-gray-900 mb-3 text-[15px] px-1">Filter</h3>
+                        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)]">
+                            
+                            <div className="mb-6">
+                                <h4 className="text-[13px] font-bold text-gray-900 mb-3">Durasi</h4>
+                                <div className="space-y-3.5">
+                                    <label className="flex items-center justify-between cursor-pointer group">
+                                        <div className="flex items-center gap-3">
+                                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#6038cc] focus:ring-[#6038cc]" />
+                                            <span className="text-[13px] text-gray-600 font-medium group-hover:text-gray-900">Pendek (&lt; 15 menit)</span>
+                                        </div>
+                                        <span className="text-[12px] text-gray-400">32</span>
+                                    </label>
+                                    <label className="flex items-center justify-between cursor-pointer group">
+                                        <div className="flex items-center gap-3">
+                                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#6038cc] focus:ring-[#6038cc]" />
+                                            <span className="text-[13px] text-gray-600 font-medium group-hover:text-gray-900">Sedang (15 - 60 menit)</span>
+                                        </div>
+                                        <span className="text-[12px] text-gray-400">68</span>
+                                    </label>
+                                    <label className="flex items-center justify-between cursor-pointer group">
+                                        <div className="flex items-center gap-3">
+                                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#6038cc] focus:ring-[#6038cc]" />
+                                            <span className="text-[13px] text-gray-600 font-medium group-hover:text-gray-900">Panjang (&gt; 60 menit)</span>
+                                        </div>
+                                        <span className="text-[12px] text-gray-400">28</span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="px-2">
-                            <h4 className="text-sm font-semibold text-gray-700 mb-3">Urutkan</h4>
-                            <div className="relative">
-                                <select className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:ring-[#7e57c2] focus:border-[#7e57c2] outline-none cursor-pointer">
-                                    <option>Terbaru</option>
-                                    <option>Terpopuler</option>
-                                    <option>Durasi (Terpanjang)</option>
-                                    <option>Durasi (Terpendek)</option>
-                                </select>
-                                <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                            <div>
+                                <h4 className="text-[13px] font-bold text-gray-900 mb-3">Urutkan</h4>
+                                <div className="relative">
+                                    <select className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-[13px] font-medium text-gray-700 focus:ring-[#6038cc] focus:border-[#6038cc] outline-none cursor-pointer">
+                                        <option>Terbaru</option>
+                                        <option>Terpopuler</option>
+                                        <option>Durasi (Terpanjang)</option>
+                                        <option>Durasi (Terpendek)</option>
+                                    </select>
+                                    <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -545,49 +568,49 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                 </div>
 
                 {/* Right Content (Video Grids) */}
-                <div className="flex-1 space-y-12">
+                <div className="flex-1 space-y-10 min-w-0">
                     
                     {/* Terbaru Section */}
                     <section>
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-900">Terbaru</h2>
-                            <Link href="#" className="flex items-center gap-1 text-sm font-semibold text-[#7e57c2] hover:text-[#6b48a8] transition-colors">
-                                Lihat Semua <ArrowRight size={16} />
+                        <div className="flex items-center justify-between mb-5">
+                            <h2 className="text-[18px] font-bold text-gray-900">Terbaru</h2>
+                            <Link href="#" className="flex items-center gap-1 text-[13px] font-semibold text-[#6038cc] hover:text-[#5229b9] transition-colors">
+                                Lihat Semua <ArrowRight size={14} />
                             </Link>
                         </div>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-x-4 gap-y-6">
                             {filteredRecentVideos.length > 0 ? filteredRecentVideos.map(video => (
                                 <Link href={`/videos/${video.id}`} key={video.id} className="group flex flex-col">
-                                    <div className="aspect-video bg-gray-200 rounded-xl overflow-hidden relative mb-3">
+                                    <div className="aspect-video bg-gray-200 rounded-xl overflow-hidden relative mb-2.5">
                                         <img 
                                             src={getImageUrl(video.thumbnail)} 
                                             alt={video.title}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
-                                        <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow">
+                                        <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
                                             {formatDuration(video.duration || (Math.floor(Math.random() * 3000) + 600))}
                                         </div>
                                     </div>
-                                    <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1 group-hover:text-[#7e57c2] transition-colors line-clamp-2">
+                                    <h3 className="font-bold text-gray-900 text-[13px] leading-snug mb-1 group-hover:text-[#6038cc] transition-colors line-clamp-2">
                                         {video.title}
                                     </h3>
-                                    <p className="text-xs text-gray-500 mb-1 line-clamp-1">{video.author?.name || 'Ustadz Anonim'}</p>
-                                    <p className="text-[11px] text-gray-400">
+                                    <p className="text-[12px] text-gray-500 mb-0.5 line-clamp-1">{video.author?.name || 'Ustadz Anonim'}</p>
+                                    <p className="text-[11px] text-gray-400 font-medium">
                                         {formatViews(video.total_views || Math.floor(Math.random() * 5000) + 100)} views • {timeAgo(video.created_at || new Date().toISOString())}
                                     </p>
                                 </Link>
                             )) : (
-                                Array(4).fill(null).map((_, i) => (
+                                Array(5).fill(null).map((_, i) => (
                                     <Link href={`/videos/${i + 1}`} key={`recent-dummy-${i}`} className="group flex flex-col">
-                                        <div className="aspect-video bg-slate-800 rounded-xl overflow-hidden relative mb-3">
-                                            <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow">45:12</div>
+                                        <div className="aspect-video bg-slate-800 rounded-xl overflow-hidden relative mb-2.5">
+                                            <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">45:12</div>
                                         </div>
-                                        <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1 group-hover:text-[#7e57c2] transition-colors line-clamp-2">
+                                        <h3 className="font-bold text-gray-900 text-[13px] leading-snug mb-1 group-hover:text-[#6038cc] transition-colors line-clamp-2">
                                             Tafsir Surat Al-Fatihah Ayat 1-7
                                         </h3>
-                                        <p className="text-xs text-gray-500 mb-1 line-clamp-1">Ustadz Dr. Firanda Andirja, MA</p>
-                                        <p className="text-[11px] text-gray-400">2.1K views • 2 hari yang lalu</p>
+                                        <p className="text-[12px] text-gray-500 mb-0.5 line-clamp-1">Ustadz Dr. Firanda Andirja, MA</p>
+                                        <p className="text-[11px] text-gray-400 font-medium">2.1K views • 2 hari yang lalu</p>
                                     </Link>
                                 ))
                             )}
@@ -596,45 +619,45 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
 
                     {/* Populer Section */}
                     <section>
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-900">Populer</h2>
-                            <Link href="#" className="flex items-center gap-1 text-sm font-semibold text-[#7e57c2] hover:text-[#6b48a8] transition-colors">
-                                Lihat Semua <ArrowRight size={16} />
+                        <div className="flex items-center justify-between mb-5">
+                            <h2 className="text-[18px] font-bold text-gray-900">Populer</h2>
+                            <Link href="#" className="flex items-center gap-1 text-[13px] font-semibold text-[#6038cc] hover:text-[#5229b9] transition-colors">
+                                Lihat Semua <ArrowRight size={14} />
                             </Link>
                         </div>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-x-4 gap-y-6">
                             {filteredPopularVideos.length > 0 ? filteredPopularVideos.map(video => (
                                 <Link href={`/videos/${video.id}`} key={video.id} className="group flex flex-col">
-                                    <div className="aspect-video bg-gray-200 rounded-xl overflow-hidden relative mb-3">
+                                    <div className="aspect-video bg-gray-200 rounded-xl overflow-hidden relative mb-2.5">
                                         <img 
                                             src={getImageUrl(video.thumbnail)} 
                                             alt={video.title}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
-                                        <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow">
+                                        <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
                                             {formatDuration(video.duration || (Math.floor(Math.random() * 3000) + 600))}
                                         </div>
                                     </div>
-                                    <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1 group-hover:text-[#7e57c2] transition-colors line-clamp-2">
+                                    <h3 className="font-bold text-gray-900 text-[13px] leading-snug mb-1 group-hover:text-[#6038cc] transition-colors line-clamp-2">
                                         {video.title}
                                     </h3>
-                                    <p className="text-xs text-gray-500 mb-1 line-clamp-1">{video.author?.name || 'Ustadz Anonim'}</p>
-                                    <p className="text-[11px] text-gray-400">
+                                    <p className="text-[12px] text-gray-500 mb-0.5 line-clamp-1">{video.author?.name || 'Ustadz Anonim'}</p>
+                                    <p className="text-[11px] text-gray-400 font-medium">
                                         {formatViews(video.total_views || Math.floor(Math.random() * 50000) + 1000)} views • {timeAgo(video.created_at || new Date().toISOString())}
                                     </p>
                                 </Link>
                             )) : (
-                                Array(4).fill(null).map((_, i) => (
+                                Array(5).fill(null).map((_, i) => (
                                     <Link href={`/videos/${i + 1}`} key={`pop-dummy-${i}`} className="group flex flex-col">
-                                        <div className="aspect-video bg-slate-900 rounded-xl overflow-hidden relative mb-3">
-                                            <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow">1:02:15</div>
+                                        <div className="aspect-video bg-slate-900 rounded-xl overflow-hidden relative mb-2.5">
+                                            <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">1:02:15</div>
                                         </div>
-                                        <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1 group-hover:text-[#7e57c2] transition-colors line-clamp-2">
+                                        <h3 className="font-bold text-gray-900 text-[13px] leading-snug mb-1 group-hover:text-[#6038cc] transition-colors line-clamp-2">
                                             Sirah Nabi Muhammad (Bagian 1)
                                         </h3>
-                                        <p className="text-xs text-gray-500 mb-1 line-clamp-1">Ustadz Muhammad Nuzul Dzikri</p>
-                                        <p className="text-[11px] text-gray-400">6.1K views • 3 minggu lalu</p>
+                                        <p className="text-[12px] text-gray-500 mb-0.5 line-clamp-1">Ustadz Muhammad Nuzul Dzikri</p>
+                                        <p className="text-[11px] text-gray-400 font-medium">6.1K views • 3 minggu lalu</p>
                                     </Link>
                                 ))
                             )}
