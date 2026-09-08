@@ -16,10 +16,16 @@ interface PageProps {
     [key: string]: unknown;
     book: Book;
     errors: Record<string, string>;
+    auth?: {
+        user?: {
+            name?: string;
+            email?: string;
+        }
+    };
 }
 
 export default function ChapterCreate() {
-    const { book, errors } = usePage<PageProps>().props;
+    const { book, errors, auth } = usePage<PageProps>().props;
 
     const [values, setValues] = useState({
         chapter_number: '',

@@ -22,10 +22,16 @@ interface PageProps {
     categories: Category[];
     authors: Author[];
     errors: Record<string, string>;
+    auth?: {
+        user?: {
+            name?: string;
+            email?: string;
+        }
+    };
 }
 
 export default function BukuCreate() {
-    const { categories, authors, errors } = usePage<PageProps>().props;
+    const { categories, authors, errors, auth } = usePage<PageProps>().props;
 
     const [values, setValues] = useState({
         title: '',

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import * as LucideIcons from 'lucide-react';
 import { ChevronDown, BookOpen, Book, LogOut } from 'lucide-react';
 
 interface AdminSidebarProps {
     activeItem: string;
-    auth: {
-        user: {
-            name: string;
-            email: string;
+    auth?: {
+        user?: {
+            name?: string;
+            email?: string;
         }
     }
 }
@@ -19,6 +19,7 @@ export const adminNavItems = [
     { name: 'Penjualan', icon: 'ShoppingCart', route: 'admin.sales.index' },
     { name: 'Buku', icon: 'Book', route: 'admin.books.index' },
     { name: 'Kategori', icon: 'Grid', route: 'admin.categories.index' },
+    { name: 'Ikon', icon: 'Sparkles', route: 'admin.icons.index' },
     { name: 'Pelanggan', icon: 'Users', route: 'admin.customers.index' },
     { name: 'Transaksi', icon: 'CreditCard', route: 'admin.transactions.index' },
     { name: 'Laporan', icon: 'FileText', route: 'admin.reports.index' },
@@ -32,7 +33,9 @@ export const adminNavItems = [
     { name: 'Pengaturan', icon: 'Settings', route: 'admin.settings.index' },
 ];
 
-export default function AdminSidebar({ activeItem, auth }: AdminSidebarProps) {
+export default function AdminSidebar({ activeItem, auth: propAuth }: AdminSidebarProps) {
+    const pageProps = usePage<any>().props;
+    const auth = propAuth || pageProps?.auth;
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     const renderIcon = (iconName: string, active: boolean) => {

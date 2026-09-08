@@ -27,10 +27,16 @@ interface PageProps {
     [key: string]: unknown;
     category: Category;
     books: Book[];
+    auth?: {
+        user?: {
+            name?: string;
+            email?: string;
+        }
+    };
 }
 
 export default function KategoriShow() {
-    const { category, books } = usePage<PageProps>().props;
+    const { category, books, auth } = usePage<PageProps>().props;
 
     
 

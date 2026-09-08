@@ -42,6 +42,11 @@ export default function NavigationIndex() {
 
     
 
+    const renderIcon = (iconName: string) => {
+        const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.Circle;
+        return <IconComponent size={16} />;
+    };
+
     const openCreateModal = () => {
         reset();
         setEditingId(null);

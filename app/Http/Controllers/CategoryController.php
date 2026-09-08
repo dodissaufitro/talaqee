@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Icon;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -34,7 +35,11 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return \Inertia\Inertia::render('admin/Kategori/Create');
+        $icons = Icon::where('is_active', true)->orderBy('category')->orderBy('name')->get();
+
+        return \Inertia\Inertia::render('admin/Kategori/Create', [
+            'icons' => $icons,
+        ]);
     }
 
     /**
@@ -74,8 +79,11 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
+        $icons = Icon::where('is_active', true)->orderBy('category')->orderBy('name')->get();
+
         return \Inertia\Inertia::render('admin/Kategori/Edit', [
-            'category' => $category
+            'category' => $category,
+            'icons' => $icons,
         ]);
     }
 

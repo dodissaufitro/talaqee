@@ -29,10 +29,16 @@ interface PageProps {
     book: Book;
     chapter: Chapter;
     errors: Record<string, string>;
+    auth?: {
+        user?: {
+            name?: string;
+            email?: string;
+        }
+    };
 }
 
 export default function ChapterEdit() {
-    const { book, chapter, errors } = usePage<PageProps>().props;
+    const { book, chapter, errors, auth } = usePage<PageProps>().props;
 
     const [values, setValues] = useState({
         chapter_number: chapter.chapter_number,

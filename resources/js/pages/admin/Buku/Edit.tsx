@@ -23,10 +23,16 @@ interface PageProps {
     categories: Category[];
     authors: Author[];
     errors: Record<string, string>;
+    auth?: {
+        user?: {
+            name?: string;
+            email?: string;
+        }
+    };
 }
 
 export default function BukuEdit() {
-    const { book, categories, authors, errors } = usePage<PageProps>().props;
+    const { book, categories, authors, errors, auth } = usePage<PageProps>().props;
 
     const [values, setValues] = useState({
         title: book.title || '',
@@ -41,7 +47,7 @@ export default function BukuEdit() {
         cover: null as File | null,
     });
 
-    const [chapters, setChapters] = useState(book.chapters && book.chapters.length > 0 ? 
+    const [chapters, setChapters] = useState<any[]>(book.chapters && book.chapters.length > 0 ? 
         book.chapters.map((c: any) => ({ id: c.id, title: c.title, content: c.content || '', coin_price: c.coin_price ?? '', isExpanded: false })) : 
         []
     );
@@ -51,7 +57,7 @@ export default function BukuEdit() {
     };
 
     const handleRemoveChapter = (index: number) => {
-        const newChapters = chapters.filter((_, i) => i !== index);
+        const newChapters = chapters.filter((_: any, i: number) => i !== index);
         setChapters(newChapters);
     };
 
@@ -101,7 +107,7 @@ export default function BukuEdit() {
         });
 
         // Append chapters as a JSON string
-        const cleanChapters = chapters.map(c => ({ id: c.id, title: c.title, content: c.content, coin_price: c.coin_price })).filter(c => c.title || c.content);
+        const cleanChapters = chapters.map((c: any) => ({ id: c.id, title: c.title, content: c.content, coin_price: c.coin_price })).filter((c: any) => c.title || c.content);
         formData.append('chapters', JSON.stringify(cleanChapters));
 
         formData.append('_method', 'put'); // For Laravel to process as PUT with multipart/form-data

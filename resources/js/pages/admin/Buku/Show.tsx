@@ -4,7 +4,7 @@ import { Head, Link, usePage, router } from '@inertiajs/react';
 import { 
     BookOpen, LayoutDashboard, ShoppingCart, Book, Grid, Users, 
     CreditCard, FileText, Box, Megaphone, Settings, ArrowLeft,
-    Bell, TrendingUp, ChevronDown, CheckCircle, Upload, Eye, List, Plus, Edit2, Trash2
+    Bell, TrendingUp, ChevronDown, CheckCircle, Upload, Eye, List, Plus, Edit2, Trash2, Star
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
@@ -12,7 +12,7 @@ interface Book {
     id: number;
     title: string;
     cover: string;
-    author: { name: string };k
+    author: { name: string };
     category: { name: string };
     is_active: boolean;
     is_free: boolean;
@@ -41,10 +41,16 @@ interface PageProps {
         total_sales: number;
         total_purchases: number;
     };
+    auth?: {
+        user?: {
+            name?: string;
+            email?: string;
+        }
+    };
 }
 
 export default function BukuShow() {
-    const { book, chapters, salesData } = usePage<PageProps>().props;
+    const { book, chapters, salesData, auth } = usePage<PageProps>().props;
 
     const handleDeleteChapter = (chapterId: number) => {
         if (confirm('Apakah Anda yakin ingin menghapus bab ini?')) {

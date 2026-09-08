@@ -297,7 +297,7 @@ export default function LaporanIndex() {
                                             dx={-10}
                                         />
                                         <Tooltip 
-                                            formatter={(value: number | string | undefined) => formatRupiah(Number(value))}
+                                            formatter={(value: any) => formatRupiah(Number(value)) as any}
                                             labelStyle={{ color: '#64748b' }}
                                         />
                                         <Line 

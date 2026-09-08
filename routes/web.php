@@ -212,6 +212,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/refund-policy', [\App\Http\Controllers\Admin\RefundPolicyController::class, 'index'])->name('admin.refund-policy.index');
     Route::post('/admin/refund-policy', [\App\Http\Controllers\Admin\RefundPolicyController::class, 'update'])->name('admin.refund-policy.update');
 
+    // Icons
+    Route::resource('/admin/icons', \App\Http\Controllers\Admin\IconController::class)->except(['create', 'show', 'edit'])->names([
+        'index' => 'admin.icons.index',
+        'store' => 'admin.icons.store',
+        'update' => 'admin.icons.update',
+        'destroy' => 'admin.icons.destroy',
+    ]);
+
     // Settings
     Route::get('/admin/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('admin.settings.index');
     });

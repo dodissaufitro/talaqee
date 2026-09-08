@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AdminSidebar from '@/components/AdminSidebar';
+import IconSelect, { IconOption } from '@/components/IconSelect';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import { 
     BookOpen, LayoutDashboard, ShoppingCart, Book, Grid, Users, 
@@ -9,11 +10,18 @@ import * as LucideIcons from 'lucide-react';
 
 interface PageProps {
     [key: string]: unknown;
+    icons?: IconOption[];
     errors: Record<string, string>;
+    auth?: {
+        user?: {
+            name?: string;
+            email?: string;
+        }
+    };
 }
 
 export default function KategoriCreate() {
-    const { errors } = usePage<PageProps>().props;
+    const { icons, errors, auth } = usePage<PageProps>().props;
 
     const [values, setValues] = useState({
         name: '',
@@ -103,16 +111,14 @@ export default function KategoriCreate() {
                                     {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Ikon (Lucide)</label>
-                                    <input 
-                                        type="text" 
-                                        name="icon" 
-                                        value={values.icon} 
-                                        onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                        placeholder="Contoh: Book, Tag, Compass"
+                                    <IconSelect 
+                                        label="Ikon Kategori"
+                                        value={values.icon}
+                                        onChange={(iconName) => setValues(prev => ({ ...prev, icon: iconName }))}
+                                        icons={icons}
+                                        error={errors.icon}
+                                        placeholder="Pilih ikon kategori..."
                                     />
-                                    {errors.icon && <p className="text-red-500 text-xs mt-1">{errors.icon}</p>}
                                 </div>
                             </div>
 
