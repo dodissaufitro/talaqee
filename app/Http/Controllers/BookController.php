@@ -68,6 +68,9 @@ class BookController extends Controller
             $validated['cover'] = '/storage/' . $path;
         }
 
+        // Unset chapters from book data to prevent unknown column error
+        unset($validated['chapters']);
+
         $book = Book::create($validated);
 
         // Notifikasi ke semua user
@@ -87,16 +90,27 @@ class BookController extends Controller
             $chapters = json_decode($request->chapters, true);
             if (is_array($chapters)) {
                 foreach ($chapters as $index => $chapter) {
-                    if (!empty($chapter['title']) && !empty($chapter['content'])) {
+                    $hasTitle = !empty($chapter['title']);
+                    $hasContent = !empty($chapter['content']);
+                    $hasPdf = $request->hasFile("chapter_pdf_{$index}");
+
+                    if ($hasTitle || $hasContent || $hasPdf) {
                         $coinPrice = isset($chapter['coin_price']) && $chapter['coin_price'] !== '' 
                             ? (int)$chapter['coin_price'] 
                             : ($book->coin_per_chapter ?? 10);
                         $isFree = $coinPrice == 0;
 
+                        $pdfPath = null;
+                        if ($hasPdf) {
+                            $stored = $request->file("chapter_pdf_{$index}")->store('chapters', 'public');
+                            $pdfPath = '/storage/' . $stored;
+                        }
+
                         $book->chapters()->create([
                             'chapter_number' => $index + 1,
-                            'title' => $chapter['title'],
-                            'content' => $chapter['content'],
+                            'title' => !empty($chapter['title']) ? $chapter['title'] : 'Bab ' . ($index + 1),
+                            'content' => $chapter['content'] ?? null,
+                            'pdf_file' => $pdfPath,
                             'coin_price' => $coinPrice,
                             'is_free' => $isFree,
                             'is_active' => true,
@@ -175,31 +189,47 @@ class BookController extends Controller
             if (is_array($chapters)) {
                 $existingChapterIds = [];
                 foreach ($chapters as $index => $chapterData) {
-                    if (!empty($chapterData['title']) && !empty($chapterData['content'])) {
+                    $hasTitle = !empty($chapterData['title']);
+                    $hasContent = !empty($chapterData['content']);
+                    $hasPdf = $request->hasFile("chapter_pdf_{$index}");
+                    $existingPdf = $chapterData['pdf_file'] ?? null;
+
+                    if ($hasTitle || $hasContent || $hasPdf || $existingPdf) {
                         $coinPrice = isset($chapterData['coin_price']) && $chapterData['coin_price'] !== '' 
                             ? (int)$chapterData['coin_price'] 
                             : ($book->coin_per_chapter ?? 10);
                         $isFree = $coinPrice == 0;
 
+                        $pdfPath = $existingPdf;
+                        if ($hasPdf) {
+                            $stored = $request->file("chapter_pdf_{$index}")->store('chapters', 'public');
+                            $pdfPath = '/storage/' . $stored;
+                        }
+
                         if (isset($chapterData['id']) && $chapterData['id']) {
                             // Update existing
                             $chapter = $book->chapters()->find($chapterData['id']);
                             if ($chapter) {
-                                $chapter->update([
+                                $updateData = [
                                     'chapter_number' => $index + 1,
-                                    'title' => $chapterData['title'],
-                                    'content' => $chapterData['content'],
+                                    'title' => !empty($chapterData['title']) ? $chapterData['title'] : 'Bab ' . ($index + 1),
+                                    'content' => $chapterData['content'] ?? null,
                                     'coin_price' => $coinPrice,
                                     'is_free' => $isFree,
-                                ]);
+                                ];
+                                if ($pdfPath !== null) {
+                                    $updateData['pdf_file'] = $pdfPath;
+                                }
+                                $chapter->update($updateData);
                                 $existingChapterIds[] = $chapter->id;
                             }
                         } else {
                             // Create new
                             $newChapter = $book->chapters()->create([
                                 'chapter_number' => $index + 1,
-                                'title' => $chapterData['title'],
-                                'content' => $chapterData['content'],
+                                'title' => !empty($chapterData['title']) ? $chapterData['title'] : 'Bab ' . ($index + 1),
+                                'content' => $chapterData['content'] ?? null,
+                                'pdf_file' => $pdfPath,
                                 'coin_price' => $coinPrice,
                                 'is_free' => $isFree,
                                 'is_active' => true,

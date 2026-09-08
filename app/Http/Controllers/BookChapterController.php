@@ -23,6 +23,7 @@ class BookChapterController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'content' => 'nullable|string',
+            'pdf_file' => 'nullable|file|mimes:pdf|max:51200',
             'page_count' => 'required|integer|min:0',
             'coin_price' => 'required|integer|min:0',
             'is_free' => 'boolean',
@@ -32,6 +33,11 @@ class BookChapterController extends Controller
         // Default checkbox values to false if not present
         $validated['is_free'] = $request->boolean('is_free');
         $validated['is_active'] = $request->has('is_active') ? $request->boolean('is_active') : true;
+
+        if ($request->hasFile('pdf_file')) {
+            $path = $request->file('pdf_file')->store('chapters', 'public');
+            $validated['pdf_file'] = '/storage/' . $path;
+        }
 
         $book->chapters()->create($validated);
 
@@ -53,6 +59,7 @@ class BookChapterController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'content' => 'nullable|string',
+            'pdf_file' => 'nullable|file|mimes:pdf|max:51200',
             'page_count' => 'required|integer|min:0',
             'coin_price' => 'required|integer|min:0',
             'is_free' => 'boolean',
@@ -61,6 +68,11 @@ class BookChapterController extends Controller
         
         $validated['is_free'] = $request->boolean('is_free');
         $validated['is_active'] = $request->has('is_active') ? $request->boolean('is_active') : true;
+
+        if ($request->hasFile('pdf_file')) {
+            $path = $request->file('pdf_file')->store('chapters', 'public');
+            $validated['pdf_file'] = '/storage/' . $path;
+        }
 
         $chapter->update($validated);
 

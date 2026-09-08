@@ -32,6 +32,7 @@ export default function ChapterCreate() {
         title: '',
         description: '',
         content: '',
+        pdf_file: null as File | null,
         page_count: 0,
         coin_price: 10,
         is_free: false,
@@ -169,14 +170,63 @@ export default function ChapterCreate() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Konten Bab</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Upload File PDF Bab <span className="text-blue-600 font-normal">(Direkomendasikan)</span>
+                                </label>
+                                {values.pdf_file ? (
+                                    <div className="flex items-center justify-between p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                                                <FileText size={20} />
+                                            </div>
+                                            <div className="truncate">
+                                                <p className="text-sm font-medium text-gray-900 truncate">
+                                                    {(values.pdf_file as File).name}
+                                                </p>
+                                                <p className="text-xs text-gray-500">
+                                                    {((values.pdf_file as File).size / 1024 / 1024).toFixed(2)} MB • PDF siap diupload
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setValues(prev => ({ ...prev, pdf_file: null }))}
+                                            className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-white transition-colors"
+                                            title="Hapus file PDF"
+                                        >
+                                            <span className="text-lg font-bold leading-none">&times;</span>
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-gray-200 hover:border-blue-400 rounded-xl cursor-pointer bg-gray-50/50 hover:bg-blue-50/30 transition-all group">
+                                        <div className="flex items-center gap-2 text-gray-500 group-hover:text-blue-600">
+                                            <Upload size={20} />
+                                            <span className="text-sm font-medium">Pilih file dokumen PDF bab</span>
+                                        </div>
+                                        <p className="text-xs text-gray-400 mt-1">Format .pdf (Maksimal 50MB)</p>
+                                        <input
+                                            type="file"
+                                            name="pdf_file"
+                                            accept="application/pdf,.pdf"
+                                            className="hidden"
+                                            onChange={handleChange}
+                                        />
+                                    </label>
+                                )}
+                                {errors.pdf_file && <p className="text-red-500 text-xs mt-1">{errors.pdf_file}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Konten Bab / Catatan Alternatif (Opsional)
+                                </label>
                                 <textarea 
                                     name="content" 
                                     value={values.content} 
                                     onChange={handleChange}
-                                    rows={10}
+                                    rows={6}
                                     className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y"
-                                    placeholder="Tuliskan seluruh isi bab di sini..."
+                                    placeholder="Tuliskan isi bab atau ringkasan jika tidak menggunakan PDF..."
                                 ></textarea>
                                 {errors.content && <p className="text-red-500 text-xs mt-1">{errors.content}</p>}
                             </div>

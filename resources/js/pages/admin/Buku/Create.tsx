@@ -3,7 +3,7 @@ import AdminSidebar from '@/components/AdminSidebar';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import { 
     BookOpen, LayoutDashboard, ShoppingCart, Book, Grid, Users, 
-    CreditCard, FileText, Box, Megaphone, Settings, ArrowLeft, Upload, Globe, UserCircle, Plus, Trash2, ChevronDown, ChevronUp
+    CreditCard, FileText, Box, Megaphone, Settings, ArrowLeft, Upload, Globe, UserCircle, Plus, Trash2, ChevronDown, ChevronUp, File, X, CheckCircle
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
@@ -46,10 +46,12 @@ export default function BukuCreate() {
         cover: null as File | null,
     });
 
-    const [chapters, setChapters] = useState([{ title: '', content: '', coin_price: '', isExpanded: true }]);
+    const [chapters, setChapters] = useState([
+        { title: '', content: '', coin_price: '', pdf_file: null as File | null, isExpanded: true }
+    ]);
 
     const handleAddChapter = () => {
-        setChapters([...chapters, { title: '', content: '', coin_price: '', isExpanded: true }]);
+        setChapters([...chapters, { title: '', content: '', coin_price: '', pdf_file: null, isExpanded: true }]);
     };
 
     const handleRemoveChapter = (index: number) => {
@@ -57,9 +59,15 @@ export default function BukuCreate() {
         setChapters(newChapters);
     };
 
-    const handleChapterChange = (index: number, field: string, value: string) => {
+    const handleChapterChange = (index: number, field: string, value: any) => {
         const newChapters = [...chapters];
         newChapters[index] = { ...newChapters[index], [field]: value };
+        setChapters(newChapters);
+    };
+
+    const handleChapterFileChange = (index: number, file: File | null) => {
+        const newChapters = [...chapters];
+        newChapters[index] = { ...newChapters[index], pdf_file: file };
         setChapters(newChapters);
     };
 
@@ -68,10 +76,6 @@ export default function BukuCreate() {
         newChapters[index] = { ...newChapters[index], isExpanded: !newChapters[index].isExpanded };
         setChapters(newChapters);
     };
-
-    
-
-    
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -102,8 +106,21 @@ export default function BukuCreate() {
             }
         });
         
-        // Append chapters as a JSON string
-        const cleanChapters = chapters.map(c => ({ title: c.title, content: c.content, coin_price: c.coin_price })).filter(c => c.title || c.content);
+        // Append chapters and individual chapter PDF files
+        const cleanChapters = chapters
+            .map((c, index) => {
+                if (c.pdf_file) {
+                    formData.append(`chapter_pdf_${index}`, c.pdf_file);
+                }
+                return {
+                    title: c.title,
+                    content: c.content,
+                    coin_price: c.coin_price,
+                    has_pdf: !!c.pdf_file,
+                };
+            })
+            .filter(c => c.title || c.content || c.has_pdf);
+
         if (cleanChapters.length > 0) {
             formData.append('chapters', JSON.stringify(cleanChapters));
         }
@@ -337,14 +354,65 @@ export default function BukuCreate() {
                                                         </div>
                                                     </div>
 
+                                                    {/* Upload PDF Section */}
                                                     <div>
-                                                        <label className="block text-sm font-medium text-gray-700 mb-1">Isi Bab</label>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Upload File PDF Bab <span className="text-blue-600 font-normal">(Direkomendasikan)</span>
+                                                        </label>
+                                                        {chapter.pdf_file ? (
+                                                            <div className="flex items-center justify-between p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl">
+                                                                <div className="flex items-center gap-3 min-w-0">
+                                                                    <div className="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                                                                        <FileText size={20} />
+                                                                    </div>
+                                                                    <div className="truncate">
+                                                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                                                            {chapter.pdf_file.name}
+                                                                        </p>
+                                                                        <p className="text-xs text-gray-500">
+                                                                            {(chapter.pdf_file.size / 1024 / 1024).toFixed(2)} MB • PDF siap diupload
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleChapterFileChange(index, null)}
+                                                                    className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-white transition-colors"
+                                                                    title="Hapus file PDF"
+                                                                >
+                                                                    <X size={18} />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 hover:border-blue-400 rounded-xl cursor-pointer bg-gray-50/50 hover:bg-blue-50/30 transition-all group">
+                                                                <div className="flex items-center gap-2 text-gray-500 group-hover:text-blue-600">
+                                                                    <Upload size={18} />
+                                                                    <span className="text-sm font-medium">Pilih file dokumen PDF bab</span>
+                                                                </div>
+                                                                <p className="text-xs text-gray-400 mt-1">Format .pdf (Maks. 50MB)</p>
+                                                                <input
+                                                                    type="file"
+                                                                    accept="application/pdf,.pdf"
+                                                                    className="hidden"
+                                                                    onChange={(e) => {
+                                                                        const file = e.target.files?.[0] || null;
+                                                                        handleChapterFileChange(index, file);
+                                                                    }}
+                                                                />
+                                                            </label>
+                                                        )}
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Isi Bab / Catatan Tambahan (Opsional)
+                                                        </label>
                                                         <textarea 
                                                             value={chapter.content} 
                                                             onChange={(e) => handleChapterChange(index, 'content', e.target.value)}
-                                                            rows={5}
+                                                            rows={3}
                                                             className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
-                                                            placeholder="Tuliskan isi bab di sini..."
+                                                            placeholder="Ringkasan atau teks bab alternatif jika tanpa PDF..."
                                                         ></textarea>
                                                     </div>
                                                 </div>

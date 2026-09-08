@@ -255,6 +255,37 @@ export default function Read({ book_id, chapter_id, chapter, purchased_chapter_i
                             <>
                                 <p>Bab ini masih terkunci. Anda dapat membukanya dengan koin untuk melanjutkan membaca.</p>
                             </>
+                        ) : chapter?.pdf_file ? (
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between pb-2">
+                                    <span className="text-xs text-gray-500 font-medium">Dokumen PDF Bab</span>
+                                    <a 
+                                        href={chapter.pdf_file} 
+                                        target="_blank" 
+                                        rel="noreferrer" 
+                                        className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-3 py-1.5 rounded-lg transition"
+                                    >
+                                        Buka PDF di Tab Baru ↗
+                                    </a>
+                                </div>
+                                <div className="w-full rounded-2xl overflow-hidden shadow-md border border-gray-200/80 bg-white">
+                                    <iframe 
+                                        src={`${chapter.pdf_file}#toolbar=1`} 
+                                        className="w-full h-[75vh] border-0" 
+                                        title={chapter.title || 'PDF Bab'}
+                                    />
+                                </div>
+                                {paragraphs.length > 0 && paragraphs[0] !== 'Belum ada konten untuk bab ini.' && (
+                                    <div className="mt-8 pt-6 border-t border-gray-200/60">
+                                        <h4 className="text-sm font-semibold mb-3">Catatan / Rangkuman:</h4>
+                                        <div className="space-y-4 text-sm leading-relaxed opacity-90">
+                                            {paragraphs.map((paragraph: string, idx: number) => (
+                                                <p key={idx}>{paragraph}</p>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         ) : (
                             paragraphs.map((paragraph: string, idx: number) => (
                                 <p key={idx}>{paragraph}</p>

@@ -28,6 +28,7 @@ interface Chapter {
     book_id: number;
     chapter_number: number;
     title: string;
+    pdf_file?: string | null;
     is_free: boolean;
     is_active: boolean;
     coin_price: number;
@@ -208,8 +209,21 @@ export default function BukuShow() {
                                             <tr key={chapter.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                                                 <td className="py-4 px-6 font-semibold text-gray-600">{chapter.chapter_number}</td>
                                                 <td className="py-4 px-6 text-gray-900 font-medium">
-                                                    {chapter.title}
-                                                    {chapter.is_free && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-600 uppercase">Gratis</span>}
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span>{chapter.title}</span>
+                                                        {chapter.pdf_file && (
+                                                            <a 
+                                                                href={chapter.pdf_file} 
+                                                                target="_blank" 
+                                                                rel="noreferrer"
+                                                                className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition flex items-center gap-1"
+                                                                title="Buka File PDF Bab"
+                                                            >
+                                                                PDF ↗
+                                                            </a>
+                                                        )}
+                                                        {chapter.is_free && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-600 uppercase">Gratis</span>}
+                                                    </div>
                                                 </td>
                                                 <td className="py-4 px-6 text-gray-600">{chapter.coin_price} Koin</td>
                                                 <td className="py-4 px-6 text-center">

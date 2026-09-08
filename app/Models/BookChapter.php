@@ -12,6 +12,7 @@ class BookChapter extends Model
         'title',
         'description',
         'content',
+        'pdf_file',
         'page_count',
         'coin_price',
         'is_free',
