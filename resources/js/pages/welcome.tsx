@@ -292,17 +292,48 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                 </div>
 
                 {/* Footer Desktop */}
-                <footer className="w-full bg-white border-t border-gray-100 py-8 mt-10">
-                    <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 flex flex-col md:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center gap-2">
-                            <img src="/logo/logo_app.talaqee.png" alt="Talaqee Logo" className="h-8 w-auto object-contain grayscale opacity-60" />
-                            <span className="text-sm text-gray-400">© 2026 Talaqee. All rights reserved.</span>
+                <footer className="w-full bg-white border-t border-gray-100 pt-12 pb-8 mt-12">
+                    <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-10 border-b border-gray-100">
+                            <div className="md:col-span-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <img src="/logo/logo_app.talaqee.png" alt="Talaqee Logo" className="h-8 w-auto object-contain" />
+                                </div>
+                                <p className="text-xs text-gray-500 leading-relaxed max-w-sm mb-4">
+                                    Platform pembelajaran Al-Qur'an, buku islami digital, dan talaqqi terpercaya untuk meningkatkan kualitas tilawah dan literasi Anda.
+                                </p>
+                                <span className="inline-block text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+                                    Terintegrasi dengan iPaymu Payment Gateway
+                                </span>
+                            </div>
+
+                            <div className="md:col-span-5">
+                                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2.5">Alamat Kantor Bisnis</h4>
+                                <p className="text-xs text-gray-600 leading-relaxed mb-2">
+                                    Gang Mawar 26-7 RT/RW 003/008, Kelurahan Halim Perdana Kusuma, Kecamatan Makasar, Kota Jakarta Timur, Provinsi DKI Jakarta 13610
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                    <span className="font-semibold text-gray-700">Jam Operasional:</span> Senin – Jumat (08.00 – 17.00 WIB)
+                                </p>
+                            </div>
+
+                            <div className="md:col-span-3">
+                                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2.5">Layanan & Kontak</h4>
+                                <div className="space-y-1.5 text-xs text-gray-600">
+                                    <p><span className="font-medium text-gray-800">WhatsApp:</span> +62 822 8557 8390</p>
+                                    <p><span className="font-medium text-gray-800">Email:</span> saufitrod@gmail.com</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-6 text-sm font-medium text-gray-500">
-                            <Link href={route('faq.index')} className="hover:text-[#7e57c2] transition-colors">FAQ</Link>
-                            <Link href={route('refund.policy')} className="hover:text-[#7e57c2] transition-colors">Refund Policy</Link>
-                            <Link href={route('terms')} className="hover:text-[#7e57c2] transition-colors">Syarat & Ketentuan</Link>
-                            <Link href={route('kontak')} className="hover:text-[#7e57c2] transition-colors">Kontak</Link>
+
+                        <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                            <span className="text-xs text-gray-400">© 2026 Talaqee. All rights reserved.</span>
+                            <div className="flex items-center gap-6 text-xs font-medium text-gray-500">
+                                <Link href={route('faq.index')} className="hover:text-[#7e57c2] transition-colors">FAQ</Link>
+                                <Link href={route('refund.policy')} className="hover:text-[#7e57c2] transition-colors">Refund Policy</Link>
+                                <Link href={route('terms')} className="hover:text-[#7e57c2] transition-colors">Syarat & Ketentuan</Link>
+                                <Link href={route('kontak')} className="hover:text-[#7e57c2] transition-colors">Kontak</Link>
+                            </div>
                         </div>
                     </div>
                 </footer>
@@ -367,7 +398,7 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                         {koleksiBuku.length > 0 ? koleksiBuku.slice(0, 4).map((book) => (
                             <Link href={`/buku/${book.id}`} key={book.id} className="flex flex-col w-full block">
                                 <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-2 border border-gray-100 shadow-sm relative">
-                                    <img src={book.cover ? (book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`) : "/images/placeholders/book-cover.svg"} alt={book.title} className="w-full h-full object-cover" />
+                                    <img src={book.cover ? (book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`) : "/images/placeholders/book-cover.svg"} alt={book.title} loading="lazy" className="w-full h-full object-cover" />
                                     {book.coins_price > 0 && (
                                         <div className="absolute top-1.5 right-1.5 bg-white/90 backdrop-blur-sm rounded-full px-1 py-0.5 flex items-center gap-0.5 shadow-sm">
                                             <div className="w-2 h-2 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[4px] font-bold">C</div>
@@ -398,7 +429,7 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                         {koleksiVideo.length > 0 ? koleksiVideo.slice(0, 3).map((video) => (
                             <Link href={`/videos/${video.id}`} key={video.id} className="flex flex-col group block w-full">
                                 <div className="w-full aspect-video bg-gray-100 rounded-lg overflow-hidden relative mb-1.5 shadow-sm border border-gray-100">
-                                    <img src={video.thumbnail ? (video.thumbnail.startsWith('http') || video.thumbnail.startsWith('/') ? video.thumbnail : `/storage/${video.thumbnail}`) : "/images/placeholders/video-thumb.jpg"} alt={video.title} className="w-full h-full object-cover" />
+                                    <img src={video.thumbnail ? (video.thumbnail.startsWith('http') || video.thumbnail.startsWith('/') ? video.thumbnail : `/storage/${video.thumbnail}`) : "/images/placeholders/video-thumb.jpg"} alt={video.title} loading="lazy" className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                                         <div className="w-6 h-6 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white">
                                             <Play className="w-2.5 h-2.5 ml-0.5 fill-current" />
@@ -432,7 +463,7 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                         {koleksiBuku.length > 0 ? koleksiBuku.slice(0, 15).map((book) => (
                             <Link href={`/buku/${book.id}`} key={book.id} className="flex flex-col w-full block">
                                 <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-2 border border-gray-100 shadow-sm relative">
-                                    <img src={book.cover ? (book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`) : "/images/placeholders/book-cover.svg"} alt={book.title} className="w-full h-full object-cover" />
+                                    <img src={book.cover ? (book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`) : "/images/placeholders/book-cover.svg"} alt={book.title} loading="lazy" className="w-full h-full object-cover" />
                                     {book.coins_price > 0 && (
                                         <div className="absolute top-1.5 right-1.5 bg-white/90 backdrop-blur-sm rounded-full px-1 py-0.5 flex items-center gap-0.5 shadow-sm">
                                             <div className="w-2 h-2 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[4px] font-bold">C</div>
@@ -452,7 +483,14 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                 </div>
 
                 {/* Footer Mobile */}
-                <div className="px-5 mb-8 text-center">
+                <div className="px-5 mb-8 text-center border-t border-gray-100 pt-6">
+                    <p className="text-xs font-bold text-gray-800 mb-1">Talaqee</p>
+                    <p className="text-[11px] text-gray-500 leading-tight mb-2 max-w-xs mx-auto">
+                        Gang Mawar 26-7 RT/RW 003/008, Kel. Halim Perdana Kusuma, Kec. Makasar, Jakarta Timur 13610
+                    </p>
+                    <p className="text-[11px] text-gray-500 mb-3">
+                        WhatsApp: +62 822 8557 8390 • Email: saufitrod@gmail.com
+                    </p>
                     <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mb-3 text-[11px] font-bold text-gray-500">
                         <Link href={route('faq.index')} className="hover:text-blue-600">FAQ</Link>
                         <Link href={route('refund.policy')} className="hover:text-blue-600">Refund Policy</Link>
@@ -472,7 +510,7 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                             { id: 'rekaman', label: 'Rekaman', icon: Headphones, route: '/audios' },
                             { id: 'akun', label: 'Akun', icon: CircleUserRound, route: (typeof auth !== 'undefined' && auth?.user) ? '/akun' : '/login' }
                         ].map((item) => (
-                            <Link prefetch={['mount', 'hover']} href={item.route} key={item.id} className="flex flex-col items-center justify-center w-16 gap-1 relative mt-1">
+                            <Link prefetch="hover" href={item.route} key={item.id} className="flex flex-col items-center justify-center w-16 gap-1 relative mt-1">
                                 {item.active ? (
                                     <>
                                         <div className="w-10 h-10 flex items-center justify-center">

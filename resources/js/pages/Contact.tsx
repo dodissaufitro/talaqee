@@ -1,12 +1,12 @@
 import { Head, Link } from '@inertiajs/react';
 import React from 'react';
-import { ChevronLeft, Mail, MapPin, Phone } from 'lucide-react';
+import { ChevronLeft, Mail, MapPin, Phone, Clock, Building2, ShieldCheck, MessageSquare } from 'lucide-react';
 import WebDesktopNav from '@/components/WebDesktopNav';
 
 export default function Contact() {
     return (
         <div className="min-h-screen bg-gray-50 font-sans selection:bg-[#7e57c2] selection:text-white pb-20">
-            <Head title="Kontak Kami - Talaqee" />
+            <Head title="Kontak & Alamat Bisnis - Talaqee" />
 
             {/* Mobile Header */}
             <div className="md:hidden flex items-center px-5 py-4 bg-white sticky top-0 z-50 border-b border-gray-100">
@@ -14,7 +14,7 @@ export default function Contact() {
                     <ChevronLeft className="w-6 h-6 text-[#5C5AE6]" />
                 </Link>
                 <span className="text-[18px] font-bold text-[#1E293B]">
-                    Kontak Kami
+                    Kontak & Alamat Kami
                 </span>
             </div>
 
@@ -48,13 +48,13 @@ export default function Contact() {
                     {/* Left: Titles */}
                     <div className="w-full md:w-1/2">
                         <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-50 rounded-xl mb-6 text-[#6c40e6]">
-                            <Phone size={24} strokeWidth={2.5} />
+                            <Building2 size={24} strokeWidth={2.5} />
                         </div>
                         <h1 className="text-[36px] lg:text-[42px] font-extrabold text-[#111827] leading-tight mb-2 tracking-tight">
-                            Kontak Kami
+                            Kontak & Alamat Bisnis
                         </h1>
                         <p className="text-slate-500 text-[15px] font-medium">
-                            Kami siap membantu Anda. Jangan ragu menghubungi kami.
+                            Informasi resmi kontak, layanan bantuan pelanggan, dan domisili operasional Talaqee.
                         </p>
                     </div>
 
@@ -81,31 +81,114 @@ export default function Contact() {
                 </div>
             </div>
 
-            {/* Main Content */}
+            {/* Main Content Grid */}
             <div className="w-full px-6 md:px-12 lg:px-20 mt-10">
-                <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col items-center text-center">
-                        <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 mb-4">
-                            <Mail size={24} />
+                <div className="max-w-5xl mx-auto space-y-8">
+                    {/* 4 Cards Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {/* Card Alamat Bisnis */}
+                        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center">
+                            <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-4">
+                                <MapPin size={24} />
+                            </div>
+                            <h3 className="text-base font-bold text-gray-900 mb-2">Alamat Bisnis</h3>
+                            <p className="text-gray-600 text-xs leading-relaxed">
+                                Gang Mawar 26-7 RT/RW 003/008, Kelurahan Halim Perdana Kusuma, Kecamatan Makasar, Jakarta Timur, Provinsi DKI Jakarta 13610
+                            </p>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">Email</h3>
-                        <p className="text-gray-600">saufitrod@gmail.com</p>
+
+                        {/* Card Telepon / WA */}
+                        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center">
+                            <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-4">
+                                <Phone size={24} />
+                            </div>
+                            <h3 className="text-base font-bold text-gray-900 mb-2">WhatsApp / Telepon</h3>
+                            <p className="text-gray-600 text-xs mb-3">+62 822 8557 8390</p>
+                            <a 
+                                href="https://wa.me/6282285578390" 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50/80 px-3 py-1.5 rounded-full"
+                            >
+                                <MessageSquare size={13} /> Chat WhatsApp
+                            </a>
+                        </div>
+
+                        {/* Card Email */}
+                        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center">
+                            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
+                                <Mail size={24} />
+                            </div>
+                            <h3 className="text-base font-bold text-gray-900 mb-2">Email Dukungan</h3>
+                            <p className="text-gray-600 text-xs mb-3">saufitrod@gmail.com</p>
+                            <a 
+                                href="mailto:saufitrod@gmail.com" 
+                                className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50/80 px-3 py-1.5 rounded-full"
+                            >
+                                Kirim Email
+                            </a>
+                        </div>
+
+                        {/* Card Jam Operasional */}
+                        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center">
+                            <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-4">
+                                <Clock size={24} />
+                            </div>
+                            <h3 className="text-base font-bold text-gray-900 mb-2">Jam Layanan</h3>
+                            <div className="text-gray-600 text-xs space-y-1">
+                                <p><span className="font-semibold text-gray-700">Senin – Jumat:</span><br/>08:00 – 17:00 WIB</p>
+                                <p><span className="font-semibold text-gray-700">Sabtu – Ahad:</span><br/>09:00 – 15:00 WIB</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col items-center text-center">
-                        <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 mb-4">
-                            <Phone size={24} />
+                    {/* Informasi Profil Bisnis & Transaksi */}
+                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                            <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                                <ShieldCheck size={22} />
+                            </div>
+                            <div>
+                                <h2 className="text-lg font-bold text-gray-900">Informasi Bisnis & Operasional</h2>
+                                <p className="text-xs text-gray-500">Transparansi layanan digital dan transaksi resmi Talaqee</p>
+                            </div>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">WhatsApp / Telepon</h3>
-                        <p className="text-gray-600">+62 822 8557 8390</p>
-                    </div>
 
-                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col items-center text-center">
-                        <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 mb-4">
-                            <MapPin size={24} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                            <div className="space-y-4">
+                                <div>
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Nama Usaha / Platform</h4>
+                                    <p className="font-semibold text-gray-900">Talaqee</p>
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Jenis Layanan</h4>
+                                    <p className="text-gray-700 leading-relaxed">
+                                        Platform Pembelajaran Talaqqi Al-Qur'an, E-Book Islami, dan Pembelian Koin Digital untuk akses materi pembelajaran premium.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Pengiriman Produk Digital</h4>
+                                    <p className="text-gray-700 leading-relaxed">
+                                        Seluruh produk buku, audio, video, dan koin dikirimkan secara instan otomatis (digital delivery) ke akun pengguna setelah pembayaran diverifikasi.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Sistem Pembayaran Resmi</h4>
+                                    <p className="text-gray-700 leading-relaxed">
+                                        Didukung oleh Payment Gateway resmi berizin <strong>iPaymu</strong> dengan pilihan metode pembayaran Virtual Account, QRIS, dan Transfer Bank yang aman.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Bantuan Transaksi</h4>
+                                    <p className="text-gray-700 leading-relaxed">
+                                        Jika mengalami kendala transaksi top up koin atau pembelian materi, silakan hubungi tim kami melalui email atau WhatsApp dengan melampirkan nomor referensi transaksi.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">Alamat</h3>
-                        <p className="text-gray-600">Jakarta, Indonesia</p>
                     </div>
                 </div>
             </div>

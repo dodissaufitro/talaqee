@@ -142,7 +142,7 @@ export default function PengaturanIndex() {
 
                                 <div>
                                     <label className="block text-xs font-medium text-gray-700 mb-1.5">Alamat Toko</label>
-                                    <textarea rows={3} defaultValue="Jl. Merdeka No. 123, Jakarta Pusat,&#10;DKI Jakarta, Indonesia - 10110" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 bg-white focus:ring-[#6366f1] focus:border-[#6366f1] resize-none"></textarea>
+                                    <textarea rows={3} defaultValue="Gang Mawar 26-7 RT/RW 003/008, Kel. Halim Perdana Kusuma,&#10;Kec. Makasar, Jakarta Timur, DKI Jakarta 13610" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 bg-white focus:ring-[#6366f1] focus:border-[#6366f1] resize-none"></textarea>
                                 </div>
 
                                 <div>

@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import * as LucideIcons from 'lucide-react';
-import { ChevronDown, BookOpen, Book, LogOut } from 'lucide-react';
+import {
+    ChevronDown, BookOpen, Book, LogOut, Globe, LayoutDashboard,
+    ShoppingCart, Grid, Sparkles, Users, CreditCard, FileText,
+    Box, Megaphone, UserCircle, PlaySquare, Mic, HelpCircle,
+    ShieldCheck, Settings, Circle
+} from 'lucide-react';
+
+const ICON_MAP: Record<string, React.ElementType> = {
+    Globe, LayoutDashboard, ShoppingCart, Book, Grid, Sparkles,
+    Users, CreditCard, FileText, Box, Megaphone, UserCircle,
+    PlaySquare, Mic, HelpCircle, ShieldCheck, Settings, Circle, BookOpen
+};
 
 interface AdminSidebarProps {
     activeItem: string;
@@ -39,7 +49,7 @@ export default function AdminSidebar({ activeItem, auth: propAuth }: AdminSideba
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     const renderIcon = (iconName: string, active: boolean) => {
-        const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.Circle;
+        const IconComponent = ICON_MAP[iconName] || Circle;
         return <IconComponent size={20} className={active ? 'text-blue-600' : 'text-gray-400'} />;
     };
 

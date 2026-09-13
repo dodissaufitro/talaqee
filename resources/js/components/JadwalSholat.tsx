@@ -25,8 +25,24 @@ export default function JadwalSholat() {
         return () => clearInterval(timer);
     }, []);
 
-    // Fetch prayer times
+    // Fetch prayer times with instant localStorage cache
     useEffect(() => {
+        const todayKey = new Date().toISOString().slice(0, 10);
+        const cacheKey = `talaqee_prayer_${todayKey}`;
+        
+        // Cek cache lokal terlebih dahulu untuk render seketika (0ms)
+        let hasCache = false;
+        try {
+            const cachedTimes = localStorage.getItem(cacheKey);
+            const cachedLoc = localStorage.getItem('talaqee_prayer_location');
+            if (cachedTimes) {
+                setPrayerTimes(JSON.parse(cachedTimes));
+                if (cachedLoc) setLocationName(cachedLoc);
+                setLoading(false);
+                hasCache = true;
+            }
+        } catch (e) {}
+
         const fetchPrayerTimes = async (lat: number, lng: number, updateName = true) => {
             try {
                 // Call Aladhan API
@@ -48,13 +64,15 @@ export default function JadwalSholat() {
                         Isya: timings.Isha
                     };
                     setPrayerTimes(newPrayerTimes);
+                    try {
+                        localStorage.setItem(cacheKey, JSON.stringify(newPrayerTimes));
+                    } catch (e) {}
                     
                     // Schedule notifications
                     try {
                         const { LocalNotifications } = await import('@capacitor/local-notifications');
                         const permStatus = await LocalNotifications.requestPermissions();
                         if (permStatus.display === 'granted') {
-                            // Cancel old notifications first
                             const pending = await LocalNotifications.getPending();
                             if (pending.notifications.length > 0) {
                                 await LocalNotifications.cancel(pending);
@@ -69,20 +87,18 @@ export default function JadwalSholat() {
                             ];
 
                             const notificationsToSchedule = [];
-                            
                             for (const prayer of schedule) {
                                 const [pHours, pMinutes] = prayer.time.split(':').map(Number);
                                 const prayerDate = new Date();
                                 prayerDate.setHours(pHours, pMinutes, 0, 0);
                                 
-                                // Only schedule if time is in the future today
                                 if (prayerDate.getTime() > new Date().getTime()) {
                                     notificationsToSchedule.push({
                                         title: `Waktu Sholat ${prayer.name}`,
                                         body: `Telah masuk waktu sholat ${prayer.name} untuk wilayah Anda.`,
                                         id: prayer.id,
                                         schedule: { at: prayerDate },
-                                        sound: undefined, // default sound
+                                        sound: undefined,
                                         smallIcon: "ic_launcher_round"
                                     });
                                 }
@@ -93,43 +109,49 @@ export default function JadwalSholat() {
                             }
                         }
                     } catch (e) {
-                        console.log("LocalNotifications not available (likely running in web)");
+                        // LocalNotifications not available in web
                     }
 
                     if (updateName) {
                         try {
                             const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`);
                             const geoData = await geoRes.json();
-                            setLocationName(geoData.address.city || geoData.address.town || geoData.address.county || geoData.address.state || "Lokasi Anda");
+                            const resolvedName = geoData.address.city || geoData.address.town || geoData.address.county || geoData.address.state || "Lokasi Anda";
+                            setLocationName(resolvedName);
+                            try {
+                                localStorage.setItem('talaqee_prayer_location', resolvedName);
+                            } catch (e) {}
                         } catch (e) {
                             setLocationName("Lokasi Ditemukan");
                         }
                     }
-                } else {
+                } else if (!hasCache) {
                     setError("Gagal mengambil jadwal sholat.");
                 }
             } catch (err) {
-                setError("Koneksi gagal.");
+                if (!hasCache) setError("Koneksi gagal.");
             } finally {
                 setLoading(false);
             }
         };
 
-        // Segera ambil jadwal untuk Jakarta agar tidak stuck loading lama
-        setLocationName('Jakarta (Default)');
-        fetchPrayerTimes(-6.2088, 106.8456, false);
+        // Jika belum ada cache sama sekali, fetch Jakarta
+        if (!hasCache) {
+            setLocationName('Jakarta (Default)');
+            fetchPrayerTimes(-6.2088, 106.8456, false);
+        }
 
-        // Coba minta lokasi asli dari perangkat
-        if (navigator.geolocation) {
+        // Coba minta lokasi asli dari perangkat jika belum pernah disimpan
+        const savedLoc = localStorage.getItem('talaqee_prayer_location');
+        if (!savedLoc && navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    setLocationName('Mencari lokasi akurat...');
                     fetchPrayerTimes(position.coords.latitude, position.coords.longitude, true);
                 },
                 (err) => {
-                    console.log("Geolocation ditolak atau timeout, tetap gunakan Jakarta");
+                    // Timeout or denied
                 },
-                { timeout: 5000 }
+                { timeout: 4000 }
             );
         }
     }, []);

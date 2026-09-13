@@ -38,5 +38,19 @@ class UserSeeder extends Seeder
                 $user->assignRole('user');
             }
         }
+
+        if (!User::where('email', 'verifikasi@ipaymu.com')->exists()) {
+            $ipaymu = User::create([
+                'name' => 'Demo Tester iPaymu',
+                'email' => 'verifikasi@ipaymu.com',
+                'password' => Hash::make('TalaqeeDemo123!'),
+                'email_verified_at' => now(),
+                'phone' => '082285578390',
+                'city' => 'Jakarta Timur',
+            ]);
+            if (class_exists(\Spatie\Permission\Models\Role::class)) {
+                $ipaymu->assignRole('user');
+            }
+        }
     }
 }

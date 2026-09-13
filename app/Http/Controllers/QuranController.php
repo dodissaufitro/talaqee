@@ -10,7 +10,9 @@ class QuranController extends Controller
 {
     public function index()
     {
-        $surahs = Surah::orderBy('number')->get();
+        $surahs = \Illuminate\Support\Facades\Cache::remember('all_surahs_list', 86400, function () {
+            return Surah::orderBy('number')->get();
+        });
         return Inertia::render('Alquran/Index', [
             'surahs' => $surahs
         ]);

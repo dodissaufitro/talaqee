@@ -462,7 +462,7 @@ export default function Show({ book, chapters = [], purchased_chapter_ids = [] }
                     ].map((item) => {
                         const Icon = item.icon as React.ElementType;
                         return (
-                            <Link prefetch={['mount', 'hover']} href={item.route} key={item.id} className="flex flex-col items-center justify-center w-16 gap-1 relative mt-1">
+                            <Link prefetch="hover" href={item.route} key={item.id} className="flex flex-col items-center justify-center w-16 gap-1 relative mt-1">
                                 {item.active ? (
                                     <>
                                         <div className="w-10 h-10 flex items-center justify-center">

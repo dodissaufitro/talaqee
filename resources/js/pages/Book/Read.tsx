@@ -7,13 +7,15 @@ import {
 } from 'lucide-react';
 
 interface BookReadProps {
+    book?: any;
     book_id: number;
     chapter_id: number;
     chapter: any;
+    chapters?: any[];
     purchased_chapter_ids: number[];
 }
 
-export default function Read({ book_id, chapter_id, chapter, purchased_chapter_ids = [] }: BookReadProps) {
+export default function Read({ book, book_id, chapter_id, chapter, chapters = [], purchased_chapter_ids = [] }: BookReadProps) {
     const { auth, flash } = usePage<any>().props;
 
     const [progress, setProgress] = useState(1);
@@ -26,7 +28,7 @@ export default function Read({ book_id, chapter_id, chapter, purchased_chapter_i
     const fontSizes = ['text-[15px]', 'text-[17px]', 'text-[19px]', 'text-[21px]'];
     const [fontSizeIdx, setFontSizeIdx] = useState(1);
 
-    const lineSpacings = ['leading-[1.5]', 'leading-[1.8]', 'leading-[2.2]'];
+    const lineSpacings = ['leading-[1.6]', 'leading-[1.9]', 'leading-[2.3]'];
     const [lineSpacingIdx, setLineSpacingIdx] = useState(1);
 
     const fontFamilies = ['font-serif', 'font-sans'];
@@ -34,7 +36,7 @@ export default function Read({ book_id, chapter_id, chapter, purchased_chapter_i
 
     const themes = [
         { id: 'light', bg: 'bg-[#FCFBF8]', text: 'text-[#1F1F1F]', card: 'bg-white', border: 'border-gray-200/50' },
-        { id: 'dark', bg: 'bg-gray-900', text: 'text-gray-300', card: 'bg-gray-800', border: 'border-gray-700' },
+        { id: 'dark', bg: 'bg-gray-900', text: 'text-gray-200', card: 'bg-gray-800', border: 'border-gray-700' },
         { id: 'sepia', bg: 'bg-[#F4ECD8]', text: 'text-[#5C4033]', card: 'bg-[#FDF6E3]', border: 'border-[#E6D5B8]' }
     ];
     const [themeIdx, setThemeIdx] = useState(0);
@@ -45,6 +47,12 @@ export default function Read({ book_id, chapter_id, chapter, purchased_chapter_i
 
     const [confirmModal, setConfirmModal] = useState(false);
     const [errorModal, setErrorModal] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: '' });
+
+    // Daftar bab dan navigasi sebelumnya / selanjutnya
+    const sortedChapters = chapters.length > 0 ? chapters : [chapter];
+    const currentIdx = sortedChapters.findIndex((c: any) => c.id === chapter?.id);
+    const prevChapter = currentIdx > 0 ? sortedChapters[currentIdx - 1] : null;
+    const nextChapter = currentIdx >= 0 && currentIdx < sortedChapters.length - 1 ? sortedChapters[currentIdx + 1] : null;
 
     useEffect(() => {
         if (flash?.error) {
@@ -72,17 +80,66 @@ export default function Read({ book_id, chapter_id, chapter, purchased_chapter_i
 
     return (
         <div className={`min-h-screen ${currentTheme.bg} font-sans transition-colors duration-300 pb-28 relative`}>
-            <Head title={`Membaca - ${chapter?.title || 'Bab'}`} />
+            <Head title={`Membaca: ${chapter?.title || 'Bab'} - ${book?.title || 'Buku'}`} />
 
-            {/* Modal Overlay */}
-            {activeModal && (
+            {/* Modal Overlay: Daftar Isi */}
+            {activeModal === 'daftar-isi' && (
+                <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setActiveModal(null)}>
+                    <div className={`${currentTheme.card} ${currentTheme.text} w-full max-w-md rounded-2xl p-6 shadow-xl border ${currentTheme.border} max-h-[80vh] flex flex-col`} onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between pb-3 border-b mb-4">
+                            <h3 className="text-lg font-bold flex items-center gap-2">
+                                <List className="w-5 h-5 text-blue-600" />
+                                Daftar Isi ({sortedChapters.length} Bab)
+                            </h3>
+                            <button onClick={() => setActiveModal(null)} className="text-gray-400 hover:text-gray-600 text-lg font-bold px-2">&times;</button>
+                        </div>
+                        <div className="overflow-y-auto space-y-2 flex-1 pr-1">
+                            {sortedChapters.map((c: any) => {
+                                const isCurrent = c.id === chapter?.id;
+                                const locked = !c.is_free && !purchased_chapter_ids.includes(c.id);
+                                return (
+                                    <Link
+                                        key={c.id}
+                                        href={`/buku/${book_id}/read/${c.id}`}
+                                        onClick={() => setActiveModal(null)}
+                                        className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${
+                                            isCurrent 
+                                                ? 'bg-blue-50 border-blue-200 text-blue-700 font-bold'
+                                                : `${currentTheme.border} hover:bg-gray-50/50`
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-2.5 min-w-0">
+                                            <span className={`text-xs px-2 py-0.5 rounded font-mono ${isCurrent ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                                                Bab {c.chapter_number}
+                                            </span>
+                                            <span className="text-sm truncate">{c.title}</span>
+                                        </div>
+                                        <div>
+                                            {c.is_free ? (
+                                                <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">Gratis</span>
+                                            ) : locked ? (
+                                                <Lock className="w-4 h-4 text-amber-500" />
+                                            ) : (
+                                                <span className="text-[10px] text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded-full">Terbuka</span>
+                                            )}
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Overlay: Pengaturan / Catatan */}
+            {activeModal && activeModal !== 'daftar-isi' && (
                 <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setActiveModal(null)}>
                     <div className={`${currentTheme.card} ${currentTheme.text} w-full max-w-sm rounded-2xl p-6 shadow-xl border ${currentTheme.border}`} onClick={e => e.stopPropagation()}>
                         <h3 className="text-lg font-bold mb-2">
-                            {activeModal === 'daftar-isi' ? 'Daftar Isi' : activeModal === 'catatan' ? 'Catatan' : 'Menu'}
+                            {activeModal === 'catatan' ? 'Catatan Pembaca' : 'Pengaturan Tampilan'}
                         </h3>
                         <p className={`text-sm ${currentTheme.id === 'dark' ? 'text-gray-400' : 'text-gray-500'} mb-6`}>
-                            Fitur {activeModal.replace('-', ' ')} sedang dalam pengembangan dan akan segera tersedia.
+                            Gunakan panel di bagian bawah layar untuk mengatur ukuran font, jenis huruf, spasi baris, dan tema tampilan.
                         </p>
                         <button 
                             onClick={() => setActiveModal(null)}
@@ -98,41 +155,39 @@ export default function Read({ book_id, chapter_id, chapter, purchased_chapter_i
             {errorModal.isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className={`${currentTheme.bg} rounded-2xl w-full max-w-[320px] p-6 shadow-2xl scale-in-95 duration-200 text-center border ${currentTheme.border}`}>
-                        <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-red-600 font-bold text-2xl">!</span>
+                        <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Lock className="w-6 h-6" />
                         </div>
-                        <h3 className={`text-lg font-extrabold mb-2 ${currentTheme.id === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Gagal</h3>
-                        <p className={`text-sm mb-6 ${currentTheme.id === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{errorModal.message}</p>
-                        <button 
-                            onClick={() => setErrorModal({ isOpen: false, message: '' })}
-                            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors"
-                        >
-                            Tutup
-                        </button>
+                        <h3 className={`text-base font-bold mb-2 ${currentTheme.text}`}>Gagal Membuka Bab</h3>
+                        <p className="text-xs text-gray-500 mb-6 leading-relaxed">{errorModal.message}</p>
+                        <div className="flex gap-2">
+                            <button onClick={() => setErrorModal({ isOpen: false, message: '' })} className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">
+                                Batal
+                            </button>
+                            <Link href="/akun/topup" className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center">
+                                Top Up Koin
+                            </Link>
+                        </div>
                     </div>
                 </div>
             )}
 
-            {/* Confirmation Modal */}
+            {/* Confirm Unlock Modal */}
             {confirmModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className={`${currentTheme.bg} rounded-2xl w-full max-w-[320px] p-6 shadow-2xl scale-in-95 duration-200 text-center border ${currentTheme.border}`}>
-                        <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Lock className="w-6 h-6 text-blue-600" />
+                    <div className={`${currentTheme.card} rounded-2xl w-full max-w-[320px] p-6 shadow-2xl scale-in-95 duration-200 text-center border ${currentTheme.border}`}>
+                        <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Lock className="w-6 h-6" />
                         </div>
-                        <h3 className={`text-lg font-extrabold mb-2 ${currentTheme.id === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Buka Bab Ini?</h3>
-                        <p className={`text-sm mb-6 ${currentTheme.id === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Anda akan menggunakan koin Anda untuk membuka bab ini. Lanjutkan?</p>
-                        <div className="flex gap-3">
-                            <button 
-                                onClick={() => setConfirmModal(false)}
-                                className={`flex-1 py-3 font-bold rounded-xl transition-colors ${currentTheme.id === 'dark' ? 'bg-gray-800 hover:bg-gray-700 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
-                            >
+                        <h3 className={`text-base font-bold mb-2 ${currentTheme.text}`}>Buka Bab {chapter?.chapter_number || chapter_id}?</h3>
+                        <p className="text-xs text-gray-500 mb-6 leading-relaxed">
+                            Akan menggunakan <strong>{chapter?.coin_price || 10} koin</strong> dari saldo koin Talaqee Anda.
+                        </p>
+                        <div className="flex gap-2">
+                            <button onClick={() => setConfirmModal(false)} className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">
                                 Batal
                             </button>
-                            <button 
-                                onClick={proceedUnlock}
-                                className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors"
-                            >
+                            <button onClick={proceedUnlock} className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-sm">
                                 Ya, Buka
                             </button>
                         </div>
@@ -148,22 +203,24 @@ export default function Read({ book_id, chapter_id, chapter, purchased_chapter_i
                             <ArrowLeft className="w-5 h-5" />
                         </Link>
                         <div className="flex flex-col">
-                            <h1 className={`text-[15px] font-extrabold leading-tight ${currentTheme.id === 'dark' ? 'text-gray-200' : 'text-gray-900'}`}>Laut Bercerita</h1>
+                            <h1 className={`text-[15px] font-extrabold leading-tight ${currentTheme.id === 'dark' ? 'text-gray-200' : 'text-gray-900'}`}>
+                                {book?.title || 'Membaca Buku'}
+                            </h1>
                             <div className={`text-[11px] font-medium ${currentTheme.id === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                                {isLocked ? `Bab ${chapter_id} - ${chapter?.title || 'Terkunci'}` : (chapter?.title || 'Leila S. Chudori')}
+                                {book?.author?.name || ''} {book?.author?.name ? '•' : ''} Bab {chapter?.chapter_number || chapter_id}
                             </div>
                         </div>
                     </div>
                     <div className={`flex items-center gap-1.5 ${currentTheme.id === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>
-                        <button onClick={() => setIsBookmarked(!isBookmarked)} className={`p-1.5 rounded-full ${currentTheme.id === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'} ${isBookmarked ? 'text-blue-600' : ''}`}>
+                        <button onClick={() => setIsBookmarked(!isBookmarked)} className={`p-1.5 rounded-full ${currentTheme.id === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'} ${isBookmarked ? 'text-blue-600' : ''}`} title="Bookmark">
                             <Bookmark className="w-5 h-5" fill={isBookmarked ? 'currentColor' : 'none'} />
                         </button>
-                        <button onClick={() => setActiveModal('daftar-isi')} className={`p-1.5 rounded-full ${currentTheme.id === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}><List className="w-5 h-5" /></button>
-                        {isLocked ? (
-                            <button className={`p-1.5 rounded-full ${currentTheme.id === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}><Settings className="w-5 h-5" /></button>
-                        ) : (
-                            <button className={`p-1.5 rounded-full ${currentTheme.id === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}><MoreVertical className="w-5 h-5" /></button>
-                        )}
+                        <button onClick={() => setActiveModal('daftar-isi')} className={`p-1.5 rounded-full ${currentTheme.id === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} title="Daftar Isi">
+                            <List className="w-5 h-5" />
+                        </button>
+                        <button onClick={() => setActiveModal('settings')} className={`p-1.5 rounded-full ${currentTheme.id === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} title="Pengaturan">
+                            <Settings className="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
 
@@ -205,10 +262,7 @@ export default function Read({ book_id, chapter_id, chapter, purchased_chapter_i
                             className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-full shrink-0 shadow-sm transition-colors ${currentTheme.id === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
                         >
                             <Moon className="w-3.5 h-3.5" />
-                            <span className="text-[11px] font-bold">{currentTheme.id === 'light' ? 'Malam' : currentTheme.id === 'dark' ? 'Sepia' : 'Terang'}</span>
-                        </button>
-                        <button className={`p-1.5 border rounded-full shrink-0 shadow-sm transition-colors ${currentTheme.id === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
-                            <MoreHorizontal className="w-4 h-4" />
+                            <span className="text-[11px] font-bold">{currentTheme.id === 'light' ? 'Mode Malam' : currentTheme.id === 'dark' ? 'Mode Sepia' : 'Mode Terang'}</span>
                         </button>
                     </div>
                 )}
@@ -218,28 +272,41 @@ export default function Read({ book_id, chapter_id, chapter, purchased_chapter_i
             <div className={`relative max-w-2xl mx-auto px-6 py-10 ${isLocked ? 'overflow-hidden max-h-[65vh]' : ''}`}>
                 
                 {/* Floating Navigation Arrows */}
-                <div className="fixed left-2 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-1.5">
-                    <button 
-                        onClick={() => setProgress(Math.max(1, progress - 1))}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md border transition-colors ${currentTheme.id === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-white border-gray-100 text-gray-600'}`}
+                {prevChapter && (
+                    <Link
+                        href={`/buku/${book_id}/read/${prevChapter.id}`}
+                        className="fixed left-2 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-1.5 group"
+                        title={`Bab Sebelumnya: ${prevChapter.title}`}
                     >
-                        <ChevronLeft className="w-6 h-6" />
-                    </button>
-                    {isLocked && <span className={`text-[9px] font-bold text-center leading-tight ${currentTheme.id === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Bab<br/>Sebelumnya</span>}
-                </div>
-                <div className="fixed right-2 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-1.5">
-                    <button 
-                        onClick={() => setProgress(Math.min(totalPages, progress + 1))}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md border transition-colors ${currentTheme.id === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-white border-gray-100 text-gray-600'}`}
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md border transition-colors ${currentTheme.id === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400 group-hover:text-white' : 'bg-white border-gray-100 text-gray-600 group-hover:text-blue-600'}`}>
+                            <ChevronLeft className="w-6 h-6" />
+                        </div>
+                        <span className={`text-[9px] font-bold text-center leading-tight hidden md:block ${currentTheme.id === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Bab {prevChapter.chapter_number}
+                        </span>
+                    </Link>
+                )}
+
+                {nextChapter && (
+                    <Link
+                        href={`/buku/${book_id}/read/${nextChapter.id}`}
+                        className="fixed right-2 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-1.5 group"
+                        title={`Bab Selanjutnya: ${nextChapter.title}`}
                     >
-                        <ChevronRight className="w-6 h-6" />
-                    </button>
-                    {isLocked && <span className={`text-[9px] font-bold text-center leading-tight ${currentTheme.id === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Bab<br/>Selanjutnya</span>}
-                </div>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md border transition-colors ${currentTheme.id === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400 group-hover:text-white' : 'bg-white border-gray-100 text-gray-600 group-hover:text-blue-600'}`}>
+                            <ChevronRight className="w-6 h-6" />
+                        </div>
+                        <span className={`text-[9px] font-bold text-center leading-tight hidden md:block ${currentTheme.id === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Bab {nextChapter.chapter_number}
+                        </span>
+                    </Link>
+                )}
 
                 <div className={`${fontFamilies[fontFamilyIdx]} ${currentTheme.text} transition-all duration-300`}>
                     <div className="text-center mb-10">
-                        <p className={`text-[13px] font-bold mb-3 ${isLocked ? 'text-blue-600' : currentTheme.id === 'dark' ? 'text-gray-500' : 'text-gray-600'} ${!isLocked && 'tracking-[0.2em]'}`}>BAB {chapter_id}</p>
+                        <p className={`text-[13px] font-bold mb-3 ${isLocked ? 'text-blue-600' : currentTheme.id === 'dark' ? 'text-gray-500' : 'text-gray-600'} ${!isLocked && 'tracking-[0.2em]'}`}>
+                            BAB {chapter?.chapter_number || chapter_id}
+                        </p>
                         <h2 className={`text-3xl ${isLocked ? 'font-bold' : 'font-normal'}`}>{chapter?.title || 'Judul Bab'}</h2>
                         {isLocked ? (
                             <div className="flex justify-center mt-4">
@@ -250,46 +317,24 @@ export default function Read({ book_id, chapter_id, chapter, purchased_chapter_i
                         )}
                     </div>
 
+                    {/* Pure Text Reading View */}
                     <div className={`${fontSizes[fontSizeIdx]} ${lineSpacings[lineSpacingIdx]} space-y-6 transition-all duration-300 relative`}>
                         {isLocked ? (
-                            <>
-                                <p>Bab ini masih terkunci. Anda dapat membukanya dengan koin untuk melanjutkan membaca.</p>
-                            </>
-                        ) : chapter?.pdf_file ? (
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between pb-2">
-                                    <span className="text-xs text-gray-500 font-medium">Dokumen PDF Bab</span>
-                                    <a 
-                                        href={chapter.pdf_file} 
-                                        target="_blank" 
-                                        rel="noreferrer" 
-                                        className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-3 py-1.5 rounded-lg transition"
-                                    >
-                                        Buka PDF di Tab Baru ↗
-                                    </a>
-                                </div>
-                                <div className="w-full rounded-2xl overflow-hidden shadow-md border border-gray-200/80 bg-white">
-                                    <iframe 
-                                        src={`${chapter.pdf_file}#toolbar=1`} 
-                                        className="w-full h-[75vh] border-0" 
-                                        title={chapter.title || 'PDF Bab'}
-                                    />
-                                </div>
-                                {paragraphs.length > 0 && paragraphs[0] !== 'Belum ada konten untuk bab ini.' && (
-                                    <div className="mt-8 pt-6 border-t border-gray-200/60">
-                                        <h4 className="text-sm font-semibold mb-3">Catatan / Rangkuman:</h4>
-                                        <div className="space-y-4 text-sm leading-relaxed opacity-90">
-                                            {paragraphs.map((paragraph: string, idx: number) => (
-                                                <p key={idx}>{paragraph}</p>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                            <p className="text-center italic opacity-80 py-6">
+                                Bab ini masih terkunci. Anda dapat membukanya dengan koin untuk melanjutkan membaca.
+                            </p>
                         ) : (
-                            paragraphs.map((paragraph: string, idx: number) => (
-                                <p key={idx}>{paragraph}</p>
-                            ))
+                            paragraphs.length > 0 && paragraphs[0] !== 'Belum ada konten untuk bab ini.' ? (
+                                paragraphs.map((paragraph: string, idx: number) => (
+                                    <p key={idx} className="text-justify leading-relaxed indent-6">
+                                        {paragraph}
+                                    </p>
+                                ))
+                            ) : (
+                                <p className="italic text-gray-400 text-center py-16">
+                                    Belum ada konten teks untuk bab ini.
+                                </p>
+                            )
                         )}
                         
                         {/* Gradient Fade for Locked Content */}

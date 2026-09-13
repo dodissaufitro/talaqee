@@ -28,6 +28,7 @@ interface Chapter {
     book_id: number;
     chapter_number: number;
     title: string;
+    content?: string | null;
     pdf_file?: string | null;
     is_free: boolean;
     is_active: boolean;
@@ -211,18 +212,16 @@ export default function BukuShow() {
                                                 <td className="py-4 px-6 text-gray-900 font-medium">
                                                     <div className="flex items-center gap-2 flex-wrap">
                                                         <span>{chapter.title}</span>
-                                                        {chapter.pdf_file && (
-                                                            <a 
-                                                                href={chapter.pdf_file} 
-                                                                target="_blank" 
-                                                                rel="noreferrer"
-                                                                className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition flex items-center gap-1"
-                                                                title="Buka File PDF Bab"
-                                                            >
-                                                                PDF ↗
-                                                            </a>
-                                                        )}
-                                                        {chapter.is_free && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-600 uppercase">Gratis</span>}
+                                                        <a 
+                                                            href={route('buku.read', [(book as any).slug || book.id, chapter.id])}
+                                                            target="_blank" 
+                                                            rel="noreferrer"
+                                                            className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 transition flex items-center gap-1"
+                                                            title="Baca Teks Bab"
+                                                        >
+                                                            Baca Teks ↗
+                                                        </a>
+                                                        {chapter.is_free && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 uppercase">Gratis</span>}
                                                     </div>
                                                 </td>
                                                 <td className="py-4 px-6 text-gray-600">{chapter.coin_price} Koin</td>

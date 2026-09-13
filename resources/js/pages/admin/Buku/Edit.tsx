@@ -53,15 +53,14 @@ export default function BukuEdit() {
             title: c.title, 
             content: c.content || '', 
             coin_price: c.coin_price ?? '', 
-            existing_pdf: c.pdf_file || null,
-            pdf_file: null as File | null,
+            doc_file: null as File | null,
             isExpanded: false 
         })) : 
         []
     );
 
     const handleAddChapter = () => {
-        setChapters([...chapters, { id: null, title: '', content: '', coin_price: '', existing_pdf: null, pdf_file: null, isExpanded: true }]);
+        setChapters([...chapters, { id: null, title: '', content: '', coin_price: '', doc_file: null, isExpanded: true }]);
     };
 
     const handleRemoveChapter = (index: number) => {
@@ -76,9 +75,32 @@ export default function BukuEdit() {
     };
 
     const handleChapterFileChange = (index: number, file: File | null) => {
-        const newChapters = [...chapters];
-        newChapters[index] = { ...newChapters[index], pdf_file: file };
-        setChapters(newChapters);
+        if (!file) {
+            const newChapters = [...chapters];
+            newChapters[index] = { ...newChapters[index], doc_file: null };
+            setChapters(newChapters);
+            return;
+        }
+
+        // Jika file .txt, baca langsung teksnya ke content
+        if (file.name.endsWith('.txt') || file.type === 'text/plain') {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const text = event.target?.result as string;
+                const newChapters = [...chapters];
+                newChapters[index] = { 
+                    ...newChapters[index], 
+                    doc_file: file,
+                    content: text || newChapters[index].content 
+                };
+                setChapters(newChapters);
+            };
+            reader.readAsText(file);
+        } else {
+            const newChapters = [...chapters];
+            newChapters[index] = { ...newChapters[index], doc_file: file };
+            setChapters(newChapters);
+        }
     };
 
     const toggleChapterExpand = (index: number) => {
@@ -116,22 +138,21 @@ export default function BukuEdit() {
             }
         });
 
-        // Append chapters as a JSON string and individual chapter PDF files
+        // Append chapters as a JSON string and individual chapter Word/Text files
         const cleanChapters = chapters
             .map((c: any, index: number) => {
-                if (c.pdf_file) {
-                    formData.append(`chapter_pdf_${index}`, c.pdf_file);
+                if (c.doc_file) {
+                    formData.append(`chapter_doc_${index}`, c.doc_file);
                 }
                 return {
                     id: c.id,
                     title: c.title,
                     content: c.content,
                     coin_price: c.coin_price,
-                    pdf_file: c.existing_pdf,
-                    has_new_pdf: !!c.pdf_file,
+                    has_doc: !!c.doc_file,
                 };
             })
-            .filter((c: any) => c.title || c.content || c.pdf_file || c.has_new_pdf);
+            .filter((c: any) => c.title || c.content || c.has_doc);
 
         formData.append('chapters', JSON.stringify(cleanChapters));
 
@@ -371,23 +392,26 @@ export default function BukuEdit() {
                                                         </div>
                                                     </div>
 
-                                                    {/* Upload PDF Section */}
+                                                    {/* Upload Dokumen Word / Teks */}
                                                     <div>
-                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                            Upload File PDF Bab <span className="text-blue-600 font-normal">(Direkomendasikan)</span>
-                                                        </label>
-                                                        {chapter.pdf_file ? (
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <label className="block text-sm font-medium text-gray-700">
+                                                                Import Dokumen Word (.docx) atau Teks (.txt) <span className="text-gray-400 font-normal">(Opsional)</span>
+                                                            </label>
+                                                            <span className="text-xs text-blue-600 font-medium">Teks diekstrak otomatis</span>
+                                                        </div>
+                                                        {chapter.doc_file ? (
                                                             <div className="flex items-center justify-between p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl">
                                                                 <div className="flex items-center gap-3 min-w-0">
-                                                                    <div className="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
-                                                                        <FileText size={20} />
+                                                                    <div className="w-9 h-9 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                                                                        <FileText size={18} />
                                                                     </div>
                                                                     <div className="truncate">
                                                                         <p className="text-sm font-medium text-gray-900 truncate">
-                                                                            {chapter.pdf_file.name}
+                                                                            {chapter.doc_file.name}
                                                                         </p>
                                                                         <p className="text-xs text-gray-500">
-                                                                            {(chapter.pdf_file.size / 1024 / 1024).toFixed(2)} MB • File baru siap diupdate
+                                                                            {(chapter.doc_file.size / 1024).toFixed(1)} KB • Dokumen baru siap diproses
                                                                         </p>
                                                                     </div>
                                                                 </div>
@@ -395,55 +419,21 @@ export default function BukuEdit() {
                                                                     type="button"
                                                                     onClick={() => handleChapterFileChange(index, null)}
                                                                     className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-white transition-colors"
-                                                                    title="Batal upload file baru"
+                                                                    title="Hapus file baru"
                                                                 >
-                                                                    <X size={18} />
+                                                                    <X size={16} />
                                                                 </button>
                                                             </div>
-                                                        ) : chapter.existing_pdf ? (
-                                                            <div className="flex items-center justify-between p-3.5 bg-emerald-50/60 border border-emerald-200 rounded-xl">
-                                                                <div className="flex items-center gap-3 min-w-0">
-                                                                    <div className="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
-                                                                        <FileText size={20} />
-                                                                    </div>
-                                                                    <div className="truncate">
-                                                                        <p className="text-sm font-medium text-gray-900 flex items-center gap-1.5 truncate">
-                                                                            <CheckCircle size={14} className="text-emerald-600 shrink-0" />
-                                                                            PDF telah tersimpan
-                                                                        </p>
-                                                                        <a 
-                                                                            href={chapter.existing_pdf} 
-                                                                            target="_blank" 
-                                                                            rel="noreferrer" 
-                                                                            className="text-xs text-blue-600 hover:underline inline-block mt-0.5"
-                                                                        >
-                                                                            Lihat file PDF saat ini ↗
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                                <label className="cursor-pointer px-3 py-1.5 bg-white border border-gray-200 hover:border-blue-400 rounded-lg text-xs font-medium text-gray-700 hover:text-blue-600 transition-colors shrink-0">
-                                                                    Ganti PDF
-                                                                    <input
-                                                                        type="file"
-                                                                        accept="application/pdf,.pdf"
-                                                                        className="hidden"
-                                                                        onChange={(e) => {
-                                                                            const file = e.target.files?.[0] || null;
-                                                                            handleChapterFileChange(index, file);
-                                                                        }}
-                                                                    />
-                                                                </label>
-                                                            </div>
                                                         ) : (
-                                                            <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 hover:border-blue-400 rounded-xl cursor-pointer bg-gray-50/50 hover:bg-blue-50/30 transition-all group">
+                                                            <label className="flex flex-col items-center justify-center p-3.5 border-2 border-dashed border-gray-200 hover:border-blue-400 rounded-xl cursor-pointer bg-gray-50/50 hover:bg-blue-50/30 transition-all group">
                                                                 <div className="flex items-center gap-2 text-gray-500 group-hover:text-blue-600">
-                                                                    <Upload size={18} />
-                                                                    <span className="text-sm font-medium">Pilih file dokumen PDF bab</span>
+                                                                    <Upload size={16} />
+                                                                    <span className="text-xs font-medium">Pilih file Word (.docx) atau Teks (.txt) baru</span>
                                                                 </div>
-                                                                <p className="text-xs text-gray-400 mt-1">Format .pdf (Maks. 50MB)</p>
+                                                                <p className="text-[11px] text-gray-400 mt-0.5">Isi naskah akan diekstrak langsung ke teks bab</p>
                                                                 <input
                                                                     type="file"
-                                                                    accept="application/pdf,.pdf"
+                                                                    accept=".docx,.txt,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
                                                                     className="hidden"
                                                                     onChange={(e) => {
                                                                         const file = e.target.files?.[0] || null;
@@ -454,16 +444,22 @@ export default function BukuEdit() {
                                                         )}
                                                     </div>
 
+                                                    {/* Isi Teks Bab */}
                                                     <div>
-                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                            Isi Bab / Catatan Tambahan (Opsional)
-                                                        </label>
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <label className="block text-sm font-medium text-gray-700">
+                                                                Isi Teks Bab Buku *
+                                                            </label>
+                                                            <div className="flex items-center gap-2 text-xs text-gray-400">
+                                                                <span>{chapter.content ? chapter.content.trim().split(/\s+/).filter(Boolean).length : 0} kata</span>
+                                                            </div>
+                                                        </div>
                                                         <textarea 
                                                             value={chapter.content} 
                                                             onChange={(e) => handleChapterChange(index, 'content', e.target.value)}
-                                                            rows={3}
-                                                            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
-                                                            placeholder="Ringkasan atau teks bab alternatif jika tanpa PDF..."
+                                                            rows={6}
+                                                            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y font-serif text-sm leading-relaxed"
+                                                            placeholder="Ketik atau tempelkan (paste) isi naskah bab buku di sini. Teks akan tampil rapi saat dibaca..."
                                                         ></textarea>
                                                     </div>
                                                 </div>

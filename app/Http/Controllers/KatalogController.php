@@ -14,8 +14,12 @@ class KatalogController extends Controller
         $categories = \Illuminate\Support\Facades\Cache::remember('katalog_categories', 3600, function () {
             return Category::all();
         });
-        $popularBooks = Book::with(['author', 'category'])->where('is_popular', true)->take(20)->get();
-        $bukuTerbaru = Book::with(['author', 'category'])->latest()->take(40)->get();
+        $popularBooks = \Illuminate\Support\Facades\Cache::remember('katalog_popular_books', 1800, function () {
+            return Book::with(['author', 'category'])->withAvg('reviews', 'rating')->where('is_popular', true)->take(20)->get();
+        });
+        $bukuTerbaru = \Illuminate\Support\Facades\Cache::remember('katalog_buku_terbaru', 1800, function () {
+            return Book::with(['author', 'category'])->withAvg('reviews', 'rating')->latest()->take(40)->get();
+        });
 
         return Inertia::render('Katalog/Index', [
             'categories' => $categories,

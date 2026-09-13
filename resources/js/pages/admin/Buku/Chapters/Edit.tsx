@@ -46,7 +46,7 @@ export default function ChapterEdit() {
         title: chapter.title,
         description: chapter.description || '',
         content: chapter.content || '',
-        pdf_file: null as File | null,
+        doc_file: null as File | null,
         page_count: chapter.page_count,
         coin_price: chapter.coin_price,
         is_free: chapter.is_free,
@@ -58,13 +58,33 @@ export default function ChapterEdit() {
         if (type === 'checkbox') {
             const checked = (e.target as HTMLInputElement).checked;
             setValues(prev => ({ ...prev, [name]: checked }));
-        } else if (type === 'file') {
-            const files = (e.target as HTMLInputElement).files;
-            if (files && files.length > 0) {
-                setValues(prev => ({ ...prev, [name]: files[0] }));
-            }
         } else {
             setValues(prev => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+        const file = files[0];
+
+        // Jika file teks biasa (.txt), langsung baca dan isi ke editor teks
+        if (file.name.endsWith('.txt') || file.type === 'text/plain') {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const text = event.target?.result as string;
+                if (text) {
+                    setValues(prev => ({
+                        ...prev,
+                        content: text,
+                        doc_file: file
+                    }));
+                }
+            };
+            reader.readAsText(file);
+        } else {
+            // File Word .docx akan diproses dan diekstrak saat simpan
+            setValues(prev => ({ ...prev, doc_file: file }));
         }
     };
 
@@ -82,8 +102,8 @@ export default function ChapterEdit() {
         formData.append('is_free', values.is_free ? '1' : '0');
         formData.append('is_active', values.is_active ? '1' : '0');
 
-        if (values.pdf_file) {
-            formData.append('pdf_file', values.pdf_file);
+        if (values.doc_file) {
+            formData.append('doc_file', values.doc_file);
         }
 
         router.post(route('admin.books.chapters.update', [book.id, chapter.id]), formData);
@@ -187,98 +207,82 @@ export default function ChapterEdit() {
                             </div>
 
                             {/* Upload PDF Section */}
+                            {/* Upload Dokumen Word / Teks */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Upload File PDF Bab <span className="text-blue-600 font-normal">(Direkomendasikan)</span>
-                                </label>
-                                {values.pdf_file ? (
+                                <div className="flex items-center justify-between mb-1">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        Update dari Dokumen Word (.docx) atau Teks (.txt) <span className="text-gray-400 font-normal">(Opsional)</span>
+                                    </label>
+                                    <span className="text-xs text-blue-600 font-medium">Teks akan diekstrak otomatis</span>
+                                </div>
+                                {values.doc_file ? (
                                     <div className="flex items-center justify-between p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl">
                                         <div className="flex items-center gap-3 min-w-0">
-                                            <div className="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                                            <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
                                                 <FileText size={20} />
                                             </div>
                                             <div className="truncate">
                                                 <p className="text-sm font-medium text-gray-900 truncate">
-                                                    {(values.pdf_file as File).name}
+                                                    {(values.doc_file as File).name}
                                                 </p>
                                                 <p className="text-xs text-gray-500">
-                                                    {((values.pdf_file as File).size / 1024 / 1024).toFixed(2)} MB • File baru siap diupdate
+                                                    {((values.doc_file as File).size / 1024).toFixed(1)} KB • File baru siap diproses
                                                 </p>
                                             </div>
                                         </div>
                                         <button
                                             type="button"
-                                            onClick={() => setValues(prev => ({ ...prev, pdf_file: null }))}
+                                            onClick={() => setValues(prev => ({ ...prev, doc_file: null }))}
                                             className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-white transition-colors"
                                             title="Batal upload file baru"
                                         >
                                             <X size={18} />
                                         </button>
                                     </div>
-                                ) : chapter.pdf_file ? (
-                                    <div className="flex items-center justify-between p-3.5 bg-emerald-50/60 border border-emerald-200 rounded-xl">
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <div className="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
-                                                <FileText size={20} />
-                                            </div>
-                                            <div className="truncate">
-                                                <p className="text-sm font-medium text-gray-900 flex items-center gap-1.5 truncate">
-                                                    <CheckCircle size={14} className="text-emerald-600 shrink-0" />
-                                                    PDF saat ini telah tersimpan
-                                                </p>
-                                                <a 
-                                                    href={chapter.pdf_file} 
-                                                    target="_blank" 
-                                                    rel="noreferrer" 
-                                                    className="text-xs text-blue-600 hover:underline inline-block mt-0.5"
-                                                >
-                                                    Lihat file PDF bab ↗
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <label className="cursor-pointer px-3.5 py-2 bg-white border border-gray-200 hover:border-blue-400 rounded-xl text-xs font-medium text-gray-700 hover:text-blue-600 transition-colors shrink-0">
-                                            Ganti PDF
-                                            <input
-                                                type="file"
-                                                name="pdf_file"
-                                                accept="application/pdf,.pdf"
-                                                className="hidden"
-                                                onChange={handleChange}
-                                            />
-                                        </label>
-                                    </div>
                                 ) : (
                                     <label className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-gray-200 hover:border-blue-400 rounded-xl cursor-pointer bg-gray-50/50 hover:bg-blue-50/30 transition-all group">
                                         <div className="flex items-center gap-2 text-gray-500 group-hover:text-blue-600">
                                             <Upload size={20} />
-                                            <span className="text-sm font-medium">Pilih file dokumen PDF bab</span>
+                                            <span className="text-sm font-medium">Pilih file Word (.docx) atau Teks (.txt) baru</span>
                                         </div>
-                                        <p className="text-xs text-gray-400 mt-1">Format .pdf (Maksimal 50MB)</p>
+                                        <p className="text-xs text-gray-400 mt-1">Menggantikan atau memperbarui teks bab saat ini</p>
                                         <input
                                             type="file"
-                                            name="pdf_file"
-                                            accept="application/pdf,.pdf"
+                                            name="doc_file"
+                                            accept=".docx,.txt,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
                                             className="hidden"
-                                            onChange={handleChange}
+                                            onChange={handleFileChange}
                                         />
                                     </label>
                                 )}
-                                {errors.pdf_file && <p className="text-red-500 text-xs mt-1">{errors.pdf_file}</p>}
+                                {errors.doc_file && <p className="text-red-500 text-xs mt-1">{errors.doc_file}</p>}
                             </div>
 
+                            {/* Editor / Textarea Teks Bab */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Konten Bab / Catatan Tambahan (Opsional)
-                                </label>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        Isi Teks Bab Buku *
+                                    </label>
+                                    <div className="flex items-center gap-3 text-xs text-gray-400">
+                                        <span>{values.content ? values.content.trim().split(/\s+/).filter(Boolean).length : 0} kata</span>
+                                        <span>•</span>
+                                        <span>{values.content ? values.content.length : 0} karakter</span>
+                                    </div>
+                                </div>
                                 <textarea 
                                     name="content" 
                                     value={values.content} 
                                     onChange={handleChange}
-                                    rows={6}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y"
-                                    placeholder="Tuliskan isi bab atau ringkasan jika tidak menggunakan PDF..."
+                                    rows={12}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y font-serif text-gray-800 leading-relaxed text-[15px]"
+                                    placeholder="Ketik atau tempelkan (paste) isi bab buku di sini..."
+                                    required={!values.doc_file}
                                 ></textarea>
                                 {errors.content && <p className="text-red-500 text-xs mt-1">{errors.content}</p>}
+                                <p className="text-xs text-gray-400 mt-1">
+                                    Tips: Anda dapat langsung mengedit teks di atas, atau mengunggah file Word (.docx) / Teks (.txt) untuk memperbaruinya.
+                                </p>
                             </div>
 
                             <div className="bg-gray-50 p-4 rounded-xl space-y-3">

@@ -362,7 +362,7 @@ export default function VideoIndex({ categories, recentVideos, popularVideos }: 
                             { id: 'rekaman', label: 'Rekaman', icon: Headphones, route: '/audios' },
                             { id: 'akun', label: 'Akun', icon: CircleUserRound, route: (typeof auth !== 'undefined' && auth?.user) ? '/akun' : '/login' },
                         ].map((item) => (
-                            <Link prefetch={['mount', 'hover']} href={item.route} key={item.id} className="flex flex-col items-center justify-center w-16 gap-1.5 relative mt-1">
+                            <Link prefetch="hover" href={item.route} key={item.id} className="flex flex-col items-center justify-center w-16 gap-1.5 relative mt-1">
                                 {item.active ? (
                                     <>
                                         <div className="w-10 h-10 flex items-center justify-center">

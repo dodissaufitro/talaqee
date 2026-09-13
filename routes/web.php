@@ -14,11 +14,11 @@ Route::get('/', function () {
         return Category::all();
     });
     $popularBooks = \Illuminate\Support\Facades\Cache::remember('homepage_popular_books', 1800, function () {
-        return Book::with(['author', 'category'])->latest()->take(10)->get();
+        return Book::with(['author', 'category'])->withAvg('reviews', 'rating')->latest()->take(10)->get();
     });
 
     $koleksiBuku = \Illuminate\Support\Facades\Cache::remember('homepage_koleksi_buku', 1800, function () {
-        return Book::with('author')->latest()->take(15)->get();
+        return Book::with('author')->withAvg('reviews', 'rating')->latest()->take(15)->get();
     });
     $koleksiVideo = \Illuminate\Support\Facades\Cache::remember('homepage_koleksi_video', 1800, function () {
         return \App\Models\Video::with('author')->take(3)->get();
@@ -95,12 +95,24 @@ Route::get('/buku/{id}', function ($id) {
                 ->toArray()
             : [];
             
+        $bookModel = \App\Models\Book::with('author')->findOrFail($book);
         $chapter = \App\Models\BookChapter::where('book_id', $book)->findOrFail($chapterId);
+        
+        $isPurchased = in_array($chapter->id, $purchasedChapterIds);
+        $chapter->is_locked = !$chapter->is_free && !$isPurchased;
+        
+        $allChapters = \App\Models\BookChapter::where('book_id', $book)
+            ->where('is_active', true)
+            ->orderBy('chapter_number', 'asc')
+            ->select('id', 'chapter_number', 'title', 'is_free', 'coin_price')
+            ->get();
             
         return Inertia::render('Book/Read', [
-            'book_id' => $book,
-            'chapter_id' => $chapterId,
+            'book' => $bookModel,
+            'book_id' => (int) $book,
+            'chapter_id' => (int) $chapterId,
             'chapter' => $chapter,
+            'chapters' => $allChapters,
             'purchased_chapter_ids' => $purchasedChapterIds
         ]);
     })->name('buku.read');

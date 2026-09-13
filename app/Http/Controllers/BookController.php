@@ -92,13 +92,22 @@ class BookController extends Controller
                 foreach ($chapters as $index => $chapter) {
                     $hasTitle = !empty($chapter['title']);
                     $hasContent = !empty($chapter['content']);
+                    $hasDoc = $request->hasFile("chapter_doc_{$index}");
                     $hasPdf = $request->hasFile("chapter_pdf_{$index}");
 
-                    if ($hasTitle || $hasContent || $hasPdf) {
+                    if ($hasTitle || $hasContent || $hasDoc || $hasPdf) {
                         $coinPrice = isset($chapter['coin_price']) && $chapter['coin_price'] !== '' 
                             ? (int)$chapter['coin_price'] 
                             : ($book->coin_per_chapter ?? 10);
                         $isFree = $coinPrice == 0;
+
+                        $content = $chapter['content'] ?? null;
+                        if ($hasDoc) {
+                            $extracted = $this->extractTextFromFile($request->file("chapter_doc_{$index}"));
+                            if (!empty($extracted)) {
+                                $content = $extracted;
+                            }
+                        }
 
                         $pdfPath = null;
                         if ($hasPdf) {
@@ -109,7 +118,7 @@ class BookController extends Controller
                         $book->chapters()->create([
                             'chapter_number' => $index + 1,
                             'title' => !empty($chapter['title']) ? $chapter['title'] : 'Bab ' . ($index + 1),
-                            'content' => $chapter['content'] ?? null,
+                            'content' => $content,
                             'pdf_file' => $pdfPath,
                             'coin_price' => $coinPrice,
                             'is_free' => $isFree,
@@ -191,14 +200,23 @@ class BookController extends Controller
                 foreach ($chapters as $index => $chapterData) {
                     $hasTitle = !empty($chapterData['title']);
                     $hasContent = !empty($chapterData['content']);
+                    $hasDoc = $request->hasFile("chapter_doc_{$index}");
                     $hasPdf = $request->hasFile("chapter_pdf_{$index}");
                     $existingPdf = $chapterData['pdf_file'] ?? null;
 
-                    if ($hasTitle || $hasContent || $hasPdf || $existingPdf) {
+                    if ($hasTitle || $hasContent || $hasDoc || $hasPdf || $existingPdf) {
                         $coinPrice = isset($chapterData['coin_price']) && $chapterData['coin_price'] !== '' 
                             ? (int)$chapterData['coin_price'] 
                             : ($book->coin_per_chapter ?? 10);
                         $isFree = $coinPrice == 0;
+
+                        $content = $chapterData['content'] ?? null;
+                        if ($hasDoc) {
+                            $extracted = $this->extractTextFromFile($request->file("chapter_doc_{$index}"));
+                            if (!empty($extracted)) {
+                                $content = $extracted;
+                            }
+                        }
 
                         $pdfPath = $existingPdf;
                         if ($hasPdf) {
@@ -213,7 +231,7 @@ class BookController extends Controller
                                 $updateData = [
                                     'chapter_number' => $index + 1,
                                     'title' => !empty($chapterData['title']) ? $chapterData['title'] : 'Bab ' . ($index + 1),
-                                    'content' => $chapterData['content'] ?? null,
+                                    'content' => $content,
                                     'coin_price' => $coinPrice,
                                     'is_free' => $isFree,
                                 ];
@@ -228,7 +246,7 @@ class BookController extends Controller
                             $newChapter = $book->chapters()->create([
                                 'chapter_number' => $index + 1,
                                 'title' => !empty($chapterData['title']) ? $chapterData['title'] : 'Bab ' . ($index + 1),
-                                'content' => $chapterData['content'] ?? null,
+                                'content' => $content,
                                 'pdf_file' => $pdfPath,
                                 'coin_price' => $coinPrice,
                                 'is_free' => $isFree,
@@ -247,6 +265,38 @@ class BookController extends Controller
         }
 
         return redirect()->route('admin.books.index')->with('success', 'Buku berhasil diperbarui.');
+    }
+
+    /**
+     * Ekstrak teks bersih dari dokumen Word (.docx) atau berkas Teks (.txt)
+     */
+    private function extractTextFromFile($file): ?string
+    {
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        if ($extension === 'txt') {
+            return file_get_contents($file->getRealPath());
+        }
+
+        if ($extension === 'docx') {
+            $zip = new \ZipArchive();
+            if ($zip->open($file->getRealPath()) === true) {
+                $xml = $zip->getFromName('word/document.xml');
+                $zip->close();
+                if ($xml) {
+                    $xml = str_replace(['</w:p>', '<w:br/>', '<w:br>', '<w:cr/>'], ["\n\n", "\n", "\n", "\n"], $xml);
+                    $text = strip_tags($xml);
+                    $decoded = html_entity_decode($text, ENT_QUOTES | ENT_XML1, 'UTF-8');
+                    $lines = explode("\n", $decoded);
+                    $cleaned = array_map(function ($line) {
+                        return trim(preg_replace('/[ \t]+/', ' ', $line));
+                    }, $lines);
+                    return trim(implode("\n", $cleaned));
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
