@@ -52,21 +52,7 @@ export default function KategoriCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const formData = new FormData();
-        Object.entries(values).forEach(([key, value]) => {
-            if (value !== null && value !== '') {
-                // handle boolean values for formData
-                if (typeof value === 'boolean') {
-                    formData.append(key, value ? '1' : '0');
-                } else {
-                    formData.append(key, value as any);
-                }
-            }
-        });
-
-        router.post(route('admin.categories.store'), formData, {
-            forceFormData: true,
-        });
+        router.post(route('admin.categories.store'), values);
     };
 
     return (

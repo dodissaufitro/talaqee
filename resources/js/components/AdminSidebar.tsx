@@ -4,13 +4,13 @@ import {
     ChevronDown, BookOpen, Book, LogOut, Globe, LayoutDashboard,
     ShoppingCart, Grid, Sparkles, Users, CreditCard, FileText,
     Box, Megaphone, UserCircle, PlaySquare, Mic, HelpCircle,
-    ShieldCheck, Settings, Circle
+    ShieldCheck, Settings, Circle, Feather
 } from 'lucide-react';
 
 const ICON_MAP: Record<string, React.ElementType> = {
     Globe, LayoutDashboard, ShoppingCart, Book, Grid, Sparkles,
     Users, CreditCard, FileText, Box, Megaphone, UserCircle,
-    PlaySquare, Mic, HelpCircle, ShieldCheck, Settings, Circle, BookOpen
+    PlaySquare, Mic, HelpCircle, ShieldCheck, Settings, Circle, BookOpen, Feather
 };
 
 interface AdminSidebarProps {
@@ -28,6 +28,7 @@ export const adminNavItems = [
     { name: 'Dashboard', icon: 'LayoutDashboard', route: 'admin.dashboard' },
     { name: 'Penjualan', icon: 'ShoppingCart', route: 'admin.sales.index' },
     { name: 'Buku', icon: 'Book', route: 'admin.books.index' },
+    { name: 'Penulis', icon: 'Feather', route: 'admin.authors.index' },
     { name: 'Kategori', icon: 'Grid', route: 'admin.categories.index' },
     { name: 'Ikon', icon: 'Sparkles', route: 'admin.icons.index' },
     { name: 'Pelanggan', icon: 'Users', route: 'admin.customers.index' },

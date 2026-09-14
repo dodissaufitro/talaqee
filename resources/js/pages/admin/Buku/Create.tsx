@@ -33,6 +33,14 @@ interface PageProps {
 export default function BukuCreate() {
     const { categories, authors, errors, auth } = usePage<PageProps>().props;
 
+    const [authorList, setAuthorList] = useState<Author[]>(authors || []);
+    const [isAuthorModalOpen, setIsAuthorModalOpen] = useState(false);
+    const [newAuthorName, setNewAuthorName] = useState('');
+    const [newAuthorBio, setNewAuthorBio] = useState('');
+    const [authorSubmitting, setAuthorSubmitting] = useState(false);
+    const [authorModalError, setAuthorModalError] = useState('');
+    const [authorSuccessMsg, setAuthorSuccessMsg] = useState('');
+
     const [values, setValues] = useState({
         title: '',
         category_id: '',
@@ -52,6 +60,55 @@ export default function BukuCreate() {
 
     const handleAddChapter = () => {
         setChapters([...chapters, { title: '', content: '', coin_price: '', doc_file: null, isExpanded: true }]);
+    };
+
+    const handleQuickAddAuthor = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newAuthorName.trim()) {
+            setAuthorModalError('Nama penulis wajib diisi');
+            return;
+        }
+
+        setAuthorSubmitting(true);
+        setAuthorModalError('');
+
+        try {
+            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content
+                || (document.cookie.match(/(^|;\s*)XSRF-TOKEN=([^;]+)/)?.[2] ? decodeURIComponent(document.cookie.match(/(^|;\s*)XSRF-TOKEN=([^;]+)/)![2]) : '');
+
+            const response = await fetch(route('admin.authors.quick-store'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': token,
+                    'X-XSRF-TOKEN': token,
+                },
+                body: JSON.stringify({
+                    name: newAuthorName,
+                    bio: newAuthorBio,
+                }),
+            });
+
+            const data = await response.json();
+            if (response.ok && data.success) {
+                const created = data.author;
+                setAuthorList(prev => [...prev, { id: created.id, name: created.name }]);
+                setValues(prev => ({ ...prev, author_id: String(created.id) }));
+                setIsAuthorModalOpen(false);
+                setNewAuthorName('');
+                setNewAuthorBio('');
+                setAuthorSuccessMsg(`Penulis "${created.name}" berhasil ditambahkan dan dipilih!`);
+                setTimeout(() => setAuthorSuccessMsg(''), 4000);
+            } else {
+                setAuthorModalError(data.message || data.errors?.name?.[0] || 'Gagal menambahkan penulis');
+            }
+        } catch (err: any) {
+            setAuthorModalError('Terjadi kesalahan saat menyimpan penulis.');
+        } finally {
+            setAuthorSubmitting(false);
+        }
     };
 
     const handleRemoveChapter = (index: number) => {
@@ -225,7 +282,20 @@ export default function BukuCreate() {
                                     {errors.category_id && <p className="text-red-500 text-xs mt-1">{errors.category_id}</p>}
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Penulis</label>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <label className="block text-sm font-medium text-gray-700">Penulis</label>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setAuthorModalError('');
+                                                setIsAuthorModalOpen(true);
+                                            }}
+                                            className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 hover:underline cursor-pointer"
+                                        >
+                                            <Plus size={14} />
+                                            Tambah Penulis Baru
+                                        </button>
+                                    </div>
                                     <select 
                                         name="author_id" 
                                         value={values.author_id} 
@@ -233,10 +303,15 @@ export default function BukuCreate() {
                                         className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
                                     >
                                         <option value="">Pilih Penulis</option>
-                                        {authors.map(author => (
+                                        {authorList.map(author => (
                                             <option key={author.id} value={author.id}>{author.name}</option>
                                         ))}
                                     </select>
+                                    {authorSuccessMsg && (
+                                        <p className="text-emerald-600 text-xs mt-1 flex items-center gap-1 font-medium">
+                                            <CheckCircle size={13} /> {authorSuccessMsg}
+                                        </p>
+                                    )}
                                     {errors.author_id && <p className="text-red-500 text-xs mt-1">{errors.author_id}</p>}
                                 </div>
                             </div>
@@ -466,6 +541,77 @@ export default function BukuCreate() {
                     </div>
                 </div>
             </main>
+
+            {/* Quick Modal Tambah Penulis */}
+            {isAuthorModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white w-full max-w-md rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                            <h3 className="text-lg font-bold text-gray-900">Tambah Penulis Baru</h3>
+                            <button
+                                type="button"
+                                onClick={() => setIsAuthorModalOpen(false)}
+                                className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleQuickAddAuthor} className="p-6 space-y-4">
+                            {authorModalError && (
+                                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600">
+                                    {authorModalError}
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Nama Penulis <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newAuthorName}
+                                    onChange={(e) => setNewAuthorName(e.target.value)}
+                                    placeholder="Contoh: Ustadz Dr. Firanda Andirja"
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                    required
+                                    autoFocus
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Biografi Singkat (Opsional)
+                                </label>
+                                <textarea
+                                    rows={3}
+                                    value={newAuthorBio}
+                                    onChange={(e) => setNewAuthorBio(e.target.value)}
+                                    placeholder="Deskripsi singkat mengenai penulis..."
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAuthorModalOpen(false)}
+                                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition"
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={authorSubmitting}
+                                    className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition disabled:opacity-50"
+                                >
+                                    {authorSubmitting ? 'Menyimpan...' : 'Simpan & Pilih'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

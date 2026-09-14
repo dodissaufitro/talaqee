@@ -53,19 +53,7 @@ export default function KategoriEdit() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const formData = new FormData();
-        Object.entries(values).forEach(([key, value]) => {
-            if (value !== null && value !== '') {
-                // handle boolean values for formData
-                if (typeof value === 'boolean') {
-                    formData.append(key, value ? '1' : '0');
-                } else {
-                    formData.append(key, value as any);
-                }
-            }
-        });
-
-        router.put(route('admin.categories.update', category.id), formData as any);
+        router.put(route('admin.categories.update', category.id), values);
     };
 
     return (

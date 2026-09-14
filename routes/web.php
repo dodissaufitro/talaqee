@@ -199,6 +199,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/books/{book}/chapters/{chapter}/edit', [\App\Http\Controllers\BookChapterController::class, 'edit'])->name('admin.books.chapters.edit');
         Route::put('/admin/books/{book}/chapters/{chapter}', [\App\Http\Controllers\BookChapterController::class, 'update'])->name('admin.books.chapters.update');
         Route::delete('/admin/books/{book}/chapters/{chapter}', [\App\Http\Controllers\BookChapterController::class, 'destroy'])->name('admin.books.chapters.destroy');
+        Route::post('/admin/authors/quick-store', [\App\Http\Controllers\AuthorController::class, 'quickStore'])->name('admin.authors.quick-store');
+        Route::resource('/admin/authors', \App\Http\Controllers\AuthorController::class)->except(['create', 'show', 'edit'])->names([
+            'index' => 'admin.authors.index',
+            'store' => 'admin.authors.store',
+            'update' => 'admin.authors.update',
+            'destroy' => 'admin.authors.destroy',
+        ]);
         Route::get('/admin/categories', [\App\Http\Controllers\CategoryController::class, 'index'])->name('admin.categories.index');
         Route::get('/admin/categories/create', [\App\Http\Controllers\CategoryController::class, 'create'])->name('admin.categories.create');
         Route::post('/admin/categories', [\App\Http\Controllers\CategoryController::class, 'store'])->name('admin.categories.store');

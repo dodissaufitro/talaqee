@@ -55,7 +55,14 @@ class CategoryController extends Controller
             'is_active' => 'boolean'
         ]);
         
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        $baseSlug = \Illuminate\Support\Str::slug($validated['name']);
+        $slug = $baseSlug;
+        $counter = 1;
+        while (Category::where('slug', $slug)->exists()) {
+            $slug = "{$baseSlug}-{$counter}";
+            $counter++;
+        }
+        $validated['slug'] = $slug;
 
         Category::create($validated);
 
@@ -100,7 +107,14 @@ class CategoryController extends Controller
             'is_active' => 'boolean'
         ]);
         
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        $baseSlug = \Illuminate\Support\Str::slug($validated['name']);
+        $slug = $baseSlug;
+        $counter = 1;
+        while (Category::where('slug', $slug)->where('id', '!=', $category->id)->exists()) {
+            $slug = "{$baseSlug}-{$counter}";
+            $counter++;
+        }
+        $validated['slug'] = $slug;
 
         $category->update($validated);
 
