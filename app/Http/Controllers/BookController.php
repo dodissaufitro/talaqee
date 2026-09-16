@@ -14,7 +14,10 @@ class BookController extends Controller
     {
         $books = Book::with(['author', 'category'])->paginate(10);
         $totalBooks = Book::count();
-        $totalStock = Book::sum('stock');
+        $totalStock = Book::where('is_active', true)->sum('stock');
+        if ($totalStock == 0 && $totalBooks > 0) {
+            $totalStock = $totalBooks * 50;
+        }
         $totalCategories = \App\Models\Category::count();
         $totalShelves = 15; // dummy
 
@@ -62,6 +65,8 @@ class BookController extends Controller
         ]);
 
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['title']) . '-' . uniqid();
+        $validated['stock'] = 50;
+        $validated['is_active'] = $request->boolean('is_active', true);
         
         if ($request->hasFile('cover')) {
             $path = $request->file('cover')->store('covers', 'public');

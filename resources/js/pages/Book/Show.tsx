@@ -52,8 +52,13 @@ export default function Show({ book, chapters = [], purchased_chapter_ids = [] }
         }
     }, [flash]);
     
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem('last_book_url', window.location.pathname);
+        }
+    }, [book?.id]);
+
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-    const [selectedCoinPackage, setSelectedCoinPackage] = useState<number | null>(250);
     const [userRating, setUserRating] = useState(5);
     const [reviewText, setReviewText] = useState('');
 
@@ -64,11 +69,33 @@ export default function Show({ book, chapters = [], purchased_chapter_ids = [] }
             window.location.href = '/login';
             return;
         }
+
+        const targetChapter = chapters.find((c) => c.id === chapterId);
+        const requiredCoin = targetChapter?.coin_price ?? 10;
+
+        if (coinBalance < requiredCoin) {
+            const returnUrl = `/buku/${book.id}`;
+            sessionStorage.setItem('last_book_url', returnUrl);
+            router.visit(`/akun/topup?return_url=${encodeURIComponent(returnUrl)}`);
+            return;
+        }
+
         setConfirmModal({ isOpen: true, chapterId });
     };
 
     const proceedUnlock = () => {
         if (confirmModal.chapterId !== null) {
+            const targetChapter = chapters.find((c) => c.id === confirmModal.chapterId);
+            const requiredCoin = targetChapter?.coin_price ?? 10;
+
+            if (coinBalance < requiredCoin) {
+                setConfirmModal({ isOpen: false, chapterId: null });
+                const returnUrl = `/buku/${book.id}`;
+                sessionStorage.setItem('last_book_url', returnUrl);
+                router.visit(`/akun/topup?return_url=${encodeURIComponent(returnUrl)}`);
+                return;
+            }
+
             router.post(`/buku/${book.id}/chapter/${confirmModal.chapterId}/unlock`, {}, {
                 preserveScroll: true
             });
@@ -195,167 +222,64 @@ export default function Show({ book, chapters = [], purchased_chapter_ids = [] }
             {/* Divider */}
             <div className="w-full h-1 bg-gray-50"></div>
 
-            {/* Coins Section */}
-            <div className="px-5 py-5 mb-1">
-                <div className="flex mb-5">
-                    {/* Koin Saya */}
-                    <div className="w-[125px] shrink-0 border-r border-gray-100 pr-4 mr-4">
-                        <p className="text-[12px] font-medium text-gray-900 mb-3">Koin Saya</p>
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="w-7 h-7 bg-amber-400 rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm font-bold">C</span>
-                            </div>
-                            <span className="text-2xl font-bold text-gray-900">{coinBalance}</span>
-                            <div className="w-5 h-5 bg-orange-100 rounded-full flex items-center justify-center ml-auto shadow-sm">
-                                <span className="text-orange-500 text-sm font-bold leading-none mb-0.5">+</span>
-                            </div>
-                        </div>
-                        <button className="text-[11px] font-medium text-blue-600 flex items-center gap-0.5">
-                            Riwayat Transaksi <ChevronRight className="w-3 h-3" />
-                        </button>
-                    </div>
-
-                    {/* Top Up Scroll */}
-                    <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-medium text-gray-500 leading-none relative z-10">Top Up Koin</p>
-                        <div className="flex gap-2.5 overflow-x-auto hide-scrollbar pb-1 pt-2.5 -mt-1.5">
-                            {/* Card 1 */}
-                            <div 
-                                onClick={() => setSelectedCoinPackage(100)}
-                                className={`shrink-0 w-[85px] p-2 border rounded-xl flex flex-col items-center shadow-sm cursor-pointer transition-colors ${selectedCoinPackage === 100 ? 'border-emerald-500 bg-emerald-50/30' : 'border-gray-200 bg-white'}`}
-                            >
-                                <div className="flex items-center gap-1.5 mb-1 mt-0.5">
-                                    <span className="text-[16px] font-bold text-gray-900">100</span>
-                                    <div className="w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center"><span className="text-[8px] text-white font-bold">C</span></div>
-                                </div>
-                                <span className="text-[10px] text-gray-500 font-medium">Rp 5.000</span>
-                            </div>
-                            {/* Card 2 (Popular) */}
-                            <div 
-                                onClick={() => setSelectedCoinPackage(250)}
-                                className={`shrink-0 w-[85px] p-2 border rounded-xl flex flex-col items-center relative shadow-sm cursor-pointer transition-colors ${selectedCoinPackage === 250 ? 'border-emerald-500 bg-emerald-50/30' : 'border-gray-200 bg-white'}`}
-                            >
-                                <div className="absolute -top-2.5 bg-emerald-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-md">Popular</div>
-                                <div className="flex items-center gap-1.5 mb-1 mt-0.5">
-                                    <span className="text-[16px] font-bold text-gray-900">250</span>
-                                    <div className="w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center"><span className="text-[8px] text-white font-bold">C</span></div>
-                                </div>
-                                <span className="text-[10px] text-gray-500 font-medium">Rp 10.000</span>
-                            </div>
-                            {/* Card 3 */}
-                            <div 
-                                onClick={() => setSelectedCoinPackage(500)}
-                                className={`shrink-0 w-[85px] p-2 border rounded-xl flex flex-col items-center shadow-sm cursor-pointer transition-colors ${selectedCoinPackage === 500 ? 'border-emerald-500 bg-emerald-50/30' : 'border-gray-200 bg-white'}`}
-                            >
-                                <div className="flex items-center gap-1.5 mb-1 mt-0.5">
-                                    <span className="text-[16px] font-bold text-gray-900">500</span>
-                                    <div className="w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center"><span className="text-[8px] text-white font-bold">C</span></div>
-                                </div>
-                                <span className="text-[10px] text-gray-500 font-medium">Rp 20.000</span>
-                            </div>
-                        </div>
-                        <Link href="/akun/topup" className="text-[11px] font-medium text-blue-600 flex items-center gap-0.5 justify-center w-full mt-3 hover:text-blue-700 transition-colors">
-                            Lihat Semua Paket <ChevronRight className="w-3 h-3" />
-                        </Link>
-                    </div>
-                </div>
-
-                {/* Banner Info */}
-                <div className="bg-blue-50/50 rounded-xl p-3 flex items-center justify-between border border-blue-100/50">
-                    <div className="flex items-start gap-3">
-                        <div className="w-5 h-5 shrink-0 bg-blue-600 rounded-full flex items-center justify-center mt-0.5">
-                            <span className="text-white font-bold text-[11px] italic">i</span>
-                        </div>
-                        <div>
-                            <p className="text-[11px] font-medium text-gray-800 leading-tight">1 bab dapat dibuka menggunakan 10 koin</p>
-                            <p className="text-[10px] text-gray-500 mt-1">Buka dan baca kapan saja selama tidak direset.</p>
-                        </div>
-                    </div>
-                    <button className="shrink-0 bg-white border border-gray-100 shadow-sm rounded-lg px-2.5 py-1 text-[10px] font-bold text-blue-600">
-                        Cara Kerja
-                    </button>
-                </div>
-            </div>
-
-            {/* Divider */}
-            <div className="w-full h-1 bg-gray-50"></div>
-
             {/* Chapters List */}
             <div className="px-5 py-6">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-[15px] font-extrabold text-gray-900">Daftar Bab</h3>
-                    <span className="text-[11px] text-gray-500 font-medium">Total 379 Bab</span>
+                    <span className="text-[11px] text-gray-500 font-medium">Total {displayChapters.length} Bab</span>
                 </div>
 
                 <div className="flex flex-col gap-2.5">
-                    {displayChapters.map((chapter) => {
-                        const isPurchased = purchased_chapter_ids.map(String).includes(String(chapter.id));
-                        const canRead = chapter.is_free || isPurchased;
+                    {displayChapters.length === 0 ? (
+                        <div className="py-8 text-center text-gray-400 text-sm">
+                            Belum ada bab yang tersedia.
+                        </div>
+                    ) : (
+                        displayChapters.map((chapter) => {
+                            const isPurchased = purchased_chapter_ids.map(String).includes(String(chapter.id));
+                            const canRead = chapter.is_free || isPurchased;
 
-                        return canRead ? (
-                            <Link href={`/buku/${book.id}/read/${chapter.id}`} key={chapter.id} className={`flex items-center gap-3 p-3.5 rounded-xl border ${chapter.is_free ? 'bg-white border-transparent shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:bg-gray-50' : 'bg-emerald-50/30 border-emerald-100/50 hover:bg-emerald-100/30'}`}>
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shrink-0 ${chapter.is_free ? 'bg-emerald-50 text-emerald-600' : 'bg-emerald-600 text-white'}`}>
-                                    {chapter.chapter_number}
-                                </div>
-                                <div className="flex-1 min-w-0 pr-2">
-                                    <h4 className="text-[13px] font-extrabold text-gray-900 leading-tight mb-0.5 truncate">{chapter.title}</h4>
-                                    <p className="text-[11px] text-gray-500">{chapter.page_count} halaman</p>
-                                </div>
-                                <div className="shrink-0">
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex flex-col items-center text-right">
-                                            <span className="text-[10px] font-bold text-emerald-600">Gratis</span>
-                                            <span className="text-[10px] font-bold text-emerald-600 leading-none">Dibuka</span>
-                                        </div>
-                                        <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
-                                            <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                            return canRead ? (
+                                <Link href={`/buku/${book.id}/read/${chapter.id}`} key={chapter.id} className={`flex items-center gap-3 p-3.5 rounded-xl border ${chapter.is_free ? 'bg-white border-transparent shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:bg-gray-50' : 'bg-emerald-50/30 border-emerald-100/50 hover:bg-emerald-100/30'}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shrink-0 ${chapter.is_free ? 'bg-emerald-50 text-emerald-600' : 'bg-emerald-600 text-white'}`}>
+                                        {chapter.chapter_number}
+                                    </div>
+                                    <div className="flex-1 min-w-0 pr-2">
+                                        <h4 className="text-[13px] font-extrabold text-gray-900 leading-tight mb-0.5 truncate">{chapter.title}</h4>
+                                        <p className="text-[11px] text-gray-500">{chapter.page_count} halaman</p>
+                                    </div>
+                                    <div className="shrink-0">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex flex-col items-center text-right">
+                                                <span className="text-[10px] font-bold text-emerald-600">Gratis</span>
+                                                <span className="text-[10px] font-bold text-emerald-600 leading-none">Dibuka</span>
+                                            </div>
+                                            <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                                                <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                                            </div>
                                         </div>
                                     </div>
+                                </Link>
+                            ) : (
+                                <div key={chapter.id} className="flex items-center gap-3 p-3.5 rounded-xl border bg-blue-50/30 border-blue-100/50 hover:bg-blue-100/30 cursor-pointer" onClick={() => handleUnlockClick(chapter.id)}>
+                                    <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shrink-0 bg-blue-600 text-white">
+                                        {chapter.chapter_number}
+                                    </div>
+                                    <div className="flex-1 min-w-0 pr-2">
+                                        <h4 className="text-[13px] font-extrabold text-gray-900 leading-tight mb-0.5 truncate">{chapter.title}</h4>
+                                        <p className="text-[11px] text-gray-500">{chapter.page_count} halaman</p>
+                                    </div>
+                                    <div className="shrink-0">
+                                        <button className="bg-white border border-blue-200 text-blue-600 rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-sm pointer-events-none">
+                                            <span className="text-[11px] font-bold">Buka</span>
+                                            <div className="w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center"><span className="text-[8px] text-white font-bold">C</span></div>
+                                            <span className="text-[12px] font-bold">{chapter.coin_price}</span>
+                                        </button>
+                                    </div>
                                 </div>
-                            </Link>
-                        ) : (
-                            <div key={chapter.id} className="flex items-center gap-3 p-3.5 rounded-xl border bg-blue-50/30 border-blue-100/50 hover:bg-blue-100/30 cursor-pointer" onClick={() => handleUnlockClick(chapter.id)}>
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shrink-0 bg-blue-600 text-white">
-                                    {chapter.chapter_number}
-                                </div>
-                                <div className="flex-1 min-w-0 pr-2">
-                                    <h4 className="text-[13px] font-extrabold text-gray-900 leading-tight mb-0.5 truncate">{chapter.title}</h4>
-                                    <p className="text-[11px] text-gray-500">{chapter.page_count} halaman</p>
-                                </div>
-                                <div className="shrink-0">
-                                    <button className="bg-white border border-blue-200 text-blue-600 rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-sm pointer-events-none">
-                                        <span className="text-[11px] font-bold">Buka</span>
-                                        <div className="w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center"><span className="text-[8px] text-white font-bold">C</span></div>
-                                        <span className="text-[12px] font-bold">{chapter.coin_price}</span>
-                                    </button>
-                                </div>
-                            </div>
-                        );
-                    })}
-
-                    {/* Bundle Unlock */}
-                    <div className="mt-3 p-4 border border-purple-100 bg-white rounded-xl flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.04)] relative overflow-hidden">
-                        {/* Soft purple gradient background */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-50/80 to-transparent"></div>
-                        
-                        <div className="flex items-center gap-3 relative z-10">
-                            <div className="w-9 h-9 rounded-full border border-purple-200 bg-white flex items-center justify-center shrink-0">
-                                <Lock className="w-4 h-4 text-purple-600" />
-                            </div>
-                            <div>
-                                <h4 className="text-[13px] font-extrabold text-gray-900 leading-tight mb-0.5">Bab 7 dan seterusnya</h4>
-                                <p className="text-[11px] text-gray-500">373 bab</p>
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-end relative z-10">
-                            <button className="border border-purple-300 bg-white text-purple-600 rounded-full px-3.5 py-1.5 flex items-center gap-1.5 shadow-sm hover:bg-purple-50">
-                                <span className="text-[11px] font-bold">Beli Semua Bab</span>
-                                <div className="w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center"><span className="text-[8px] text-white font-bold">C</span></div>
-                                <span className="text-[12px] font-bold">3.000</span>
-                            </button>
-                            <span className="text-[10px] font-medium text-purple-600 mt-1.5 mr-1">Hemat 25%</span>
-                        </div>
-                    </div>
+                            );
+                        })
+                    )}
                 </div>
             </div>
 

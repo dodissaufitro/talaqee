@@ -16,9 +16,6 @@ export default function TopUp() {
     const coinBalance = auth?.user?.coin_balance || 0;
     
     useEffect(() => {
-        if (flash?.error) {
-            alert(flash.error);
-        }
         if (flash?.success) {
             alert(flash.success);
         }
@@ -31,14 +28,28 @@ export default function TopUp() {
         if (!selectedPackage) return;
         setIsCheckingOut(true);
         
+        const params = new URLSearchParams(window.location.search);
+        const returnUrl = params.get('return_url') || sessionStorage.getItem('last_book_url') || '';
+
         router.post('/akun/topup/checkout', {
-            package_id: selectedPackage
+            package_id: selectedPackage,
+            return_url: returnUrl
         }, {
             onFinish: () => setIsCheckingOut(false),
         });
     };
 
     const selectedPkg = coinPackages.find(p => p.id === selectedPackage);
+
+    const handleBack = () => {
+        const params = new URLSearchParams(window.location.search);
+        const returnUrl = params.get('return_url') || sessionStorage.getItem('last_book_url');
+        if (returnUrl) {
+            router.visit(returnUrl);
+        } else {
+            window.history.back();
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] pb-24 font-sans selection:bg-blue-100">
@@ -47,7 +58,7 @@ export default function TopUp() {
             {/* Header */}
             <div className="bg-white px-6 py-4 flex items-center justify-between sticky top-0 z-50 border-b border-[#F1F5F9] shadow-sm">
                 <div className="flex items-center gap-4">
-                    <button onClick={() => window.history.back()} className="w-10 h-10 bg-[#F8FAFC] rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors">
+                    <button onClick={handleBack} className="w-10 h-10 bg-[#F8FAFC] rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors">
                         <ChevronLeft className="w-6 h-6 text-[#1E293B]" />
                     </button>
                     <h1 className="text-[18px] font-extrabold text-[#1E293B]">Top Up Koin</h1>
@@ -55,6 +66,14 @@ export default function TopUp() {
             </div>
 
             <div className="md:max-w-md md:mx-auto pt-6 px-6">
+                {/* Flash Notice */}
+                {flash?.error && (
+                    <div className="mb-6 bg-amber-50 border border-amber-200/80 text-amber-900 text-sm p-4 rounded-2xl flex items-start gap-3 shadow-sm animate-in fade-in duration-200">
+                        <Info className="w-5 h-5 shrink-0 text-amber-600 mt-0.5" />
+                        <span className="font-semibold text-[13px] leading-snug">{flash.error}</span>
+                    </div>
+                )}
+
                 {/* Current Balance */}
                 <div className="bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] rounded-[20px] p-6 text-white mb-8 shadow-lg relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10 blur-xl"></div>

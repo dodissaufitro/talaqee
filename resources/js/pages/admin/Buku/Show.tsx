@@ -53,6 +53,7 @@ interface PageProps {
 
 export default function BukuShow() {
     const { book, chapters, salesData, auth } = usePage<PageProps>().props;
+    const [coverError, setCoverError] = React.useState(false);
 
     const handleDeleteChapter = (chapterId: number) => {
         if (confirm('Apakah Anda yakin ingin menghapus bab ini?')) {
@@ -105,10 +106,19 @@ export default function BukuShow() {
                         <div className="p-8 flex flex-col md:flex-row gap-8">
                             <div className="w-full md:w-64 shrink-0">
                                 <div className="aspect-[2/3] bg-gray-100 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
-                                    {book.cover ? (
-                                        <img src={book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`} alt={book.title} className="w-full h-full object-cover" />
+                                    {book.cover && !coverError ? (
+                                        <img 
+                                            src={book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`} 
+                                            alt={book.title} 
+                                            className="w-full h-full object-cover" 
+                                            onError={() => setCoverError(true)}
+                                        />
                                     ) : (
-                                        <Book size={64} className="text-gray-300" />
+                                        <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-blue-800 flex flex-col items-center justify-center text-white p-6 text-center select-none relative">
+                                            <div className="absolute top-0 left-0 w-2.5 h-full bg-black/20"></div>
+                                            <BookOpen size={48} className="text-white/80 mb-3" />
+                                            <p className="font-bold text-lg leading-tight text-white/95 line-clamp-3">{book.title}</p>
+                                        </div>
                                     )}
                                 </div>
                             </div>

@@ -33,6 +33,12 @@ class TopUpController extends Controller
         $package = $this->coinPackages[$packageId];
         $user = $request->user();
 
+        // Simpan URL buku terakhir ke session
+        $returnUrl = $request->input('return_url') ?: session('last_book_url');
+        if ($returnUrl) {
+            session(['topup_return_url' => $returnUrl]);
+        }
+
         // 1. Prepare iPaymu Request Data
         $va = env('IPAYMU_VA');
         $apiKey = env('IPAYMU_API_KEY');
@@ -40,6 +46,41 @@ class TopUpController extends Controller
 
         // Create a unique transaction reference
         $transactionId = 'TALAQEE-COIN-' . time() . '-' . $user->id;
+
+        // Jika VA / API Key iPaymu belum diisi di environment local, lakukan simulasi top up langsung
+        if (empty($va) || empty($apiKey)) {
+            $newBalance = $user->coin_balance + $package['coins'];
+            $user->coin_balance = $newBalance;
+            $user->save();
+
+            \Illuminate\Support\Facades\DB::table('coin_transactions')->insert([
+                'user_id' => $user->id,
+                'type' => 'topup',
+                'amount' => $package['coins'],
+                'balance_before' => $user->coin_balance - $package['coins'],
+                'balance_after' => $newBalance,
+                'reference_type' => 'simulasi_local',
+                'reference_id' => null,
+                'description' => 'Top Up ' . $package['coins'] . ' Koin (Simulasi)',
+                'transaction_number' => $transactionId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $targetUrl = session()->pull('topup_return_url') ?: session('last_book_url');
+            if (!$targetUrl) {
+                $progress = \App\Models\ReadingProgress::where('user_id', $user->id)
+                    ->orderBy('last_read_at', 'desc')
+                    ->first();
+                if ($progress && $progress->book_id) {
+                    $targetUrl = $progress->chapter_id 
+                        ? "/buku/{$progress->book_id}/read/{$progress->chapter_id}"
+                        : "/buku/{$progress->book_id}";
+                }
+            }
+
+            return redirect($targetUrl ?: '/akun/topup')->with('success', 'Top Up ' . $package['coins'] . ' Koin Berhasil!');
+        }
 
         $body = [
             'product' => ['Top Up ' . $package['coins'] . ' Koin Talaqee'],
@@ -78,13 +119,13 @@ class TopUpController extends Controller
             $paymentUrl = $result['Data']['Url'];
             $sessionId = $result['Data']['SessionID'];
 
-            // Normally you would save this transaction to DB as 'pending'
+            // Save this transaction to DB as 'pending'
             \Illuminate\Support\Facades\DB::table('coin_transactions')->insert([
                 'user_id' => $user->id,
                 'type' => 'topup',
                 'amount' => $package['coins'],
                 'balance_before' => $user->coin_balance,
-                'balance_after' => $user->coin_balance, // Will be updated on callback
+                'balance_after' => $user->coin_balance, // Will be updated on callback / return
                 'reference_type' => 'ipaymu',
                 'reference_id' => null,
                 'description' => 'Top Up ' . $package['coins'] . ' Koin via iPaymu (Session: '.$sessionId.')',
@@ -104,7 +145,6 @@ class TopUpController extends Controller
     public function success(Request $request)
     {
         // Simulasi Localhost: Tambahkan koin langsung saat user diarahkan kembali ke aplikasi
-        // Di server production asli, proses ini HANYA boleh ada di dalam fungsi callback().
         $user = clone $request->user();
 
         // Ambil transaksi terakhir yang masih pending untuk user ini
@@ -131,7 +171,19 @@ class TopUpController extends Controller
                 ]);
         }
 
-        return redirect('/akun/topup')->with('success', 'Top Up Koin Berhasil! (Koin telah ditambahkan otomatis untuk keperluan simulasi Localhost)');
+        $targetUrl = session()->pull('topup_return_url') ?: session('last_book_url');
+        if (!$targetUrl) {
+            $progress = \App\Models\ReadingProgress::where('user_id', $user->id)
+                ->orderBy('last_read_at', 'desc')
+                ->first();
+            if ($progress && $progress->book_id) {
+                $targetUrl = $progress->chapter_id 
+                    ? "/buku/{$progress->book_id}/read/{$progress->chapter_id}"
+                    : "/buku/{$progress->book_id}";
+            }
+        }
+
+        return redirect($targetUrl ?: '/akun/topup')->with('success', 'Top Up Koin Berhasil! Koin telah ditambahkan.');
     }
 
     public function cancel()

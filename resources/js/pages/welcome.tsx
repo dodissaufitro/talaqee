@@ -459,23 +459,32 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                         </Link>
                     </div>
                     
-                    <div className="px-5 grid grid-cols-5 gap-x-2 gap-y-4">
-                        {koleksiBuku.length > 0 ? koleksiBuku.slice(0, 15).map((book) => (
-                            <Link href={`/buku/${book.id}`} key={book.id} className="flex flex-col w-full block">
-                                <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-2 border border-gray-100 shadow-sm relative">
-                                    <img src={book.cover ? (book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`) : "/images/placeholders/book-cover.svg"} alt={book.title} loading="lazy" className="w-full h-full object-cover" />
-                                    {book.coins_price > 0 && (
-                                        <div className="absolute top-1.5 right-1.5 bg-white/90 backdrop-blur-sm rounded-full px-1 py-0.5 flex items-center gap-0.5 shadow-sm">
-                                            <div className="w-2 h-2 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[4px] font-bold">C</div>
-                                            <span className="text-[7px] font-bold text-gray-900">{book.coins_price}</span>
+                    <div className="px-5 grid grid-cols-2 gap-2">
+                        {koleksiBuku.length > 0 ? koleksiBuku.slice(0, 10).map((book) => (
+                            <Link href={`/buku/${book.id}`} key={book.id} className="group flex flex-col w-full bg-white rounded-xl p-2.5 border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                                <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-2.5 border border-gray-50 shadow-inner relative">
+                                    <img 
+                                        src={book.cover ? (book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`) : "/images/placeholders/book-cover.svg"} 
+                                        alt={book.title} 
+                                        loading="lazy" 
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                                    />
+                                    {book.coins_price > 0 ? (
+                                        <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1 shadow-sm border border-black/5">
+                                            <div className="w-3 h-3 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[7px] font-bold">C</div>
+                                            <span className="text-[9px] font-bold text-gray-900">{book.coins_price}</span>
+                                        </div>
+                                    ) : (
+                                        <div className="absolute top-2 right-2 bg-emerald-500/90 backdrop-blur-sm text-white text-[9px] font-bold rounded-full px-2 py-0.5 shadow-sm">
+                                            Gratis
                                         </div>
                                     )}
                                 </div>
-                                <h4 className="font-bold text-[9px] text-gray-900 leading-[1.3] mb-1 line-clamp-2 min-h-[24px]">{book.title}</h4>
-                                <p className="text-[8px] font-medium text-gray-500 truncate">{book.author?.name || 'Penulis'}</p>
+                                <h4 className="font-bold text-[12px] text-gray-900 leading-[1.35] mb-1 line-clamp-2 min-h-[32px] group-hover:text-blue-600 transition-colors">{book.title}</h4>
+                                <p className="text-[10px] font-medium text-gray-500 truncate">{book.author?.name || 'Penulis'}</p>
                             </Link>
                         )) : (
-                            <div className="col-span-3 w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-center text-gray-500 text-[11px]">
+                            <div className="col-span-2 w-full bg-gray-50 border border-gray-100 rounded-xl p-6 text-center text-gray-500 text-xs">
                                 Belum ada buku
                             </div>
                         )}

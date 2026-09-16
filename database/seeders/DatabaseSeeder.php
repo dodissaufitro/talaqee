@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             IconSeeder::class,
             BookStoreSeeder::class,
+            BookChapterSeeder::class,
             VideoSeeder::class,
         ]);
     }

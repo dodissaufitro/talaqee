@@ -41,7 +41,10 @@ class ChapterPurchaseController extends Controller
         $price = $chapter->coin_price;
 
         if ($user->coin_balance < $price) {
-            return back()->with('error', 'Koin Anda tidak mencukupi untuk membuka bab ini.');
+            $returnUrl = url()->previous() ?: route('buku.show', $book->id);
+            session(['topup_return_url' => $returnUrl]);
+            return redirect()->route('akun.topup', ['return_url' => $returnUrl])
+                ->with('error', 'Koin Anda tidak mencukupi untuk membuka bab ini. Silakan lakukan top up koin terlebih dahulu.');
         }
 
         try {

@@ -78,6 +78,10 @@ Route::get('/buku/{id}', function ($id) {
             ->toArray()
         : [];
         
+    if (auth()->check()) {
+        session(['last_book_url' => "/buku/{$id}"]);
+    }
+        
     return Inertia::render('Book/Show', [
         'book' => $book,
         'chapters' => $chapters,
@@ -107,6 +111,18 @@ Route::get('/buku/{id}', function ($id) {
             ->select('id', 'chapter_number', 'title', 'is_free', 'coin_price')
             ->get();
             
+        if (auth()->check()) {
+            session(['last_book_url' => "/buku/{$book}/read/{$chapterId}"]);
+            \App\Models\ReadingProgress::updateOrCreate(
+                ['user_id' => auth()->id(), 'book_id' => $bookModel->id],
+                [
+                    'chapter_id' => $chapter->id,
+                    'last_read_at' => now(),
+                    'progress_percent' => 0
+                ]
+            );
+        }
+
         return Inertia::render('Book/Read', [
             'book' => $bookModel,
             'book_id' => (int) $book,

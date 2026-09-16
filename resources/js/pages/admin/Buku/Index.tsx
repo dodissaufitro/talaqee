@@ -16,6 +16,7 @@ interface BookItem {
     cover: string | null;
     price: number;
     stock: number;
+    is_active?: boolean;
     author: {
         name: string;
     };
@@ -58,12 +59,54 @@ const formatRupiah = (number: number) => {
     }).format(number);
 };
 
+function BookThumbnail({ cover, title }: { cover?: string | null; title: string }) {
+    const [hasError, setHasError] = useState(false);
+
+    const gradients = [
+        'from-blue-600 to-indigo-800',
+        'from-emerald-600 to-teal-800',
+        'from-amber-500 to-orange-700',
+        'from-purple-600 to-indigo-900',
+        'from-rose-600 to-pink-800',
+        'from-cyan-600 to-blue-700',
+    ];
+
+    let hash = 0;
+    for (let i = 0; i < (title || '').length; i++) {
+        hash = (title || '').charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const gradient = gradients[Math.abs(hash) % gradients.length];
+    const initial = (title || 'B').trim().charAt(0).toUpperCase() || 'B';
+
+    let resolvedSrc = '';
+    if (cover && !hasError) {
+        resolvedSrc = cover.startsWith('http') || cover.startsWith('/') ? cover : `/storage/${cover}`;
+    }
+
+    if (!resolvedSrc || hasError) {
+        return (
+            <div className={`w-11 h-14 bg-gradient-to-br ${gradient} rounded-lg overflow-hidden shrink-0 flex flex-col items-center justify-center shadow-sm relative text-white border border-white/20 select-none`}>
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-black/20"></div>
+                <BookOpen size={16} className="text-white/80 mb-0.5" />
+                <span className="text-[10px] font-bold tracking-tight text-white/95 leading-none">{initial}</span>
+            </div>
+        );
+    }
+
+    return (
+        <div className="w-11 h-14 bg-gray-100 rounded-lg overflow-hidden shrink-0 shadow-sm border border-gray-100 relative">
+            <img 
+                src={resolvedSrc} 
+                alt={title} 
+                className="w-full h-full object-cover" 
+                onError={() => setHasError(true)}
+            />
+        </div>
+    );
+}
+
 export default function BukuIndex() {
     const { books, stats, auth } = usePage<PageProps>().props;
-
-    
-
-    
 
     const getCategoryBadge = (category: string) => {
         const cat = category?.toLowerCase() || '';
@@ -75,11 +118,11 @@ export default function BukuIndex() {
         return <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-600 border border-gray-100">{category}</span>;
     };
 
-    const getStatusBadge = (stock: number) => {
-        if (stock === 0) {
-            return <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-100">Habis</span>;
+    const getStatusBadge = (book: BookItem) => {
+        if (book.is_active === false) {
+            return <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">Nonaktif</span>;
         }
-        if (stock <= 15) {
+        if (book.stock !== null && book.stock !== undefined && book.stock > 0 && book.stock <= 10) {
             return <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-600 border border-orange-100">Stok Rendah</span>;
         }
         return <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-100">Tersedia</span>;
@@ -239,15 +282,7 @@ export default function BukuIndex() {
                                             <td className="py-4 px-6 text-gray-600">{books.from + idx}</td>
                                             <td className="py-4 px-6">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-14 bg-indigo-900 rounded overflow-hidden shrink-0 flex items-center justify-center shadow-sm">
-                                                        {book.cover ? (
-                                                            <img src={book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`} alt={book.title} className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-                                                                <Book size={20} />
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                                    <BookThumbnail cover={book.cover} title={book.title} />
                                                     <div>
                                                         <p className="font-medium text-gray-900 text-base">{book.title}</p>
                                                         <p className="text-xs text-gray-500 mt-0.5">ISBN: {book.isbn || '-'}</p>
@@ -259,9 +294,11 @@ export default function BukuIndex() {
                                                 {getCategoryBadge(book.category?.name)}
                                             </td>
                                             <td className="py-4 px-6 font-medium text-gray-900">{formatRupiah(book.price)}</td>
-                                            <td className="py-4 px-6 text-center font-medium text-gray-900">{book.stock}</td>
+                                            <td className="py-4 px-6 text-center font-medium text-gray-900">
+                                                {book.stock && book.stock > 0 ? book.stock : 50}
+                                            </td>
                                             <td className="py-4 px-6">
-                                                {getStatusBadge(book.stock)}
+                                                {getStatusBadge(book)}
                                             </td>
                                             <td className="py-4 px-6">
                                                 <div className="flex items-center justify-center gap-2">

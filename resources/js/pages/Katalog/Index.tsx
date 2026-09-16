@@ -305,17 +305,32 @@ export default function Katalog(props: KatalogProps) {
                             </div>
                             
                             {filteredTerbaru.length > 0 ? (
-                            <div className="grid grid-cols-4 gap-2.5 px-6 pb-2">
+                            <div className="grid grid-cols-2 gap-2 px-6 pb-2">
                                 {filteredTerbaru.slice(0, visibleCount).map((book) => (
-                                    <Link href={`/buku/${book.id}`} key={book.id} className="flex flex-col w-full block">
-                                        <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-2 border border-[#F1F5F9]">
-                                            <img src={book.cover ? (book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`) : "/images/placeholders/book-cover.svg"} alt={book.title} className="w-full h-full object-cover" />
+                                    <Link href={`/buku/${book.id}`} key={book.id} className="group flex flex-col w-full bg-white rounded-xl p-2.5 border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                                        <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-2 border border-gray-50 shadow-inner relative">
+                                            <img 
+                                                src={book.cover ? (book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`) : "/images/placeholders/book-cover.svg"} 
+                                                alt={book.title} 
+                                                loading="lazy" 
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                                            />
+                                            {book.coins_price > 0 ? (
+                                                <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1 shadow-sm border border-black/5">
+                                                    <div className="w-3 h-3 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[7px] font-bold">C</div>
+                                                    <span className="text-[9px] font-bold text-gray-900">{book.coins_price}</span>
+                                                </div>
+                                            ) : (
+                                                <div className="absolute top-2 right-2 bg-emerald-500/90 backdrop-blur-sm text-white text-[9px] font-bold rounded-full px-2 py-0.5 shadow-sm">
+                                                    Gratis
+                                                </div>
+                                            )}
                                         </div>
-                                        <h4 className="font-bold text-[9px] text-[#1E293B] leading-[1.3] mb-1 line-clamp-2 min-h-[24px]">{book.title}</h4>
-                                        <p className="text-[8px] font-medium text-[#64748B] mb-1.5 truncate">{book.author?.name || 'Leila S. Chudori'}</p>
+                                        <h4 className="font-bold text-[12px] text-gray-900 leading-[1.35] mb-1 line-clamp-2 min-h-[32px] group-hover:text-blue-600 transition-colors">{book.title}</h4>
+                                        <p className="text-[10px] font-medium text-gray-500 truncate mb-2">{book.author?.name || 'Leila S. Chudori'}</p>
                                         <div className="flex items-center gap-1 mt-auto">
-                                            <div className="w-3 h-3 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[7px] font-bold shadow-sm">C</div>
-                                            <span className="font-bold text-[9px] text-[#1E293B]">{book.coins_price || 0}</span>
+                                            <div className="w-3.5 h-3.5 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[8px] font-bold shadow-sm">C</div>
+                                            <span className="font-bold text-[11px] text-[#1E293B]">{book.coins_price || 0}</span>
                                         </div>
                                     </Link>
                                 ))}

@@ -60,18 +60,42 @@ export default function Read({ book, book_id, chapter_id, chapter, chapters = []
         }
     }, [flash]);
 
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem('last_book_url', window.location.pathname);
+        }
+    }, [book_id, chapter_id]);
+
     // Logic for locked chapters: use passed chapter data
     const isLocked = chapter?.is_locked;
+    const coinBalance = auth?.user?.coin_balance || 0;
+    const requiredCoin = chapter?.coin_price ?? 10;
 
     const handleUnlockClick = () => {
         if (!auth?.user) {
             window.location.href = '/login';
             return;
         }
+
+        if (coinBalance < requiredCoin) {
+            const returnUrl = window.location.pathname;
+            sessionStorage.setItem('last_book_url', returnUrl);
+            router.visit(`/akun/topup?return_url=${encodeURIComponent(returnUrl)}`);
+            return;
+        }
+
         setConfirmModal(true);
     };
 
     const proceedUnlock = () => {
+        if (coinBalance < requiredCoin) {
+            setConfirmModal(false);
+            const returnUrl = window.location.pathname;
+            sessionStorage.setItem('last_book_url', returnUrl);
+            router.visit(`/akun/topup?return_url=${encodeURIComponent(returnUrl)}`);
+            return;
+        }
+
         router.post(`/buku/${book_id}/chapter/${chapter_id}/unlock`, {}, {
             preserveScroll: true
         });
@@ -379,7 +403,7 @@ export default function Read({ book, book_id, chapter_id, chapter, chapters = []
                                     <div className="w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center shrink-0">
                                         <span className="text-[9px] font-bold text-white">C</span>
                                     </div>
-                                    <span className={`text-[16px] font-extrabold ${currentTheme.id === 'dark' ? 'text-white' : 'text-gray-900'}`}>10</span>
+                                    <span className={`text-[16px] font-extrabold ${currentTheme.id === 'dark' ? 'text-white' : 'text-gray-900'}`}>{requiredCoin}</span>
                                 </div>
                                 <span className={`text-[10px] font-medium ${currentTheme.id === 'dark' ? 'text-gray-400' : 'text-amber-700/70'}`}>Koin dibutuhkan</span>
                             </div>
@@ -391,18 +415,18 @@ export default function Read({ book, book_id, chapter_id, chapter, chapters = []
                                     <div className="w-3 h-4 border-2 border-blue-600 rounded-sm relative flex items-center justify-center mt-0.5">
                                         <div className="absolute -top-1.5 w-2 h-2 border-2 border-b-0 border-blue-600 rounded-t-full"></div>
                                     </div>
-                                    <span className="text-[13px] font-bold">Buka Bab 3</span>
+                                    <span className="text-[13px] font-bold">Buka Bab {chapter?.chapter_number || chapter_id}</span>
                                 </div>
                                 <span className="text-[10px] text-blue-600/70 font-medium">Baca sekarang</span>
                             </div>
                         </div>
 
                         <button onClick={handleUnlockClick} className="w-full bg-[#2F5AF4] hover:bg-blue-700 text-white rounded-xl py-3.5 flex items-center justify-center gap-2 font-bold text-[14px] shadow-lg shadow-blue-500/20 transition mb-3">
-                            Buka Bab {chapter_id} 
+                            Buka Bab {chapter?.chapter_number || chapter_id} 
                             <div className="w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center shrink-0 ml-1">
                                 <span className="text-[9px] font-bold text-white">C</span>
                             </div>
-                            10
+                            {requiredCoin}
                         </button>
                         
                         <div className="flex items-center justify-center gap-1.5 text-gray-400">
