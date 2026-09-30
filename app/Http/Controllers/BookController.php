@@ -78,17 +78,24 @@ class BookController extends Controller
 
         $book = Book::create($validated);
 
-        // Notifikasi ke semua user
-        $users = \App\Models\User::all();
-        foreach($users as $u) {
-            \App\Models\Notification::create([
-                'user_id' => $u->id,
-                'title' => 'Buku Baru: ' . $book->title,
-                'message' => 'Buku baru telah ditambahkan ke katalog. Baca sekarang!',
-                'type' => 'new_book',
+        // Notifikasi ke semua user — bulk insert (satu query, tidak timeout)
+        $userIds = \App\Models\User::pluck('id');
+        if ($userIds->isNotEmpty()) {
+            $now = now();
+            $notifications = $userIds->map(fn($uid) => [
+                'user_id'    => $uid,
+                'title'      => 'Buku Baru: ' . $book->title,
+                'message'    => 'Buku baru telah ditambahkan ke katalog. Baca sekarang!',
+                'type'       => 'new_book',
                 'action_url' => '/buku/' . $book->id,
-                'is_read' => false
-            ]);
+                'is_read'    => false,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ])->toArray();
+            // Chunk insert agar tidak overflow memory jika user sangat banyak
+            foreach (array_chunk($notifications, 500) as $chunk) {
+                \App\Models\Notification::insert($chunk);
+            }
         }
 
         if ($request->filled('chapters')) {

@@ -112,13 +112,23 @@ class TopUpController extends Controller
         $stringToSign = "POST:" . $va . ":" . $bodyHash . ":" . $apiKey;
         $signature = hash_hmac('sha256', $stringToSign, $apiKey);
 
-        // 3. Send Request to iPaymu
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'signature' => $signature,
-            'va' => $va,
-            'timestamp' => date('YmdHis')
-        ])->post($url, $body);
+        // 3. Send Request to iPaymu (with timeout to prevent 502)
+        try {
+            $response = Http::timeout(15)
+                ->withoutVerifying()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'signature' => $signature,
+                    'va' => $va,
+                    'timestamp' => date('YmdHis')
+                ])->post($url, $body);
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error('iPaymu Connection Failed', ['error' => $e->getMessage()]);
+            return back()->with('error', 'Gagal terhubung ke server pembayaran. Silakan coba beberapa saat lagi.');
+        } catch (\Exception $e) {
+            Log::error('iPaymu Request Exception', ['error' => $e->getMessage()]);
+            return back()->with('error', 'Terjadi kesalahan saat memproses pembayaran.');
+        }
 
         $result = $response->json();
 
