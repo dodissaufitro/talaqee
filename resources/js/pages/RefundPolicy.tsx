@@ -1,186 +1,360 @@
 import { Head, Link } from '@inertiajs/react';
-import React from 'react';
-import { Search, ChevronLeft, ShieldCheck, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { 
+    ChevronLeft, ShieldCheck, Clock, CheckCircle2, AlertCircle, 
+    ArrowRight, MessageCircle, Mail, FileText, HelpCircle, 
+    Check, AlertTriangle, RefreshCw, CreditCard, Sparkles, Building2
+} from 'lucide-react';
 import WebDesktopNav from '@/components/WebDesktopNav';
+import WebFooter from '@/components/WebFooter';
 
-export default function RefundPolicy({ policyContent = '' }: { policyContent?: string }) {
+interface RefundPolicyProps {
+    policyContent?: string;
+}
+
+export default function RefundPolicy({ policyContent = '' }: RefundPolicyProps) {
+    const [activeSection, setActiveSection] = useState<'all' | 'eligible' | 'not-eligible' | 'process'>('all');
+
     return (
-        <div className="min-h-screen bg-gray-50 font-sans selection:bg-[#7e57c2] selection:text-white pb-20">
+        <div className="min-h-screen bg-[#F8FAFC] font-sans selection:bg-[#7e57c2] selection:text-white flex flex-col justify-between">
             <Head title="Kebijakan Pengembalian Dana (Refund Policy) - Talaqee" />
 
-            {/* Mobile Header */}
-            <div className="md:hidden flex items-center px-5 py-4 bg-white sticky top-0 z-50 border-b border-gray-100">
-                <Link href={route('home')} className="w-8 h-8 flex items-center justify-center -ml-2 mr-2">
-                    <ChevronLeft className="w-6 h-6 text-[#5C5AE6]" />
-                </Link>
-                <span className="text-[18px] font-bold text-[#1E293B]">
-                    Refund Policy
-                </span>
-            </div>
-
-            {/* Desktop Navigation */}
-            <WebDesktopNav />
-
-            {/* Hero Section */}
-            <div className="relative bg-white pt-14 pb-[130px] overflow-hidden">
-                {/* Background Image / Pattern */}
-                <div className="absolute top-0 right-0 w-full md:w-[65%] h-full hidden md:block pointer-events-none">
-                    <img 
-                        src="/images/mosque_hero.png" 
-                        alt="Mosque" 
-                        className="w-full h-full object-cover object-[center_right] opacity-95"
-                        style={{
-                            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
-                            maskImage: 'linear-gradient(to right, transparent 0%, black 40%)'
-                        }}
-                    />
-                </div>
-
-                {/* Wavy bottom */}
-                <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20">
-                    <svg viewBox="0 0 1440 120" className="w-full h-[60px] md:h-[100px] block" preserveAspectRatio="none">
-                        <path d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,42.7C1120,32,1280,32,1360,32L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z" fill="#f9fafb"></path>
-                    </svg>
-                </div>
-
-                <div className="w-full px-6 md:px-10 lg:px-16 relative z-30 flex flex-col md:flex-row gap-10 items-center max-w-[1600px] mx-auto">
-                    
-                    {/* Left: Titles */}
-                    <div className="w-full md:w-1/2">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-50 rounded-xl mb-6 text-[#6c40e6]">
-                            <ShieldCheck size={24} strokeWidth={2.5} />
-                        </div>
-                        <h1 className="text-[36px] lg:text-[42px] font-extrabold text-[#111827] leading-tight mb-2 tracking-tight">
-                            Kebijakan Pengembalian Dana
-                        </h1>
-                        <p className="text-slate-500 text-[15px] font-medium">
-                            Terakhir diperbarui: 22 Agustus 2026
-                        </p>
+            <div>
+                {/* ─── MOBILE HEADER (Preserved for Mobile View) ─── */}
+                <div className="md:hidden flex items-center justify-between px-5 py-4 bg-white sticky top-0 z-50 border-b border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <Link href={route('home')} className="w-8 h-8 flex items-center justify-center -ml-1 text-gray-700 hover:text-[#7e57c2]">
+                            <ChevronLeft className="w-6 h-6" />
+                        </Link>
+                        <span className="text-[17px] font-bold text-gray-900">
+                            Kebijakan Refund
+                        </span>
                     </div>
-
-                    {/* Right: Quote Block */}
-                    <div className="w-full md:w-1/2 flex justify-start md:pl-10 mt-8 md:mt-0">
-                        <div className="max-w-[320px]">
-                            <div className="text-[#8155ff] mb-4">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10 9C10 6.23858 7.76142 4 5 4C2.23858 4 0 6.23858 0 9C0 11.2312 1.45892 13.1207 3.48627 13.7915C2.65809 15.656 0.817366 17.1593 0.771965 17.1952C0.334057 17.5413 0.25875 18.1778 0.604886 18.6157C0.951022 19.0536 1.58756 19.1289 2.02547 18.7828C2.17647 18.6635 4.90807 16.4867 6.46328 13.1585C8.61111 12.027 10 9.7717 10 9ZM24 9C24 6.23858 21.7614 4 19 4C16.2386 4 14 6.23858 14 9C14 11.2312 15.4589 13.1207 17.4863 13.7915C16.6581 15.656 14.8174 17.1593 14.772 17.1952C14.3341 17.5413 14.2588 18.1778 14.6049 18.6157C14.951 19.0536 15.5876 19.1289 16.0255 18.7828C16.1765 18.6635 18.9081 16.4867 20.4633 13.1585C22.6111 12.027 24 9.7717 24 9Z" />
-                                </svg>
-                            </div>
-                            <p className="text-[15px] font-medium text-slate-700 leading-[1.6]">
-                                Dan penuhilah janji;<br/>
-                                sesungguhnya janji itu<br/>
-                                pasti diminta<br/>
-                                pertanggungjawabannya.
-                            </p>
-                            <p className="text-[#8155ff] font-semibold mt-4 text-[12px]">
-                                (QS. Al-Isra: 34)
-                            </p>
-                        </div>
-                    </div>
-
+                    <Link href={route('kontak')} className="text-xs font-semibold text-[#7e57c2] bg-purple-50 px-2.5 py-1 rounded-full">
+                        Bantuan
+                    </Link>
                 </div>
-            </div>
 
-            {/* Main Content */}
-            <div className="w-full px-6 md:px-12 lg:px-20 mt-10">
-                <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12">
-                    
-                    {policyContent ? (
-                        <div className="prose prose-indigo max-w-none text-gray-700 whitespace-pre-wrap font-sans">
-                            {policyContent}
-                        </div>
-                    ) : (
-                        <div className="prose prose-indigo max-w-none text-gray-700">
-                            <p className="text-[16px] leading-relaxed mb-8">
-                                Terima kasih telah berbelanja dan menggunakan layanan di <strong>Talaqee</strong>. Kami selalu berkomitmen untuk menyediakan konten islami dan layanan berkualitas tinggi. Jika Anda tidak sepenuhnya puas dengan pembelian Anda, kami siap membantu sesuai dengan syarat dan ketentuan pengembalian dana (refund) yang berlaku.
-                            </p>
+                {/* ─── DESKTOP NAVIGATION ─── */}
+                <WebDesktopNav />
 
-                            <div className="mb-10">
-                                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-4">
-                                    <span className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm"><CheckCircle2 size={18} /></span>
-                                    Syarat Pengembalian Dana
-                                </h2>
-                                <p className="mb-4 text-[15px] leading-relaxed">
-                                    Pengembalian dana dapat diproses jika memenuhi salah satu atau beberapa kriteria berikut:
+                {/* ─── HERO BANNER (Modern Dark Gradient with Glow) ─── */}
+                <div className="relative bg-gradient-to-br from-[#0B091A] via-[#140E2E] to-[#1E123D] pt-12 pb-24 md:pt-16 md:pb-28 overflow-hidden text-white border-b border-purple-900/30">
+                    <div className="absolute top-[-80px] left-1/4 w-96 h-96 bg-[#7C3AED]/20 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute bottom-[-100px] right-10 w-[500px] h-[500px] bg-[#6366F1]/15 rounded-full blur-3xl pointer-events-none" />
+
+                    <div className="w-full max-w-[1340px] mx-auto px-6 md:px-10 relative z-10">
+                        <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+                            
+                            {/* Left Header Info */}
+                            <div className="w-full lg:max-w-2xl text-center lg:text-left">
+                                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-400/20 text-purple-300 text-xs font-semibold tracking-wide uppercase mb-4">
+                                    <ShieldCheck size={14} className="text-purple-400" />
+                                    Transparansi & Perlindungan Konsumen
+                                </div>
+                                <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
+                                    Kebijakan Pengembalian <br className="hidden md:inline" />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-purple-100 to-indigo-200">Dana (Refund Policy)</span>
+                                </h1>
+                                <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-6 max-w-xl">
+                                    Komitmen Talaqee dalam menjamin transaksi yang adil, jujur, amanah, dan terpercaya bagi seluruh penuntut ilmu syar'i.
                                 </p>
-                                <ul className="space-y-3 mb-6 list-none pl-0">
-                                    <li className="flex items-start gap-3 text-[15px] leading-relaxed bg-gray-50 p-4 rounded-xl">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-[#7e57c2] mt-2 shrink-0"></div>
-                                        <span><strong>Konten Tidak Dapat Diakses:</strong> Jika terjadi kesalahan teknis dari sisi server kami yang mengakibatkan produk digital (Video, Audio, atau E-Book) yang sudah dibeli tidak dapat diakses sama sekali dalam waktu 2x24 jam.</span>
-                                    </li>
-                                    <li className="flex items-start gap-3 text-[15px] leading-relaxed bg-gray-50 p-4 rounded-xl">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-[#7e57c2] mt-2 shrink-0"></div>
-                                        <span><strong>Transaksi Ganda (Double Billing):</strong> Jika sistem kami atau pihak metode pembayaran secara tidak sengaja memotong dana Anda dua kali untuk satu transaksi yang sama.</span>
-                                    </li>
-                                    <li className="flex items-start gap-3 text-[15px] leading-relaxed bg-gray-50 p-4 rounded-xl">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-[#7e57c2] mt-2 shrink-0"></div>
-                                        <span><strong>Pembelian Koin Gagal:</strong> Saldo/uang Anda sudah terpotong melalui Payment Gateway, namun Saldo Koin di aplikasi Anda tidak bertambah dalam waktu maksimal 1x24 jam setelah Anda melaporkan kendala.</span>
-                                    </li>
-                                </ul>
+
+                                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-xs text-purple-200">
+                                    <span className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg">
+                                        <Clock size={13} className="text-purple-400" />
+                                        Terakhir diperbarui: 22 Agustus 2026
+                                    </span>
+                                    <span className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg">
+                                        <CheckCircle2 size={13} className="text-emerald-400" />
+                                        Proses 1x24 Jam Kerja
+                                    </span>
+                                </div>
                             </div>
 
-                            <div className="mb-10">
-                                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-4">
-                                    <span className="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center text-sm"><AlertCircle size={18} /></span>
-                                    Kondisi Tidak Berlakunya Refund
-                                </h2>
-                                <p className="mb-4 text-[15px] leading-relaxed">
-                                    Pengembalian dana <strong>TIDAK BERLAKU</strong> untuk kondisi berikut:
-                                </p>
-                                <ul className="space-y-3 list-none pl-0">
-                                    <li className="flex items-start gap-3 text-[15px] leading-relaxed border border-gray-100 p-4 rounded-xl">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 shrink-0"></div>
-                                        <span>Anda salah membeli produk (misal: salah membeli judul buku atau video).</span>
-                                    </li>
-                                    <li className="flex items-start gap-3 text-[15px] leading-relaxed border border-gray-100 p-4 rounded-xl">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 shrink-0"></div>
-                                        <span>Anda merasa konten yang disajikan tidak sesuai dengan ekspektasi pribadi Anda (semua deskripsi dan preview sudah disajikan sebelum pembelian).</span>
-                                    </li>
-                                    <li className="flex items-start gap-3 text-[15px] leading-relaxed border border-gray-100 p-4 rounded-xl">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 shrink-0"></div>
-                                        <span>Pembelian telah dilakukan lebih dari <strong>7 Hari kerja</strong> sebelum Anda mengajukan klaim.</span>
-                                    </li>
-                                    <li className="flex items-start gap-3 text-[15px] leading-relaxed border border-gray-100 p-4 rounded-xl">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 shrink-0"></div>
-                                        <span>Anda melanggar Syarat dan Ketentuan Layanan (Terms of Service) Talaqee yang berakibat pada pembekuan akun.</span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div className="mb-8 bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100">
-                                <h2 className="text-xl font-bold text-indigo-900 flex items-center gap-3 mb-4">
-                                    <span className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm"><Clock size={18} /></span>
-                                    Proses Pengajuan Pengembalian Dana
-                                </h2>
-                                <div className="space-y-4">
-                                    <div className="flex gap-4">
-                                        <div className="font-bold text-indigo-400 text-xl">01.</div>
+                            {/* Right Quote Glass Card */}
+                            <div className="w-full lg:w-auto shrink-0 flex justify-center">
+                                <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-6 md:p-8 max-w-[380px] shadow-2xl relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl pointer-events-none" />
+                                    
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300">
+                                            <FileText size={22} />
+                                        </div>
                                         <div>
-                                            <h4 className="font-bold text-gray-900 mb-1">Hubungi Tim Bantuan</h4>
-                                            <p className="text-sm text-gray-600 leading-relaxed">Kirimkan email ke <strong>support@talaqee.com</strong> atau hubungi nomor WhatsApp resmi kami dengan melampirkan Bukti Pembayaran, ID Transaksi, dan deskripsi detail mengenai kendala Anda.</p>
+                                            <h4 className="text-sm font-bold text-white">Amanah & Janji</h4>
+                                            <p className="text-xs text-purple-200/70">Prinsip Muamalah Islam</p>
                                         </div>
                                     </div>
-                                    <div className="flex gap-4">
-                                        <div className="font-bold text-indigo-400 text-xl">02.</div>
-                                        <div>
-                                            <h4 className="font-bold text-gray-900 mb-1">Verifikasi</h4>
-                                            <p className="text-sm text-gray-600 leading-relaxed">Tim kami akan meninjau dan memverifikasi laporan Anda dalam waktu maksimal 2x24 jam pada hari kerja.</p>
-                                        </div>
+
+                                    <div className="my-4 border-l-2 border-purple-400/50 pl-4 py-1">
+                                        <p className="text-sm text-gray-200 italic leading-relaxed">
+                                            "Dan penuhilah janji; sesungguhnya janji itu pasti diminta pertanggungjawabannya."
+                                        </p>
+                                        <span className="text-xs font-semibold text-purple-300 block mt-2">
+                                            (QS. Al-Isra: 34)
+                                        </span>
                                     </div>
-                                    <div className="flex gap-4">
-                                        <div className="font-bold text-indigo-400 text-xl">03.</div>
-                                        <div>
-                                            <h4 className="font-bold text-gray-900 mb-1">Pencairan Dana</h4>
-                                            <p className="text-sm text-gray-600 leading-relaxed">Jika disetujui, dana akan dikembalikan ke rekening/metode pembayaran asli Anda atau dikonversi menjadi Koin Talaqee (sesuai kesepakatan). Proses pengembalian dana ke rekening bank memakan waktu 3-7 hari kerja tergantung kebijakan bank terkait.</p>
-                                        </div>
+
+                                    <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-gray-300">
+                                        <span>Metode Resmi:</span>
+                                        <span className="font-semibold text-white bg-purple-900/60 px-2.5 py-1 rounded-md border border-purple-400/30">
+                                            iPaymu Payment Gateway
+                                        </span>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
-                    )}
+                    </div>
+                </div>
+
+                {/* ─── MAIN CONTENT ─── */}
+                <div className="w-full max-w-[1340px] mx-auto px-6 md:px-10 -mt-8 relative z-20 pb-20">
+                    <div className="flex flex-col lg:flex-row gap-8 items-start">
+                        
+                        {/* ─── LEFT SIDEBAR NAVIGATION ─── */}
+                        <div className="w-full lg:w-80 shrink-0 space-y-6">
+                            
+                            {/* Fast Nav Card */}
+                            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                                <div className="px-3 py-2 border-b border-gray-100 mb-2">
+                                    <h3 className="font-bold text-gray-900 text-sm">Navigasi Kebijakan</h3>
+                                </div>
+                                <div className="space-y-1">
+                                    {[
+                                        { id: 'all', label: 'Seluruh Kebijakan', icon: FileText },
+                                        { id: 'eligible', label: 'Syarat Pengembalian', icon: CheckCircle2 },
+                                        { id: 'not-eligible', label: 'Kondisi Tidak Berlaku', icon: AlertCircle },
+                                        { id: 'process', label: 'Alur 3 Langkah Refund', icon: RefreshCw },
+                                    ].map((item) => {
+                                        const IconComp = item.icon;
+                                        const isSelected = activeSection === item.id;
+                                        return (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => setActiveSection(item.id as any)}
+                                                className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-sm transition-all ${
+                                                    isSelected 
+                                                        ? 'bg-purple-50 text-[#7C3AED] font-bold shadow-sm' 
+                                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                                }`}
+                                            >
+                                                <IconComp size={16} className={isSelected ? 'text-[#7C3AED]' : 'text-gray-400'} />
+                                                <span>{item.label}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Help & WhatsApp Card */}
+                            <div className="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-sm text-center">
+                                <div className="w-12 h-12 bg-purple-50 text-[#7C3AED] rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                    <MessageCircle size={24} />
+                                </div>
+                                <h4 className="font-bold text-gray-900 text-sm mb-1">Ingin Mengajukan Refund?</h4>
+                                <p className="text-xs text-gray-500 leading-relaxed mb-4">
+                                    Siapkan ID Transaksi, bukti transfer, dan deskripsi kendala Anda.
+                                </p>
+                                <a 
+                                    href="https://wa.me/6282285578390?text=Halo%20Admin%20Talaqee,%20saya%20ingin%20mengajukan%20klaim%20pengembalian%20dana%20(refund)"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shadow-sm mb-2"
+                                >
+                                    <MessageCircle size={15} />
+                                    Ajukan via WhatsApp
+                                </a>
+                                <a 
+                                    href="mailto:saufitrod@gmail.com?subject=Pengajuan%20Refund%20Talaqee"
+                                    className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-medium transition-colors"
+                                >
+                                    <Mail size={14} />
+                                    Kirim Email Dukungan
+                                </a>
+                            </div>
+
+                        </div>
+
+                        {/* ─── RIGHT CONTENT DETAILS ─── */}
+                        <div className="flex-1 w-full space-y-6">
+                            
+                            {/* Introduction Card */}
+                            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
+                                <h2 className="text-xl font-bold text-gray-900 mb-3">Ketentuan Umum Layanan Digital</h2>
+                                <p className="text-sm md:text-[15px] text-gray-600 leading-relaxed">
+                                    Terima kasih telah mempercayai <strong>Talaqee</strong> sebagai wadah belajar Al-Qur'an, video kajian, dan literasi Islam. Kami berupaya memberikan pengalaman terbaik bagi setiap pengguna. Namun, jika terjadi kendala teknis atau ketidaksesuaian yang sah dalam proses pembayaran dan akses materi, kami menyediakan prosedur pengembalian dana yang berkeadilan sesuai ketentuan di bawah ini.
+                                </p>
+                            </div>
+
+                            {/* SECTION 1: Syarat Pengembalian Dana */}
+                            {(activeSection === 'all' || activeSection === 'eligible') && (
+                                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                                            <CheckCircle2 size={22} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900">Kondisi yang Memenuhi Syarat Refund</h3>
+                                            <p className="text-xs text-gray-500">Klaim Anda akan disetujui jika memenuhi salah satu kondisi berikut:</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div className="p-4 rounded-xl bg-emerald-50/40 border border-emerald-100 flex items-start gap-3.5">
+                                            <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                                                <Check size={14} strokeWidth={3} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-sm font-bold text-gray-900 mb-1">1. Kendala Teknis Akses Konten (Digital Access Failure)</h4>
+                                                <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+                                                    Jika terjadi kegagalan sistem internal server Talaqee yang menyebabkan materi (E-Book, Audio Talaqqi, atau Video Kajian) yang telah berhasil dibeli tidak dapat diakses sama sekali dalam waktu lebih dari <strong>2x24 jam</strong> setelah dilaporkan.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="p-4 rounded-xl bg-emerald-50/40 border border-emerald-100 flex items-start gap-3.5">
+                                            <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                                                <Check size={14} strokeWidth={3} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-sm font-bold text-gray-900 mb-1">2. Transaksi Terpotong Ganda (Double Billing)</h4>
+                                                <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+                                                    Apabila rekening bank atau saldo e-wallet Anda terpotong lebih dari satu kali untuk nomor invoice atau pesanan paket koin yang sama, dana lebihan akan dikembalikan 100%.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="p-4 rounded-xl bg-emerald-50/40 border border-emerald-100 flex items-start gap-3.5">
+                                            <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                                                <Check size={14} strokeWidth={3} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-sm font-bold text-gray-900 mb-1">3. Saldo Koin Gagal Masuk Otomatis</h4>
+                                                <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+                                                    Uang pembayaran telah sukses terverifikasi pada Payment Gateway iPaymu, namun Saldo Koin tidak bertambah di akun Anda dalam waktu maksimal <strong>1x24 jam</strong> sejak pembayaran selesai.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* SECTION 2: Kondisi Tidak Berlaku */}
+                            {(activeSection === 'all' || activeSection === 'not-eligible') && (
+                                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
+                                            <AlertTriangle size={22} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900">Kondisi yang Tidak Memenuhi Syarat Refund</h3>
+                                            <p className="text-xs text-gray-500">Pengembalian dana tidak dapat diproses dalam skenario berikut:</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="p-4 rounded-xl border border-rose-100 bg-rose-50/20">
+                                            <div className="text-rose-500 font-bold text-xs uppercase tracking-wider mb-1">Kelalaian Pengguna</div>
+                                            <h4 className="text-sm font-bold text-gray-900 mb-1">Salah Memilih Produk</h4>
+                                            <p className="text-xs text-gray-600 leading-relaxed">
+                                                Salah membeli judul e-book, bab kajian, atau paket koin karena ketidaktelitian pembeli sebelum mengonfirmasi pembayaran.
+                                            </p>
+                                        </div>
+
+                                        <div className="p-4 rounded-xl border border-rose-100 bg-rose-50/20">
+                                            <div className="text-rose-500 font-bold text-xs uppercase tracking-wider mb-1">Subjektivitas</div>
+                                            <h4 className="text-sm font-bold text-gray-900 mb-1">Perubahan Keputusan</h4>
+                                            <p className="text-xs text-gray-600 leading-relaxed">
+                                                Alasan subjektif seperti tidak lagi menyukai konten setelah materi selesai dibaca atau ditonton.
+                                            </p>
+                                        </div>
+
+                                        <div className="p-4 rounded-xl border border-rose-100 bg-rose-50/20">
+                                            <div className="text-rose-500 font-bold text-xs uppercase tracking-wider mb-1">Batas Waktu</div>
+                                            <h4 className="text-sm font-bold text-gray-900 mb-1">Lewat dari 7 Hari Kalender</h4>
+                                            <p className="text-xs text-gray-600 leading-relaxed">
+                                                Klaim yang diajukan setelah lebih dari 7 (tujuh) hari kerja sejak transaksi pembelian diselesaikan.
+                                            </p>
+                                        </div>
+
+                                        <div className="p-4 rounded-xl border border-rose-100 bg-rose-50/20">
+                                            <div className="text-rose-500 font-bold text-xs uppercase tracking-wider mb-1">Pelanggaran Syarat</div>
+                                            <h4 className="text-sm font-bold text-gray-900 mb-1">Pelanggaran Hak Cipta & ToS</h4>
+                                            <p className="text-xs text-gray-600 leading-relaxed">
+                                                Akun yang dibekukan karena terbukti melakukan pembajakan, penyebaran ulang, atau manipulasi sistem.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* SECTION 3: Alur 3 Langkah Pengajuan */}
+                            {(activeSection === 'all' || activeSection === 'process') && (
+                                <div className="bg-gradient-to-br from-purple-50/60 to-indigo-50/40 rounded-2xl p-6 md:p-8 border border-purple-100 shadow-sm">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-md shadow-purple-500/20">
+                                            <RefreshCw size={20} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900">Alur & Tahapan Pengajuan Refund</h3>
+                                            <p className="text-xs text-gray-500">3 langkah mudah untuk menyelesaikan proses klaim pengembalian dana</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-purple-100 relative">
+                                            <div className="text-3xl font-extrabold text-purple-200 mb-2">01</div>
+                                            <h4 className="text-sm font-bold text-gray-900 mb-1.5">Kirimkan Bukti</h4>
+                                            <p className="text-xs text-gray-600 leading-relaxed">
+                                                Hubungi WhatsApp resmi atau email kami dengan melampirkan screenshot bukti transfer, nomor referensi transaksi, dan email akun Anda.
+                                            </p>
+                                        </div>
+
+                                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-purple-100 relative">
+                                            <div className="text-3xl font-extrabold text-purple-200 mb-2">02</div>
+                                            <h4 className="text-sm font-bold text-gray-900 mb-1.5">Verifikasi Admin</h4>
+                                            <p className="text-xs text-gray-600 leading-relaxed">
+                                                Tim Finance Talaqee memvalidasi data transaksi Anda ke log Payment Gateway iPaymu dalam waktu maksimal 1x24 jam kerja.
+                                            </p>
+                                        </div>
+
+                                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-purple-100 relative">
+                                            <div className="text-3xl font-extrabold text-purple-200 mb-2">03</div>
+                                            <h4 className="text-sm font-bold text-gray-900 mb-1.5">Pencairan Dana</h4>
+                                            <p className="text-xs text-gray-600 leading-relaxed">
+                                                Dana ditransfer kembali ke rekening pengirim atau dikonversi menjadi Koin Talaqee (sesuai persetujuan pengguna).
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* SLA Info Banner */}
+                                    <div className="mt-6 p-4 rounded-xl bg-white border border-purple-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                        <div className="flex items-center gap-3 text-center sm:text-left">
+                                            <Clock size={20} className="text-[#7C3AED] shrink-0" />
+                                            <span className="text-xs text-gray-700 font-medium">
+                                                Estimasi waktu pencairan ke rekening bank lokal: <strong>3 – 7 hari kerja</strong> (tergantung kliring bank).
+                                            </span>
+                                        </div>
+                                        <Link 
+                                            href={route('terms')}
+                                            className="text-xs font-bold text-[#7C3AED] hover:underline shrink-0"
+                                        >
+                                            Baca Syarat & Ketentuan →
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+
+                        </div>
+
+                    </div>
                 </div>
             </div>
-            
+
+            {/* ─── WEB FOOTER ─── */}
+            <WebFooter />
         </div>
     );
 }

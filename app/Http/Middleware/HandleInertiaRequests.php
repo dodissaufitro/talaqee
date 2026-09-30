@@ -43,7 +43,10 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? array_merge($request->user()->toArray(), [
+                    'roles' => $request->user()->getRoleNames(),
+                    'is_super_admin' => $request->user()->hasRole('super_admin'),
+                ]) : null,
                 'unread_notifications' => $request->user() ? $request->user()->notifications()->where('is_read', false)->get() : [],
             ],
             'flash' => [

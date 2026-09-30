@@ -2,35 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CoinPackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class TopUpController extends Controller
 {
-    // Packages definition (matching the frontend TopUp.tsx)
-    private $coinPackages = [
-        1 => ['coins' => 50, 'price' => 2500],
-        2 => ['coins' => 100, 'price' => 5000],
-        3 => ['coins' => 250, 'price' => 10000],
-        4 => ['coins' => 500, 'price' => 20000],
-        5 => ['coins' => 1000, 'price' => 40000],
-        6 => ['coins' => 5000, 'price' => 200000],
-    ];
+    /**
+     * Display the Top Up page with available coin packages.
+     */
+    public function index(Request $request)
+    {
+        $packages = CoinPackage::where('is_active', true)
+            ->orderBy('coin_amount', 'asc')
+            ->get();
+
+        return Inertia::render('Akun/TopUp', [
+            'packages' => $packages,
+        ]);
+    }
 
     public function checkout(Request $request)
     {
         $request->validate([
-            'package_id' => 'required|integer',
+            'package_id' => 'required|exists:coin_packages,id',
         ]);
 
-        $packageId = $request->input('package_id');
-        
-        if (!array_key_exists($packageId, $this->coinPackages)) {
-            return back()->with('error', 'Paket koin tidak valid.');
+        $package = CoinPackage::findOrFail($request->input('package_id'));
+
+        if (!$package->is_active) {
+            return back()->with('error', 'Paket koin tidak aktif.');
         }
 
-        $package = $this->coinPackages[$packageId];
+        $totalCoins = (int) $package->coin_amount + (int) ($package->bonus_coin ?? 0);
         $user = $request->user();
 
         // Simpan URL buku terakhir ke session
@@ -49,19 +55,19 @@ class TopUpController extends Controller
 
         // Jika VA / API Key iPaymu belum diisi di environment local, lakukan simulasi top up langsung
         if (empty($va) || empty($apiKey)) {
-            $newBalance = $user->coin_balance + $package['coins'];
+            $newBalance = $user->coin_balance + $totalCoins;
             $user->coin_balance = $newBalance;
             $user->save();
 
             \Illuminate\Support\Facades\DB::table('coin_transactions')->insert([
                 'user_id' => $user->id,
                 'type' => 'topup',
-                'amount' => $package['coins'],
-                'balance_before' => $user->coin_balance - $package['coins'],
+                'amount' => $totalCoins,
+                'balance_before' => $user->coin_balance - $totalCoins,
                 'balance_after' => $newBalance,
                 'reference_type' => 'simulasi_local',
                 'reference_id' => null,
-                'description' => 'Top Up ' . $package['coins'] . ' Koin (Simulasi)',
+                'description' => 'Top Up ' . $package->name . ' (' . $totalCoins . ' Koin) (Simulasi)',
                 'transaction_number' => $transactionId,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -79,14 +85,16 @@ class TopUpController extends Controller
                 }
             }
 
-            return redirect($targetUrl ?: '/akun/topup')->with('success', 'Top Up ' . $package['coins'] . ' Koin Berhasil!');
+            return redirect($targetUrl ?: '/akun/topup')->with('success', 'Top Up ' . $totalCoins . ' Koin Berhasil!');
         }
 
+        $packagePrice = (int) $package->price;
+
         $body = [
-            'product' => ['Top Up ' . $package['coins'] . ' Koin Talaqee'],
+            'product' => ['Top Up ' . $package->name . ' Talaqee'],
             'qty' => ['1'],
-            'price' => [$package['price']],
-            'amount' => $package['price'],
+            'price' => [$packagePrice],
+            'amount' => $packagePrice,
             'returnUrl' => route('topup.success'),
             'cancelUrl' => route('topup.cancel'),
             'notifyUrl' => route('topup.callback'),
@@ -123,12 +131,12 @@ class TopUpController extends Controller
             \Illuminate\Support\Facades\DB::table('coin_transactions')->insert([
                 'user_id' => $user->id,
                 'type' => 'topup',
-                'amount' => $package['coins'],
+                'amount' => $totalCoins,
                 'balance_before' => $user->coin_balance,
                 'balance_after' => $user->coin_balance, // Will be updated on callback / return
                 'reference_type' => 'ipaymu',
                 'reference_id' => null,
-                'description' => 'Top Up ' . $package['coins'] . ' Koin via iPaymu (Session: '.$sessionId.')',
+                'description' => 'Top Up ' . $package->name . ' (' . $totalCoins . ' Koin) via iPaymu (Session: '.$sessionId.')',
                 'transaction_number' => $transactionId,
                 'created_at' => now(),
                 'updated_at' => now(),

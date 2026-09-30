@@ -17,4 +17,9 @@ class Category extends Model
     {
         return $this->hasMany(Video::class);
     }
+
+    public function audios()
+    {
+        return $this->hasMany(Audio::class);
+    }
 }

@@ -1,10 +1,12 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import React, { useState, useEffect, useRef } from 'react';
 import {
-    Search, Star, ChevronRight,
+    Search, Star, ChevronRight, ChevronLeft,
     CheckCircle2, Clock, MapPin, Wallet, ArrowRight,
-    BookOpen, Heart, Activity, Globe, Users, Smile, Shield,
-    Bell, List, PlaySquare, Headphones, Play, Home, LayoutGrid, CircleUserRound, Library, MoreVertical, Bookmark, Filter, Crown, ChevronLeft, ShoppingCart
+    BookOpen, Heart, Activity, Globe, Users, Smile, Shield, ShieldCheck,
+    Bell, List, PlaySquare, Headphones, Play, Home, LayoutGrid, 
+    CircleUserRound, Library, Bookmark, Filter, Crown, Sparkles, 
+    Coins, Zap, Compass, Feather, ArrowUpRight
 } from 'lucide-react';
 import NotificationBell from '@/components/NotificationBell';
 import JadwalSholat from '@/components/JadwalSholat';
@@ -23,8 +25,10 @@ interface Book {
         name: string;
     };
     category?: {
+        id?: number;
         name: string;
     };
+    is_popular?: boolean;
 }
 
 interface Video {
@@ -79,13 +83,60 @@ interface WelcomeProps {
     terakhirDibaca?: TerakhirDibaca | null;
 }
 
-export default function Welcome({ categories, popularBooks, koleksiBuku = [], koleksiVideo = [], koleksiAudio = [], banners = [], terakhirDibaca = null }: WelcomeProps) {
+export default function Welcome({ 
+    categories = [], 
+    popularBooks = [], 
+    koleksiBuku = [], 
+    koleksiVideo = [], 
+    koleksiAudio = [], 
+    banners = [], 
+    terakhirDibaca = null 
+}: WelcomeProps) {
     const { auth } = usePage().props as any;
     const user = auth?.user;
 
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [bookTab, setBookTab] = useState<'all' | 'popular' | 'latest'>('all');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
-    // Map category name to icon for a better visual representation if icon string is missing
+    // Auto rotate banners if any
+    useEffect(() => {
+        if (!banners || banners.length <= 1) return;
+        const interval = setInterval(() => {
+            setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [banners]);
+
+    // Handle search submit from hero
+    const handleHeroSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            router.visit(`/katalog?q=${encodeURIComponent(searchQuery.trim())}`);
+        } else {
+            router.visit(route('katalog.index'));
+        }
+    };
+
+    // Filter books based on active tab and category
+    const displayedBooks = React.useMemo(() => {
+        let list = koleksiBuku.length > 0 ? koleksiBuku : popularBooks;
+        
+        if (bookTab === 'popular') {
+            list = popularBooks.length > 0 ? popularBooks : list;
+        } else if (bookTab === 'latest') {
+            list = [...list].reverse();
+        }
+
+        if (selectedCategory) {
+            list = list.filter(b => b.category?.name?.toLowerCase() === selectedCategory.toLowerCase());
+        }
+
+        return list.slice(0, 10);
+    }, [koleksiBuku, popularBooks, bookTab, selectedCategory]);
+
+    // Map category name to icon for visual representation
     const getCategoryIcon = (name: string) => {
         const lowerName = name.toLowerCase();
         if (lowerName.includes('aqidah')) return <Shield size={20} />;
@@ -97,249 +148,831 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
         if (lowerName.includes('motivasi')) return <Star size={20} />;
         if (lowerName.includes('keluarga')) return <Users size={20} />;
         if (lowerName.includes('anak')) return <Smile size={20} />;
+        if (lowerName.includes('fiksi')) return <Feather size={20} />;
         return <BookOpen size={20} />;
+    };
+
+    const getBookCoverUrl = (cover?: string) => {
+        if (!cover) return "/images/placeholders/book-cover.svg";
+        if (cover.startsWith('http://') || cover.startsWith('https://') || cover.startsWith('/')) {
+            return cover;
+        }
+        return `/storage/${cover}`;
+    };
+
+    const getVideoThumbnailUrl = (thumb?: string) => {
+        if (!thumb) return "/images/placeholders/video-thumb.jpg";
+        if (thumb.startsWith('http://') || thumb.startsWith('https://') || thumb.startsWith('/')) {
+            return thumb;
+        }
+        return `/storage/${thumb}`;
     };
 
     return (
         <>
-            <Head title="Talaqee - Katalog Islami" />
-            <div className="hidden md:block min-h-screen bg-gray-50 font-sans selection:bg-[#7e57c2] selection:text-white">
+            <Head title="Talaqee - Platform Belajar Al-Qur'an & Literasi Islami Modern" />
 
-                {/* Top Navigation */}
+            {/* ══════════════════════════════════════════════════════════════
+                DESKTOP WEB VERSION (md: and above)
+            ══════════════════════════════════════════════════════════════ */}
+            <div className="hidden md:block min-h-screen bg-[#F8FAFC] font-sans selection:bg-purple-100 selection:text-purple-900">
+
+                {/* Top Desktop Navigation */}
                 <WebDesktopNav />
 
-                {/* Hero Section */}
-                <div className="relative bg-white overflow-hidden">
-                    {/* Background Image / Pattern */}
-                    <div className="absolute top-0 right-0 w-3/4 h-full hidden md:block">
-                        {/* Gradient mask to blend the image seamlessly to white on the left */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent z-10"></div>
-                        <img src="/images/mosque_hero.png" alt="Islamic Mosque Background" className="w-full h-full object-cover object-left-top opacity-90" />
+                {/* ─── HERO SECTION ─── */}
+                <section className="relative bg-white border-b border-gray-100 overflow-hidden">
+                    {/* Background Islamic Architecture Pattern / Glow */}
+                    <div className="absolute top-0 right-0 w-1/2 h-full pointer-events-none hidden lg:block opacity-30 select-none">
+                        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/70 to-transparent z-10"></div>
+                        <img 
+                            src="/images/mosque_hero.png" 
+                            alt="Mosque Silhouette" 
+                            className="w-full h-full object-cover object-left-top" 
+                        />
                     </div>
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-100/40 rounded-full blur-3xl -z-10"></div>
+                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-100/30 rounded-full blur-3xl -z-10"></div>
 
-                    <div className="w-full px-6 md:px-12 lg:px-20 pt-20 pb-28 relative z-20 flex flex-col md:flex-row items-center">
-                        <div className="w-full md:w-3/5 lg:w-1/2">
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f3eefe] text-[#7e57c2] text-xs font-semibold mb-6">
-                                Katalog Islami Terlengkap
-                            </div>
-                            <h1 className="text-4xl md:text-5xl lg:text-[54px] font-extrabold text-gray-900 leading-[1.15] tracking-tight mb-6">
-                                Temukan Ribuan Konten<br />
-                                Berkualitas untuk<br />
-                                <span className="text-[#7e57c2]">Perjalanan Ilmu Anda</span>
-                            </h1>
-                            <p className="text-gray-600 text-lg mb-10 max-w-lg leading-relaxed">
-                                Buku, video, audio, dan berbagai konten islami pilihan untuk menambah ilmu dan mendekatkan diri kepada Allah.
-                            </p>
-
-                            {/* Search Bar */}
-                            <div className="relative bg-white p-2 rounded-2xl shadow-lg shadow-gray-200/50 flex items-center border border-gray-100 mb-8 max-w-2xl">
-                                <div className="pl-4 pr-3 text-gray-400">
-                                    <Search size={22} />
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20 relative z-20">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                            
+                            {/* Left Text & Search */}
+                            <div className="lg:col-span-7">
+                                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-50 border border-purple-100/80 text-purple-700 text-xs font-bold mb-6 shadow-sm">
+                                    <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                                    <span>Perpustakaan & Pembelajaran Islami Digital</span>
                                 </div>
-                                <input
-                                    type="text"
-                                    placeholder="Cari buku, video, audio, atau topik kajian..."
-                                    className="w-full border-none focus:ring-0 text-gray-700 bg-transparent py-3 placeholder:text-gray-400 text-base"
-                                />
-                                <button className="bg-[#7e57c2] hover:bg-[#6b48a8] text-white px-8 py-3.5 rounded-xl font-semibold transition-colors shrink-0">
-                                    Cari
-                                </button>
-                            </div>
 
-                            {/* Features List */}
-                            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-medium text-gray-500">
-                                <div className="flex items-center gap-2">
-                                    <div className="text-[#7e57c2]"><CheckCircle2 size={16} /></div>
-                                    Konten Terpercaya
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="text-[#7e57c2]"><Clock size={16} /></div>
-                                    Update Setiap Hari
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="text-[#7e57c2]"><MapPin size={16} /></div>
-                                    Akses di Mana Saja
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="text-[#7e57c2]"><Wallet size={16} /></div>
-                                    Gratis & Berbayar
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                <h1 className="text-4xl lg:text-[50px] font-black text-gray-900 leading-[1.18] tracking-tight mb-5">
+                                    Tingkatkan Kualitas Ibadah & Literasi dengan{' '}
+                                    <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 bg-clip-text text-transparent">
+                                        Konten Pilihan
+                                    </span>
+                                </h1>
 
-                {/* Categories Floating Container */}
-                <div className="w-full px-6 md:px-12 lg:px-20 -mt-12 relative z-30 mb-16">
-                    <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-4 border border-gray-100 flex items-center justify-between overflow-x-auto gap-4 scrollbar-hide">
+                                <p className="text-gray-600 text-base lg:text-lg mb-8 max-w-xl leading-relaxed">
+                                    Akses ribuan buku digital, video kajian tematik, audio talaqqi Al-Qur'an, dan bimbingan langsung dalam satu genggaman.
+                                </p>
 
-                        {/* Active All item */}
-                        <div className="flex flex-col items-center gap-3 min-w-[80px] cursor-pointer group">
-                            <div className="w-14 h-14 rounded-full bg-[#f3eefe] text-[#7e57c2] flex items-center justify-center transition-transform group-hover:scale-105">
-                                <Activity size={24} />
-                            </div>
-                            <span className="text-xs font-bold text-[#7e57c2] border-b-2 border-[#7e57c2] pb-1">Semua</span>
-                        </div>
-
-                        {categories.slice(0, 9).map((cat, idx) => {
-                            const Icon = getCategoryIcon(cat.name);
-                            const colors = [
-                                'bg-emerald-50 text-emerald-500', 'bg-blue-50 text-blue-500',
-                                'bg-orange-50 text-orange-500', 'bg-teal-50 text-teal-500',
-                                'bg-rose-50 text-rose-500', 'bg-indigo-50 text-indigo-500',
-                                'bg-amber-50 text-amber-500', 'bg-sky-50 text-sky-500', 'bg-fuchsia-50 text-fuchsia-500'
-                            ];
-                            const color = colors[idx % colors.length];
-
-                            return (
-                                <div key={cat.id} className="flex flex-col items-center gap-3 min-w-[80px] cursor-pointer group">
-                                    <div className={`w-14 h-14 rounded-full ${color} flex items-center justify-center transition-transform group-hover:scale-105`}>
-                                        {Icon}
+                                {/* Search Bar */}
+                                <form 
+                                    onSubmit={handleHeroSearch}
+                                    className="bg-white p-2 rounded-2xl shadow-xl shadow-purple-900/5 border border-gray-200/80 flex items-center mb-6 max-w-xl transition-all focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-100"
+                                >
+                                    <div className="pl-4 pr-3 text-gray-400">
+                                        <Search className="w-5 h-5" />
                                     </div>
-                                    <span className="text-xs font-semibold text-gray-600 group-hover:text-gray-900">{cat.name}</span>
-                                </div>
-                            )
-                        })}
+                                    <input
+                                        type="text"
+                                        placeholder="Cari judul buku, ustadz, atau topik kajian..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full border-none focus:ring-0 text-gray-800 bg-transparent py-2.5 placeholder:text-gray-400 text-sm font-medium outline-none"
+                                    />
+                                    <button 
+                                        type="submit"
+                                        className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-7 py-3 rounded-xl font-bold text-sm transition-all shadow-md shadow-purple-600/20 shrink-0 active:scale-95"
+                                    >
+                                        Cari
+                                    </button>
+                                </form>
 
-                        {/* View All */}
-                        <div className="flex flex-col items-center gap-3 min-w-[80px] cursor-pointer group">
-                            <div className="w-14 h-14 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center transition-transform group-hover:scale-105">
-                                <ArrowRight size={24} />
+                                {/* Quick Keywords */}
+                                <div className="flex flex-wrap items-center gap-2 mb-8">
+                                    <span className="text-xs font-bold text-gray-400">Topik Populer:</span>
+                                    {['Tafsir', 'Fiqih Sholat', 'Talaqqi', 'Aqidah', 'Sirah'].map((tag) => (
+                                        <Link
+                                            key={tag}
+                                            href={`/katalog?q=${encodeURIComponent(tag)}`}
+                                            className="text-xs font-semibold px-2.5 py-1 bg-gray-100 hover:bg-purple-50 hover:text-purple-700 text-gray-600 rounded-lg transition-colors"
+                                        >
+                                            #{tag}
+                                        </Link>
+                                    ))}
+                                </div>
+
+                                {/* Trust Value Badges */}
+                                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100 max-w-xl">
+                                    <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-700">
+                                        <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                            <CheckCircle2 size={16} />
+                                        </div>
+                                        <span>Shahih & Terverifikasi</span>
+                                    </div>
+                                    <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-700">
+                                        <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                            <Clock size={16} />
+                                        </div>
+                                        <span>Akses Tanpa Batas</span>
+                                    </div>
+                                    <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-700">
+                                        <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                                            <Wallet size={16} />
+                                        </div>
+                                        <span>Gratis & Koin</span>
+                                    </div>
+                                </div>
                             </div>
-                            <span className="text-xs font-semibold text-[#7e57c2]">Lihat Semua</span>
+
+                            {/* Right Highlight Card Showcase */}
+                            <div className="lg:col-span-5 flex flex-col gap-4">
+                                {terakhirDibaca ? (
+                                    /* Continue Reading Card if User has reading history */
+                                    <div className="bg-gradient-to-br from-purple-900 to-indigo-950 rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden border border-purple-800/40">
+                                        <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                                        
+                                        <div className="flex items-center justify-between mb-4 relative z-10">
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/10 backdrop-blur-md text-purple-200">
+                                                <Clock className="w-3.5 h-3.5" /> Lanjutkan Membaca
+                                            </span>
+                                            <span className="text-xs font-semibold text-purple-300">
+                                                {terakhirDibaca.progress_percent}% Selesai
+                                            </span>
+                                        </div>
+
+                                        <div className="flex gap-4 items-center mb-5 relative z-10">
+                                            <div className="w-20 aspect-[3/4] rounded-xl overflow-hidden bg-white/10 shrink-0 shadow-lg border border-white/20">
+                                                <img 
+                                                    src={getBookCoverUrl(terakhirDibaca.cover)} 
+                                                    alt={terakhirDibaca.title} 
+                                                    className="w-full h-full object-cover" 
+                                                />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-extrabold text-base text-white leading-snug line-clamp-2 mb-1">
+                                                    {terakhirDibaca.title}
+                                                </h3>
+                                                <p className="text-xs text-purple-200/80 mb-2 truncate">
+                                                    {terakhirDibaca.author}
+                                                </p>
+                                                <div className="w-full bg-white/20 h-2 rounded-full overflow-hidden mb-1">
+                                                    <div 
+                                                        className="bg-amber-400 h-full rounded-full transition-all duration-500" 
+                                                        style={{ width: `${terakhirDibaca.progress_percent}%` }}
+                                                    ></div>
+                                                </div>
+                                                <span className="text-[11px] text-purple-300 font-medium">
+                                                    {terakhirDibaca.chapter_info}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <Link 
+                                            href={sessionStorage.getItem('last_book_url') || route('katalog.index')}
+                                            className="w-full py-3 bg-white hover:bg-gray-100 text-purple-900 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-95"
+                                        >
+                                            <span>Lanjutkan Sekarang</span>
+                                            <ArrowRight className="w-4 h-4" />
+                                        </Link>
+                                    </div>
+                                ) : (
+                                    /* Featured Spotlight Card if no reading progress */
+                                    <div className="bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 rounded-3xl p-7 text-white shadow-2xl relative overflow-hidden border border-purple-700/30">
+                                        <div className="absolute top-0 right-0 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                                        
+                                        <div className="flex items-center justify-between mb-5 relative z-10">
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                                                <Crown className="w-3.5 h-3.5" /> Buku Pilihan Pekan Ini
+                                            </span>
+                                            <span className="flex items-center gap-1 text-xs font-bold text-amber-400">
+                                                <Star size={14} className="fill-amber-400" /> 4.9 (1.8k)
+                                            </span>
+                                        </div>
+
+                                        <div className="flex gap-5 items-center mb-6 relative z-10">
+                                            <div className="w-24 aspect-[3/4] rounded-xl overflow-hidden bg-white/10 shrink-0 shadow-2xl border border-white/20 transform rotate-1 hover:rotate-0 transition-transform">
+                                                <img 
+                                                    src={getBookCoverUrl(popularBooks[0]?.cover)} 
+                                                    alt="Buku Rekomendasi" 
+                                                    className="w-full h-full object-cover" 
+                                                />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-extrabold text-lg text-white leading-tight line-clamp-2 mb-1.5">
+                                                    {popularBooks[0]?.title || 'Tafsir & Tadabbur Al-Qur\'an'}
+                                                </h3>
+                                                <p className="text-xs text-purple-200/80 mb-3 truncate">
+                                                    {popularBooks[0]?.author?.name || 'Kompilasi Ulama Terpercaya'}
+                                                </p>
+                                                <div className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-bold text-purple-200">
+                                                    <Coins className="w-3.5 h-3.5 text-amber-400" />
+                                                    <span>{popularBooks[0]?.coins_price ? `${popularBooks[0].coins_price} Koin` : 'Tersedia Lengkap'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <Link 
+                                            href={popularBooks[0]?.id ? `/buku/${popularBooks[0].id}` : route('katalog.index')}
+                                            className="w-full py-3.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-amber-500/20 active:scale-95"
+                                        >
+                                            <span>Mulai Membaca Sekarang</span>
+                                            <ArrowRight className="w-4 h-4" />
+                                        </Link>
+                                    </div>
+                                )}
+
+                                {/* Top Up Koin Quick Card */}
+                                <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex items-center justify-between gap-4 hover:border-purple-200 transition-colors">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-black text-sm shadow-inner shrink-0">
+                                            C
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xs font-bold text-gray-900">Saldo Koin Anda</h4>
+                                            <p className="text-sm font-extrabold text-amber-600">
+                                                {user ? (user.coin_balance || 0).toLocaleString('id-ID') : 0} Koin
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <Link 
+                                        href="/akun/topup" 
+                                        className="px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 shrink-0"
+                                    >
+                                        <span>Top Up</span>
+                                        <ChevronRight size={14} />
+                                    </Link>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
-                </div>
+                </section>
 
-                {/* Popular Books Section */}
-                <div className="w-full px-6 md:px-12 lg:px-20 pb-24">
-                    <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Koleksi Semua Buku</h2>
-                        <Link href="#" className="flex items-center gap-1 text-sm font-semibold text-[#7e57c2] hover:text-[#6b48a8] transition-colors">
-                            Lihat Semua Buku <ArrowRight size={16} />
-                        </Link>
-                    </div>
+                {/* ─── BANNER CAROUSEL (DESKTOP) ─── */}
+                {banners && banners.length > 0 && (
+                    <section className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+                        <div className="relative rounded-3xl overflow-hidden shadow-md bg-gradient-to-r from-purple-800 to-indigo-900 text-white min-h-[160px] flex items-center">
+                            {banners.map((banner, idx) => (
+                                <div 
+                                    key={banner.id}
+                                    className={`absolute inset-0 transition-opacity duration-700 flex items-center justify-between px-10 py-6 ${
+                                        idx === currentBannerIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                                    }`}
+                                    style={{ backgroundColor: banner.background_color || undefined }}
+                                >
+                                    <div className="max-w-xl z-10">
+                                        {banner.subtitle && (
+                                            <span className="text-xs font-bold uppercase tracking-wider text-purple-200 mb-1.5 block">
+                                                {banner.subtitle}
+                                            </span>
+                                        )}
+                                        <h3 className="text-2xl lg:text-3xl font-black mb-2 text-white">
+                                            {banner.title || 'Promo Menarik Talaqee'}
+                                        </h3>
+                                        {banner.button_text && (
+                                            <Link 
+                                                href={banner.link_url || route('katalog.index')}
+                                                className="inline-flex items-center gap-2 mt-2 px-5 py-2.5 bg-white text-purple-900 hover:bg-purple-50 font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-95"
+                                            >
+                                                <span>{banner.button_text}</span>
+                                                <ArrowUpRight size={16} />
+                                            </Link>
+                                        )}
+                                    </div>
 
-                    <div className="relative">
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                            {popularBooks.map((book, idx) => (
-                                <Link href={`/buku/${book.id}`} key={idx} className="group cursor-pointer block">
-                                    {/* Book Cover Container */}
-                                    <div className="aspect-[3/4] rounded-2xl overflow-hidden mb-4 relative bg-gray-100 shadow-sm border border-gray-100 group-hover:shadow-md transition-shadow">
-                                        <img
-                                            src={book.cover ? (book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`) : "/images/placeholders/book-cover.svg"}
-                                            alt={book.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                    {banner.image_path && (
+                                        <div className="h-32 w-48 shrink-0 rounded-2xl overflow-hidden shadow-lg border border-white/20 hidden md:block">
+                                            <img 
+                                                src={banner.image_path.startsWith('http') ? banner.image_path : `/storage/${banner.image_path}`} 
+                                                alt="Banner" 
+                                                className="w-full h-full object-cover" 
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+
+                            {/* Carousel Dots */}
+                            {banners.length > 1 && (
+                                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
+                                    {banners.map((_, i) => (
+                                        <button 
+                                            key={i} 
+                                            onClick={() => setCurrentBannerIndex(i)}
+                                            className={`h-2 rounded-full transition-all ${
+                                                i === currentBannerIndex ? 'w-6 bg-white' : 'w-2 bg-white/40'
+                                            }`}
                                         />
-                                        {/* Subtle overlay on hover */}
-                                        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                )}
 
-                                    {/* Book Info */}
+                {/* ─── KATEGORI UNGGULAN (INTERACTIVE PILLS) ─── */}
+                <section className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
+                    <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm">
+                        <div className="flex items-center justify-between mb-4 px-2">
+                            <div>
+                                <h3 className="text-base font-extrabold text-gray-900">Eksplorasi Berdasarkan Kategori</h3>
+                                <p className="text-xs text-gray-500">Pilih topik pembahasan untuk memfilter buku di bawah</p>
+                            </div>
+                            <Link 
+                                href={route('katalog.index')}
+                                className="text-xs font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                            >
+                                <span>Semua Kategori</span>
+                                <ChevronRight size={14} />
+                            </Link>
+                        </div>
+
+                        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                            {/* "Semua" pill */}
+                            <button
+                                onClick={() => setSelectedCategory(null)}
+                                className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl font-bold text-xs shrink-0 transition-all ${
+                                    selectedCategory === null 
+                                        ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' 
+                                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-100'
+                                }`}
+                            >
+                                <Activity size={16} />
+                                <span>Semua Topik</span>
+                            </button>
+
+                            {categories.map((cat, idx) => {
+                                const isSelected = selectedCategory === cat.name;
+                                const Icon = getCategoryIcon(cat.name);
+
+                                return (
+                                    <button
+                                        key={cat.id}
+                                        onClick={() => setSelectedCategory(isSelected ? null : cat.name)}
+                                        className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl font-bold text-xs shrink-0 transition-all ${
+                                            isSelected 
+                                                ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' 
+                                                : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-100'
+                                        }`}
+                                    >
+                                        <span className={isSelected ? 'text-white' : 'text-purple-600'}>
+                                            {Icon}
+                                        </span>
+                                        <span>{cat.name}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ─── KOLEKSI BUKU UTAMA (GRID BUKU DENGAN TABS) ─── */}
+                <section className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+                                    {selectedCategory ? `Buku Kategori: ${selectedCategory}` : 'Koleksi Buku Pilihan'}
+                                </h2>
+                                {selectedCategory && (
+                                    <button 
+                                        onClick={() => setSelectedCategory(null)}
+                                        className="text-[11px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full hover:bg-red-100 transition-colors"
+                                    >
+                                        Reset Filter ×
+                                    </button>
+                                )}
+                            </div>
+                            <p className="text-xs text-gray-500">
+                                Beragam judul buku islami pilihan dari penulis dan penerbit terpercaya
+                            </p>
+                        </div>
+
+                        {/* Tabs Filter */}
+                        <div className="flex items-center gap-2 bg-white p-1 rounded-2xl border border-gray-200/80 shadow-sm shrink-0">
+                            <button
+                                onClick={() => setBookTab('all')}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                                    bookTab === 'all' 
+                                        ? 'bg-purple-600 text-white shadow-sm' 
+                                        : 'text-gray-600 hover:text-gray-900'
+                                }`}
+                            >
+                                Semua
+                            </button>
+                            <button
+                                onClick={() => setBookTab('popular')}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                                    bookTab === 'popular' 
+                                        ? 'bg-purple-600 text-white shadow-sm' 
+                                        : 'text-gray-600 hover:text-gray-900'
+                                }`}
+                            >
+                                Terpopuler
+                            </button>
+                            <button
+                                onClick={() => setBookTab('latest')}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                                    bookTab === 'latest' 
+                                        ? 'bg-purple-600 text-white shadow-sm' 
+                                        : 'text-gray-600 hover:text-gray-900'
+                                }`}
+                            >
+                                Terbaru
+                            </button>
+                            <Link 
+                                href={route('katalog.index')}
+                                className="px-3 py-2 text-xs font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1 border-l border-gray-100 pl-3"
+                            >
+                                <span>Lihat Semua</span>
+                                <ArrowRight size={14} />
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* Book Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+                        {displayedBooks.map((book) => (
+                            <Link 
+                                href={`/buku/${book.id}`} 
+                                key={book.id} 
+                                className="group flex flex-col bg-white rounded-2xl p-3 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 relative"
+                            >
+                                {/* Cover Container */}
+                                <div className="aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-3 relative shadow-inner border border-gray-50">
+                                    <img
+                                        src={getBookCoverUrl(book.cover)}
+                                        alt={book.title}
+                                        loading="lazy"
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                    
+                                    {/* Price Badge */}
+                                    {book.coins_price > 0 ? (
+                                        <div className="absolute top-2.5 right-2.5 bg-white/95 backdrop-blur-md rounded-full px-2.5 py-1 flex items-center gap-1 shadow-md border border-amber-200">
+                                            <div className="w-3.5 h-3.5 rounded-full bg-amber-400 flex items-center justify-center text-white text-[8px] font-black">
+                                                C
+                                            </div>
+                                            <span className="text-[10px] font-extrabold text-amber-800">
+                                                {book.coins_price}
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <div className="absolute top-2.5 right-2.5 bg-emerald-500/95 backdrop-blur-md text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-md">
+                                            Gratis
+                                        </div>
+                                    )}
+
+                                    {/* Category tag */}
+                                    {book.category?.name && (
+                                        <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[9px] font-bold px-2 py-0.5 rounded-md">
+                                            {book.category.name}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Content Details */}
+                                <div className="flex-1 flex flex-col justify-between">
                                     <div>
-                                        <h3 className="font-bold text-gray-900 leading-tight mb-1 group-hover:text-[#7e57c2] transition-colors line-clamp-1" title={book.title}>
+                                        <h3 
+                                            className="font-bold text-sm text-gray-900 leading-snug mb-1 group-hover:text-purple-700 transition-colors line-clamp-2 min-h-[2.5rem]" 
+                                            title={book.title}
+                                        >
                                             {book.title}
                                         </h3>
-                                        <p className="text-xs text-gray-500 mb-3">{book.author?.name || 'Penulis Tidak Diketahui'}</p>
+                                        <p className="text-xs text-gray-500 mb-2 truncate">
+                                            {book.author?.name || 'Penulis Tidak Diketahui'}
+                                        </p>
+                                    </div>
 
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-1 text-xs font-medium text-amber-500">
-                                                <Star size={14} className="fill-amber-500" />
-                                                <span>4.8 <span className="text-gray-400 font-normal">(1.245)</span></span>
-                                            </div>
-
-                                            {/* Price / Free Badge */}
-                                            {book.price === 0 || !book.price ? (
-                                                <div className="px-2.5 py-1 bg-[#f3eefe] text-[#7e57c2] text-xs font-bold rounded-lg">
-                                                    Gratis
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-600 text-xs font-bold rounded-lg border border-amber-100">
-                                                    <div className="w-3.5 h-3.5 rounded-full bg-amber-400 flex items-center justify-center text-white text-[8px]">
-                                                        C
-                                                    </div>
-                                                    {book.coins_price || 10}
-                                                </div>
-                                            )}
+                                    <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-1">
+                                        <div className="flex items-center gap-1 text-xs font-bold text-amber-500">
+                                            <Star size={13} className="fill-amber-400 text-amber-400" />
+                                            <span>4.8</span>
                                         </div>
+                                        <span className="text-[11px] font-bold text-purple-600 group-hover:underline flex items-center gap-0.5">
+                                            Baca <ChevronRight size={12} />
+                                        </span>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {displayedBooks.length === 0 && (
+                        <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm max-w-md mx-auto">
+                            <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                            <h4 className="font-bold text-gray-800 text-base mb-1">Tidak Ada Buku</h4>
+                            <p className="text-xs text-gray-500 mb-4">Belum ada buku untuk kategori yang dipilih.</p>
+                            <button
+                                onClick={() => setSelectedCategory(null)}
+                                className="px-4 py-2 bg-purple-600 text-white rounded-xl text-xs font-bold hover:bg-purple-700 transition-colors"
+                            >
+                                Tampilkan Semua Buku
+                            </button>
+                        </div>
+                    )}
+                </section>
+
+                {/* ─── VIDEO KAJIAN SECTION (DESKTOP) ─── */}
+                {koleksiVideo && koleksiVideo.length > 0 && (
+                    <section className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h2 className="text-2xl font-black text-gray-900 tracking-tight">Video Kajian Pilihan</h2>
+                                <p className="text-xs text-gray-500 mt-0.5">Simak penjelasan materi islami dari para asatidz</p>
+                            </div>
+                            <Link 
+                                href={route('videos.index')}
+                                className="text-xs font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                            >
+                                <span>Lihat Semua Video</span>
+                                <ChevronRight size={14} />
+                            </Link>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {koleksiVideo.slice(0, 3).map((video) => (
+                                <Link 
+                                    href={`/videos/${video.id}`} 
+                                    key={video.id} 
+                                    className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 block"
+                                >
+                                    <div className="w-full aspect-video bg-slate-900 relative overflow-hidden">
+                                        <img 
+                                            src={getVideoThumbnailUrl(video.thumbnail)} 
+                                            alt={video.title} 
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100" 
+                                        />
+                                        <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                                            <div className="w-12 h-12 rounded-full bg-white/90 text-purple-700 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                                <Play size={20} className="fill-current ml-0.5" />
+                                            </div>
+                                        </div>
+                                        <div className="absolute bottom-2.5 right-2.5 bg-black/80 backdrop-blur-sm text-white text-[11px] font-bold px-2 py-0.5 rounded-md">
+                                            {Math.floor(video.duration / 60)}:{String(video.duration % 60).padStart(2, '0')}
+                                        </div>
+                                    </div>
+
+                                    <div className="p-4">
+                                        <h3 className="font-bold text-sm text-gray-900 leading-snug line-clamp-2 mb-1 group-hover:text-purple-700 transition-colors">
+                                            {video.title}
+                                        </h3>
+                                        <p className="text-xs text-gray-500 flex items-center gap-1.5 mt-2">
+                                            <CircleUserRound size={14} className="text-purple-500" />
+                                            <span>{video.author?.name || 'Pemateri Kajian'}</span>
+                                        </p>
                                     </div>
                                 </Link>
                             ))}
+                        </div>
+                    </section>
+                )}
 
-                            {/* Fallback if no books to show layout nicely */}
-                            {popularBooks.length === 0 && Array(5).fill(null).map((_, idx) => (
-                                <div key={`empty-${idx}`} className="group cursor-pointer">
-                                    <div className="aspect-[3/4] rounded-2xl overflow-hidden mb-4 relative bg-gray-100 border border-gray-100 flex items-center justify-center">
-                                        <BookOpen size={48} className="text-gray-300" />
+                {/* ─── AUDIO TALAQQI SECTION (DESKTOP) ─── */}
+                {koleksiAudio && koleksiAudio.length > 0 && (
+                    <section className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h2 className="text-2xl font-black text-gray-900 tracking-tight">Rekaman Audio & Talaqqi</h2>
+                                <p className="text-xs text-gray-500 mt-0.5">Dengarkan lantunan ayat Al-Qur'an dan bimbingan tajwid</p>
+                            </div>
+                            <Link 
+                                href={route('audios.index')}
+                                className="text-xs font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                            >
+                                <span>Lihat Semua Audio</span>
+                                <ChevronRight size={14} />
+                            </Link>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {koleksiAudio.slice(0, 3).map((audio) => (
+                                <Link 
+                                    href={route('audios.index')} 
+                                    key={audio.id} 
+                                    className="group bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-4"
+                                >
+                                    <div className="w-14 h-14 rounded-2xl bg-purple-50 text-purple-700 flex items-center justify-center shrink-0 group-hover:bg-purple-600 group-hover:text-white transition-colors shadow-sm">
+                                        <Headphones size={24} />
                                     </div>
-                                    <div>
-                                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                                        <div className="h-3 bg-gray-100 rounded w-1/2 mb-3"></div>
-                                        <div className="flex items-center justify-between">
-                                            <div className="h-3 bg-gray-100 rounded w-1/3"></div>
-                                            <div className="h-5 bg-gray-100 rounded-lg w-1/4"></div>
-                                        </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-bold text-sm text-gray-900 truncate group-hover:text-purple-700 transition-colors mb-0.5">
+                                            {audio.title}
+                                        </h3>
+                                        <p className="text-xs text-gray-500 truncate mb-1">
+                                            {audio.author?.name || 'Qari / Ustadz'}
+                                        </p>
+                                        <span className="text-[11px] font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full inline-block">
+                                            {Math.floor(audio.duration / 60)} menit
+                                        </span>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
+                    </section>
+                )}
 
-                        {/* Next Button Arrow (Floating right) */}
-                        <button className="absolute -right-5 top-[40%] -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-lg border border-gray-100 flex items-center justify-center text-[#7e57c2] hover:bg-gray-50 transition-colors z-10 hidden lg:flex">
-                            <ChevronRight size={24} />
-                        </button>
-                    </div>
-                </div>
+                {/* ─── COIN TOP UP CALL TO ACTION (CTA BANNER) ─── */}
+                <section className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
+                    <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 rounded-3xl p-8 lg:p-12 text-white shadow-2xl relative overflow-hidden border border-purple-800/40">
+                        {/* Glowing Background Circles */}
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/15 rounded-full blur-2xl -ml-16 -mb-16"></div>
 
-                {/* Footer Desktop */}
-                <footer className="w-full bg-white border-t border-gray-100 pt-12 pb-8 mt-12">
-                    <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-10 border-b border-gray-100">
-                            <div className="md:col-span-4">
-                                <div className="flex items-center gap-2 mb-3">
-                                    <img src="/logo/logo_app.talaqee.png" alt="Talaqee Logo" className="h-8 w-auto object-contain" />
+                        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                            <div className="lg:col-span-8">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold mb-4 border border-amber-400/30">
+                                    <Coins className="w-3.5 h-3.5 text-amber-400" />
+                                    <span>Koin Digital Talaqee</span>
                                 </div>
-                                <p className="text-xs text-gray-500 leading-relaxed max-w-sm mb-4">
-                                    Platform pembelajaran Al-Qur'an, buku islami digital, dan talaqqi terpercaya untuk meningkatkan kualitas tilawah dan literasi Anda.
+                                <h2 className="text-2xl lg:text-3xl font-black mb-3 leading-tight">
+                                    Buka Bab Buku Eksklusif & Nikmati Konten Premium Tanpa Batas
+                                </h2>
+                                <p className="text-purple-200/90 text-sm max-w-2xl leading-relaxed mb-6">
+                                    Dapatkan kemudahan membaca bab buku pilihan dengan tarif terjangkau mulai dari Rp 2.500. Koin otomatis ditambahkan ke saldo Anda secara instan.
                                 </p>
-                                <span className="inline-block text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
-                                    Terintegrasi dengan iPaymu Payment Gateway
+
+                                <div className="flex flex-wrap items-center gap-6 text-xs text-purple-200 font-semibold">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-[10px]">✓</div>
+                                        <span>Proses Cepat & Otomatis</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-[10px]">✓</div>
+                                        <span>Tersedia Banyak Pilihan Paket</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-[10px]">✓</div>
+                                        <span>Banyak Bonus Koin Tambahan</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="lg:col-span-4 flex flex-col items-center lg:items-end">
+                                <Link 
+                                    href="/akun/topup" 
+                                    className="px-8 py-4 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 rounded-2xl font-black text-sm transition-all shadow-xl shadow-amber-500/25 active:scale-95 flex items-center gap-2.5"
+                                >
+                                    <Coins className="w-5 h-5 text-slate-950" />
+                                    <span>Top Up Koin Sekarang</span>
+                                    <ArrowRight className="w-4 h-4" />
+                                </Link>
+                                <span className="text-[11px] text-purple-300 mt-3 font-medium">
+                                    Pembayaran aman terintegrasi dengan iPaymu
                                 </span>
                             </div>
+                        </div>
+                    </div>
+                </section>
 
-                            <div className="md:col-span-5">
-                                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2.5">Alamat Kantor Bisnis</h4>
-                                <p className="text-xs text-gray-600 leading-relaxed mb-2">
-                                    Gang Mawar 26-7 RT/RW 003/008, Kelurahan Halim Perdana Kusuma, Kecamatan Makasar, Kota Jakarta Timur, Provinsi DKI Jakarta 13610
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                    <span className="font-semibold text-gray-700">Jam Operasional:</span> Senin – Jumat (08.00 – 17.00 WIB)
-                                </p>
-                            </div>
+                {/* ─── KENAPA MEMILIH TALAQEE (FEATURES) ─── */}
+                <section className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
+                    <div className="text-center max-w-2xl mx-auto mb-12">
+                        <span className="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+                            Keunggulan Platform
+                        </span>
+                        <h2 className="text-2xl lg:text-3xl font-black text-gray-900 mt-3 mb-3">
+                            Mengapa Belajar di Talaqee?
+                        </h2>
+                        <p className="text-xs lg:text-sm text-gray-500 leading-relaxed">
+                            Kami menggabungkan metode talaqqi tradisional dengan teknologi modern demi kemudahan belajar umat.
+                        </p>
+                    </div>
 
-                            <div className="md:col-span-3">
-                                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2.5">Layanan & Kontak</h4>
-                                <div className="space-y-1.5 text-xs text-gray-600">
-                                    <p><span className="font-medium text-gray-800">WhatsApp:</span> +62 822 8557 8390</p>
-                                    <p><span className="font-medium text-gray-800">Email:</span> saufitrod@gmail.com</p>
-                                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all text-center">
+                            <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto mb-4 font-bold">
+                                <BookOpen size={24} />
                             </div>
+                            <h4 className="font-bold text-gray-900 text-sm mb-1.5">Buku Islami Lengkap</h4>
+                            <p className="text-xs text-gray-500 leading-relaxed">
+                                Ribuan bab materi terstruktur dari aqidah, fiqih, tafsir, hingga adab harian.
+                            </p>
                         </div>
 
-                        <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                            <span className="text-xs text-gray-400">© 2026 Talaqee. All rights reserved.</span>
-                            <div className="flex items-center gap-6 text-xs font-medium text-gray-500">
-                                <Link href={route('faq.index')} className="hover:text-[#7e57c2] transition-colors">FAQ</Link>
-                                <Link href={route('refund.policy')} className="hover:text-[#7e57c2] transition-colors">Refund Policy</Link>
-                                <Link href={route('terms')} className="hover:text-[#7e57c2] transition-colors">Syarat & Ketentuan</Link>
-                                <Link href={route('kontak')} className="hover:text-[#7e57c2] transition-colors">Kontak</Link>
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all text-center">
+                            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 font-bold">
+                                <PlaySquare size={24} />
+                            </div>
+                            <h4 className="font-bold text-gray-900 text-sm mb-1.5">Kajian Video HD</h4>
+                            <p className="text-xs text-gray-500 leading-relaxed">
+                                Tonton video kajian tematik dengan audio jernih dan visual menarik kapan saja.
+                            </p>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all text-center">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4 font-bold">
+                                <Headphones size={24} />
+                            </div>
+                            <h4 className="font-bold text-gray-900 text-sm mb-1.5">Talaqqi Interaktif</h4>
+                            <p className="text-xs text-gray-500 leading-relaxed">
+                                Dengarkan contoh bacaan qari dan setorkan hafalan atau tilawah Anda dengan mudah.
+                            </p>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all text-center">
+                            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 font-bold">
+                                <ShieldCheck size={24} />
+                            </div>
+                            <h4 className="font-bold text-gray-900 text-sm mb-1.5">Terpercaya & Berlisensi</h4>
+                            <p className="text-xs text-gray-500 leading-relaxed">
+                                Setiap konten telah melalui kurasi ketat untuk menjamin keaslian referensi ilmu.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ─── DESKTOP FOOTER ─── */}
+                <footer className="w-full bg-white border-t border-gray-100 pt-16 pb-10 mt-16">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-gray-100">
+                            
+                            {/* Column 1: Brand & Desc */}
+                            <div className="md:col-span-4">
+                                <Link href={route('home')} className="inline-block mb-4">
+                                    <img src="/logo/logo_app.talaqee.png" alt="Talaqee Logo" className="h-9 w-auto object-contain" />
+                                </Link>
+                                <p className="text-xs text-gray-500 leading-relaxed max-w-sm mb-5">
+                                    Platform pembelajaran Al-Qur'an, perpustakaan digital islami, dan audio talaqqi terpercaya untuk mendampingi langkah hijrah dan literasi Anda.
+                                </p>
+                                <div className="inline-flex items-center gap-2 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                                    <span>Pembayaran Resmi via iPaymu Gateway</span>
+                                </div>
+                            </div>
+
+                            {/* Column 2: Navigasi */}
+                            <div className="md:col-span-3">
+                                <h4 className="text-xs font-extrabold text-gray-900 uppercase tracking-wider mb-4">
+                                    Navigasi Cepat
+                                </h4>
+                                <ul className="space-y-2.5 text-xs font-medium text-gray-600">
+                                    <li>
+                                        <Link href={route('home')} className="hover:text-purple-600 transition-colors">Beranda</Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('katalog.index')} className="hover:text-purple-600 transition-colors">Katalog Buku</Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('videos.index')} className="hover:text-purple-600 transition-colors">Video Kajian</Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('audios.index')} className="hover:text-purple-600 transition-colors">Audio Talaqqi</Link>
+                                    </li>
+                                    <li>
+                                        <Link href="/akun/topup" className="hover:text-purple-600 transition-colors">Top Up Koin</Link>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Column 3: Bantuan & Legalitas */}
+                            <div className="md:col-span-2">
+                                <h4 className="text-xs font-extrabold text-gray-900 uppercase tracking-wider mb-4">
+                                    Bantuan
+                                </h4>
+                                <ul className="space-y-2.5 text-xs font-medium text-gray-600">
+                                    <li>
+                                        <Link href={route('faq.index')} className="hover:text-purple-600 transition-colors">FAQ</Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('refund.policy')} className="hover:text-purple-600 transition-colors">Refund Policy</Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('terms')} className="hover:text-purple-600 transition-colors">Syarat & Ketentuan</Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('kontak')} className="hover:text-purple-600 transition-colors">Kontak Kami</Link>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Column 4: Kontak & Kantor */}
+                            <div className="md:col-span-3">
+                                <h4 className="text-xs font-extrabold text-gray-900 uppercase tracking-wider mb-4">
+                                    Kantor Bisnis
+                                </h4>
+                                <p className="text-xs text-gray-500 leading-relaxed mb-3">
+                                    Gang Mawar 26-7 RT/RW 003/008, Kel. Halim Perdana Kusuma, Kec. Makasar, Kota Jakarta Timur, DKI Jakarta 13610
+                                </p>
+                                <div className="space-y-1 text-xs text-gray-600 mb-3">
+                                    <p><strong className="text-gray-800">WhatsApp:</strong> +62 822 8557 8390</p>
+                                    <p><strong className="text-gray-800">Email:</strong> saufitrod@gmail.com</p>
+                                </div>
+                                <p className="text-[11px] text-gray-400">
+                                    Jam Layanan: Senin – Jumat (08.00 – 17.00 WIB)
+                                </p>
+                            </div>
+
+                        </div>
+
+                        {/* Bottom Copyright */}
+                        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400">
+                            <span>© 2026 Talaqee. Seluruh hak cipta dilindungi undang-undang.</span>
+                            <div className="flex items-center gap-6">
+                                <Link href={route('faq.index')} className="hover:text-purple-600 transition-colors">Pusat Bantuan</Link>
+                                <Link href={route('terms')} className="hover:text-purple-600 transition-colors">Privasi</Link>
+                                <Link href={route('kontak')} className="hover:text-purple-600 transition-colors">Customer Support</Link>
                             </div>
                         </div>
                     </div>
                 </footer>
             </div>
 
-            {/* ─── MOBILE VIEW (BookStore Beranda) ─── */}
+            {/* ══════════════════════════════════════════════════════════════
+                MOBILE VERSION (block md:hidden)
+            ══════════════════════════════════════════════════════════════ */}
             <div className="block md:hidden bg-white min-h-screen pb-24 font-sans selection:bg-blue-600 selection:text-white">
 
                 {/* Header Profile */}
@@ -380,8 +1013,6 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                     </div>
                 </div>
 
-
-
                 {/* Jadwal Sholat */}
                 <JadwalSholat />
 
@@ -398,7 +1029,7 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                         {koleksiBuku.length > 0 ? koleksiBuku.slice(0, 4).map((book) => (
                             <Link href={`/buku/${book.id}`} key={book.id} className="flex flex-col w-full block">
                                 <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-2 border border-gray-100 shadow-sm relative">
-                                    <img src={book.cover ? (book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`) : "/images/placeholders/book-cover.svg"} alt={book.title} loading="lazy" className="w-full h-full object-cover" />
+                                    <img src={getBookCoverUrl(book.cover)} alt={book.title} loading="lazy" className="w-full h-full object-cover" />
                                     {book.coins_price > 0 && (
                                         <div className="absolute top-1.5 right-1.5 bg-white/90 backdrop-blur-sm rounded-full px-1 py-0.5 flex items-center gap-0.5 shadow-sm">
                                             <div className="w-2 h-2 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[4px] font-bold">C</div>
@@ -429,7 +1060,7 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                         {koleksiVideo.length > 0 ? koleksiVideo.slice(0, 3).map((video) => (
                             <Link href={`/videos/${video.id}`} key={video.id} className="flex flex-col group block w-full">
                                 <div className="w-full aspect-video bg-gray-100 rounded-lg overflow-hidden relative mb-1.5 shadow-sm border border-gray-100">
-                                    <img src={video.thumbnail ? (video.thumbnail.startsWith('http') || video.thumbnail.startsWith('/') ? video.thumbnail : `/storage/${video.thumbnail}`) : "/images/placeholders/video-thumb.jpg"} alt={video.title} loading="lazy" className="w-full h-full object-cover" />
+                                    <img src={getVideoThumbnailUrl(video.thumbnail)} alt={video.title} loading="lazy" className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                                         <div className="w-6 h-6 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white">
                                             <Play className="w-2.5 h-2.5 ml-0.5 fill-current" />
@@ -464,7 +1095,7 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                             <Link href={`/buku/${book.id}`} key={book.id} className="group flex flex-col w-full bg-white rounded-xl p-2.5 border border-gray-100 shadow-sm hover:shadow-md transition-all">
                                 <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-2.5 border border-gray-50 shadow-inner relative">
                                     <img 
-                                        src={book.cover ? (book.cover.startsWith('http') || book.cover.startsWith('/') ? book.cover : `/storage/${book.cover}`) : "/images/placeholders/book-cover.svg"} 
+                                        src={getBookCoverUrl(book.cover)} 
                                         alt={book.title} 
                                         loading="lazy" 
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
@@ -509,7 +1140,7 @@ export default function Welcome({ categories, popularBooks, koleksiBuku = [], ko
                     <p className="text-[10px] text-gray-400">© 2026 Talaqee. All rights reserved.</p>
                 </div>
 
-                {/* Bottom Navigation */}
+                {/* Bottom Navigation Mobile */}
                 <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#F1F5F9] md:max-w-md md:mx-auto z-50">
                     <div className="flex justify-around items-center h-[70px] pb-2">
                         {[

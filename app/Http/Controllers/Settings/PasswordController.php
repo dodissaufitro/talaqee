@@ -25,19 +25,42 @@ class PasswordController extends Controller
     }
 
     /**
-     * Update the user's password.
+     * Show Keamanan Akun page.
      */
-    public function update(Request $request): RedirectResponse
+    public function editKeamanan(Request $request): Response
     {
-        $validated = $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', Password::defaults(), 'confirmed'],
-        ]);
+        $user = $request->user();
+        $hasPassword = !empty($user->password);
+        $isGoogleAccount = !empty($user->google_id);
 
-        $request->user()->update([
+        return Inertia::render('Akun/Keamanan', [
+            'hasPassword' => $hasPassword,
+            'isGoogleAccount' => $isGoogleAccount,
+            'email' => $user->email,
+            'status' => $request->session()->get('status'),
+        ]);
+    }
+
+    /**
+     * Update password from Keamanan Akun page.
+     */
+    public function updateKeamanan(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $rules = [
+            'password' => ['required', Password::min(8), 'confirmed'],
+        ];
+
+        if (!empty($user->password)) {
+            $rules['current_password'] = ['required', 'current_password'];
+        }
+
+        $validated = $request->validate($rules);
+
+        $user->update([
             'password' => Hash::make($validated['password']),
         ]);
 
-        return back();
+        return back()->with('success', 'Kata sandi berhasil diperbarui.');
     }
 }

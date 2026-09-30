@@ -4,13 +4,13 @@ import {
     ChevronDown, BookOpen, Book, LogOut, Globe, LayoutDashboard,
     ShoppingCart, Grid, Sparkles, Users, CreditCard, FileText,
     Box, Megaphone, UserCircle, PlaySquare, Mic, HelpCircle,
-    ShieldCheck, Settings, Circle, Feather
+    ShieldCheck, Settings, Circle, Feather, Coins
 } from 'lucide-react';
 
 const ICON_MAP: Record<string, React.ElementType> = {
     Globe, LayoutDashboard, ShoppingCart, Book, Grid, Sparkles,
     Users, CreditCard, FileText, Box, Megaphone, UserCircle,
-    PlaySquare, Mic, HelpCircle, ShieldCheck, Settings, Circle, BookOpen, Feather
+    PlaySquare, Mic, HelpCircle, ShieldCheck, Settings, Circle, BookOpen, Feather, Coins
 };
 
 interface AdminSidebarProps {
@@ -19,6 +19,8 @@ interface AdminSidebarProps {
         user?: {
             name?: string;
             email?: string;
+            roles?: string[];
+            is_super_admin?: boolean;
         }
     }
 }
@@ -33,6 +35,7 @@ export const adminNavItems = [
     { name: 'Ikon', icon: 'Sparkles', route: 'admin.icons.index' },
     { name: 'Pelanggan', icon: 'Users', route: 'admin.customers.index' },
     { name: 'Transaksi', icon: 'CreditCard', route: 'admin.transactions.index' },
+    { name: 'Paket Koin', icon: 'Coins', route: 'admin.coin-packages.index', superAdminOnly: true },
     { name: 'Laporan', icon: 'FileText', route: 'admin.reports.index' },
     { name: 'Stok', icon: 'Box', route: 'admin.stock.index' },
     { name: 'Promosi', icon: 'Megaphone', route: 'admin.promotions.index' },
@@ -54,6 +57,18 @@ export default function AdminSidebar({ activeItem, auth: propAuth }: AdminSideba
         return <IconComponent size={20} className={active ? 'text-blue-600' : 'text-gray-400'} />;
     };
 
+    const isSuperAdmin = Boolean(
+        auth?.user?.is_super_admin || 
+        (Array.isArray(auth?.user?.roles) && auth?.user?.roles.includes('super_admin'))
+    );
+
+    const visibleNavItems = adminNavItems.filter((item: any) => {
+        if (item.superAdminOnly && !isSuperAdmin) {
+            return false;
+        }
+        return true;
+    });
+
     return (
         <aside className="w-[280px] bg-white border-r border-gray-100 flex flex-col h-full shrink-0 overflow-y-auto">
             <div className="p-6 flex items-center gap-3">
@@ -63,7 +78,7 @@ export default function AdminSidebar({ activeItem, auth: propAuth }: AdminSideba
             </div>
 
             <div className="px-4 py-2 space-y-1">
-                {adminNavItems.map((item, idx) => {
+                {visibleNavItems.map((item, idx) => {
                     let active = item.name === activeItem; // fallback
                     
                     if (item.route && typeof route !== 'undefined') {

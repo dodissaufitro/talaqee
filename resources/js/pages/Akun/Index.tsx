@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export default function AkunIndex() {
-    const { auth } = usePage<any>().props;
+    const { auth, hasActiveSubscription = false } = usePage<any>().props;
     const user = auth.user;
     const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
 
@@ -46,9 +46,15 @@ export default function AkunIndex() {
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                             <h2 className="text-[17px] font-extrabold text-[#1E293B] truncate">{user?.name || 'Ahmad Fauzi'}</h2>
-                            <span className="flex items-center gap-1 bg-[#F5F3FF] text-[#7C3AED] text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0">
-                                <Crown className="w-3 h-3" /> Premium
-                            </span>
+                            {hasActiveSubscription ? (
+                                <span className="flex items-center gap-1 bg-[#F5F3FF] text-[#7C3AED] text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0">
+                                    <Crown className="w-3 h-3" /> VIP
+                                </span>
+                            ) : (
+                                <span className="flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0">
+                                    Reguler
+                                </span>
+                            )}
                         </div>
                         <p className="text-[13px] text-[#64748B] mb-1">{user?.email || 'ahmadfauzi@gmail.com'}</p>
                         <p className="text-[11px] font-medium text-[#94A3B8]">Bergabung sejak {user?.created_at ? new Date(user.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '12 Jan 2024'}</p>
@@ -99,7 +105,7 @@ export default function AkunIndex() {
                             </div>
                             <ChevronRight className="w-5 h-5 text-[#94A3B8] shrink-0" />
                         </Link>
-                        <button className="w-full flex items-center p-4 border-b border-[#F8FAFC] hover:bg-gray-50 transition-colors text-left">
+                        <Link href="/akun/keamanan" className="w-full flex items-center p-4 border-b border-[#F8FAFC] hover:bg-gray-50 transition-colors text-left block">
                             <div className="w-10 h-10 bg-[#ECFDF5] text-[#10B981] rounded-full flex items-center justify-center mr-3 shrink-0">
                                 <ShieldCheck className="w-5 h-5" strokeWidth={2} />
                             </div>
@@ -108,8 +114,8 @@ export default function AkunIndex() {
                                 <p className="text-[11px] text-[#64748B]">Ganti password dan keamanan</p>
                             </div>
                             <ChevronRight className="w-5 h-5 text-[#94A3B8] shrink-0" />
-                        </button>
-                        <button className="w-full flex items-center p-4 hover:bg-gray-50 transition-colors text-left">
+                        </Link>
+                        <Link href="/akun/langganan" className="w-full flex items-center p-4 hover:bg-gray-50 transition-colors text-left block">
                             <div className="w-10 h-10 bg-[#FFFBEB] text-[#F59E0B] rounded-full flex items-center justify-center mr-3 shrink-0">
                                 <Crown className="w-5 h-5" strokeWidth={2} />
                             </div>
@@ -117,9 +123,13 @@ export default function AkunIndex() {
                                 <h4 className="text-[14px] font-extrabold text-[#1E293B]">Langganan Premium</h4>
                                 <p className="text-[11px] text-[#64748B]">Lihat status dan keuntungan</p>
                             </div>
-                            <span className="bg-[#EEF2FF] text-[#5C5AE6] text-[10px] font-bold px-2 py-0.5 rounded mr-2">Aktif</span>
+                            {hasActiveSubscription ? (
+                                <span className="bg-[#EEF2FF] text-[#5C5AE6] text-[10px] font-bold px-2 py-0.5 rounded mr-2">Aktif</span>
+                            ) : (
+                                <span className="bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded mr-2">Daftar</span>
+                            )}
                             <ChevronRight className="w-5 h-5 text-[#94A3B8] shrink-0" />
-                        </button>
+                        </Link>
                     </div>
                 </div>
 
@@ -127,7 +137,7 @@ export default function AkunIndex() {
                 <div>
                     <h3 className="text-[13px] font-bold text-[#64748B] px-1 mb-2">Aktivitas</h3>
                     <div className="bg-white rounded-[24px] overflow-hidden shadow-sm border border-[#F1F5F9]">
-                        <button className="w-full flex items-center p-4 border-b border-[#F8FAFC] hover:bg-gray-50 transition-colors text-left">
+                        <Link href="/akun/riwayat" className="w-full flex items-center p-4 border-b border-[#F8FAFC] hover:bg-gray-50 transition-colors text-left block">
                             <div className="w-10 h-10 bg-[#EFF6FF] text-[#3B82F6] rounded-full flex items-center justify-center mr-3 shrink-0">
                                 <Clock className="w-5 h-5" strokeWidth={2} />
                             </div>
@@ -136,8 +146,8 @@ export default function AkunIndex() {
                                 <p className="text-[11px] text-[#64748B]">Lihat buku dan kajian yang pernah dibaca</p>
                             </div>
                             <ChevronRight className="w-5 h-5 text-[#94A3B8] shrink-0" />
-                        </button>
-                        <button className="w-full flex items-center p-4 border-b border-[#F8FAFC] hover:bg-gray-50 transition-colors text-left">
+                        </Link>
+                        <Link href="/akun/favorit" className="w-full flex items-center p-4 border-b border-[#F8FAFC] hover:bg-gray-50 transition-colors text-left block">
                             <div className="w-10 h-10 bg-[#FFF1F2] text-[#F43F5E] rounded-full flex items-center justify-center mr-3 shrink-0">
                                 <Heart className="w-5 h-5" strokeWidth={2} />
                             </div>
@@ -146,8 +156,8 @@ export default function AkunIndex() {
                                 <p className="text-[11px] text-[#64748B]">Koleksi favorit buku dan kajian</p>
                             </div>
                             <ChevronRight className="w-5 h-5 text-[#94A3B8] shrink-0" />
-                        </button>
-                        <button className="w-full flex items-center p-4 hover:bg-gray-50 transition-colors text-left">
+                        </Link>
+                        <Link href="/akun/unduhan" className="w-full flex items-center p-4 hover:bg-gray-50 transition-colors text-left block">
                             <div className="w-10 h-10 bg-[#ECFDF5] text-[#10B981] rounded-full flex items-center justify-center mr-3 shrink-0">
                                 <Download className="w-5 h-5" strokeWidth={2} />
                             </div>
@@ -156,7 +166,7 @@ export default function AkunIndex() {
                                 <p className="text-[11px] text-[#64748B]">Konten yang diunduh</p>
                             </div>
                             <ChevronRight className="w-5 h-5 text-[#94A3B8] shrink-0" />
-                        </button>
+                        </Link>
                     </div>
                 </div>
 

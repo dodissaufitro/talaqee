@@ -1,355 +1,483 @@
 import { Head, Link } from '@inertiajs/react';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
-    BookOpen, Search, Grid, User, CreditCard, PlaySquare, Settings, Info, Headset, Phone, MessageCircle, Mail, ChevronDown, ChevronUp
+    Search, Grid, User, CreditCard, PlaySquare, Settings, Info, Headset, 
+    MessageCircle, Mail, ChevronDown, Sparkles, CheckCircle2, ThumbsUp, ThumbsDown,
+    HelpCircle, ArrowRight, X, Phone, ShieldCheck, BookOpen, Layers
 } from 'lucide-react';
 import WebDesktopNav from '@/components/WebDesktopNav';
-
-interface FaqCategory {
-    id: string;
-    name: string;
-    icon: React.ReactNode;
-    count: number;
-}
+import WebFooter from '@/components/WebFooter';
 
 interface FaqItem {
     id: number;
-    categoryId: string;
     question: string;
     answer: string;
+    category?: string;
+    order?: number;
 }
 
-const FAQ_CATEGORIES: FaqCategory[] = [
-    { id: 'all', name: 'Semua Pertanyaan', icon: <Grid size={18} />, count: 32 },
-    { id: 'account', name: 'Akun & Pendaftaran', icon: <User size={18} />, count: 6 },
-    { id: 'payment', name: 'Pembayaran & Langganan', icon: <CreditCard size={18} />, count: 8 },
-    { id: 'content', name: 'Konten & Akses', icon: <PlaySquare size={18} />, count: 9 },
-    { id: 'features', name: 'Fitur & Penggunaan', icon: <Settings size={18} />, count: 6 },
-    { id: 'technical', name: 'Teknis & Lainnya', icon: <Info size={18} />, count: 3 },
+const DEFAULT_CATEGORIES = [
+    { id: 'all', name: 'Semua Pertanyaan', icon: Layers },
+    { id: 'umum', name: 'Umum & Layanan', icon: BookOpen },
+    { id: 'akun', name: 'Akun & Pendaftaran', icon: User },
+    { id: 'pembayaran', name: 'Koin & Pembayaran', icon: CreditCard },
+    { id: 'konten', name: 'Konten & Talaqqi', icon: PlaySquare },
+    { id: 'teknis', name: 'Fitur & Dukungan', icon: Settings },
 ];
 
-const FAQS: FaqItem[] = [
-    {
-        id: 1,
-        categoryId: 'all',
-        question: 'Apa itu Talaqee?',
-        answer: 'Talaqee adalah platform digital yang menyediakan ribuan konten islami berkualitas, seperti video kajian, rekaman audio, e-book, dan artikel dari ustadz dan ulama terpercaya untuk membantu Anda dalam belajar dan memperdalam ilmu agama.'
-    },
-    {
-        id: 2,
-        categoryId: 'account',
-        question: 'Bagaimana cara mendaftar di Talaqee?',
-        answer: 'Anda dapat mendaftar dengan mengklik tombol "Daftar Gratis" di sudut kanan atas halaman utama. Isi nama, email, dan password Anda, lalu ikuti instruksi yang dikirimkan ke email Anda untuk verifikasi.'
-    },
-    {
-        id: 3,
-        categoryId: 'payment',
-        question: 'Apakah semua konten di Talaqee gratis?',
-        answer: 'Talaqee menyediakan konten gratis maupun berbayar. Konten berbayar dapat diakses dengan membeli menggunakan sistem Koin atau berlangganan paket bulanan.'
-    },
-    {
-        id: 4,
-        categoryId: 'payment',
-        question: 'Bagaimana cara mengakses konten berbayar?',
-        answer: 'Anda bisa melakukan top-up Saldo/Koin terlebih dahulu, kemudian gunakan koin tersebut untuk membuka video premium atau membeli e-book di dalam aplikasi.'
-    },
-    {
-        id: 5,
-        categoryId: 'payment',
-        question: 'Metode pembayaran apa saja yang tersedia?',
-        answer: 'Kami mendukung berbagai metode pembayaran termasuk Transfer Bank (Virtual Account), e-Wallet (OVO, GoPay, Dana), dan minimarket terdekat.'
-    },
-    {
-        id: 6,
-        categoryId: 'content',
-        question: 'Dapatkah saya mengunduh konten untuk ditonton secara offline?',
-        answer: 'Ya, sebagian besar konten video dan audio di Talaqee dapat diunduh untuk dinikmati tanpa koneksi internet melalui aplikasi seluler kami.'
-    },
-    {
-        id: 7,
-        categoryId: 'features',
-        question: 'Di perangkat apa saja saya bisa menggunakan Talaqee?',
-        answer: 'Talaqee dapat diakses melalui browser komputer (PC/Laptop), tablet, serta smartphone Android maupun iOS menggunakan aplikasi resmi kami.'
-    },
-    {
-        id: 8,
-        categoryId: 'technical',
-        question: 'Bagaimana cara menghubungi customer service?',
-        answer: 'Anda dapat menghubungi tim dukungan kami melalui WhatsApp, Email, atau formulir "Hubungi Kami" yang tersedia di halaman ini. Tim kami siap membantu Anda 24/7.'
-    },
-];
-
-export default function FaqIndex({ faqs = [] }: { faqs: any[] }) {
+export default function FaqIndex({ faqs = [] }: { faqs: FaqItem[] }) {
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
-    const [expandedFaq, setExpandedFaq] = useState<number | null>(1); // Expand the first one by default
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [expandedFaq, setExpandedFaq] = useState<number | null>(1);
+    const [feedbackMap, setFeedbackMap] = useState<Record<number, 'yes' | 'no'>>({});
+
+    // Augment FAQs with inferred categories if not specified from database
+    const mappedFaqs = useMemo(() => {
+        return faqs.map((faq) => {
+            let cat = faq.category || 'umum';
+            const q = faq.question.toLowerCase();
+            const a = faq.answer.toLowerCase();
+
+            if (q.includes('daftar') || q.includes('login') || q.includes('akun') || q.includes('password')) {
+                cat = 'akun';
+            } else if (q.includes('koin') || q.includes('bayar') || q.includes('langganan') || q.includes('gratis') || q.includes('harga') || a.includes('koin')) {
+                cat = 'pembayaran';
+            } else if (q.includes('unduh') || q.includes('konten') || q.includes('offline') || q.includes('video') || q.includes('buku')) {
+                cat = 'konten';
+            } else if (q.includes('customer') || q.includes('perangkat') || q.includes('service') || q.includes('bantuan') || q.includes('aplikasi')) {
+                cat = 'teknis';
+            } else if (q.includes('apa itu') || q.includes('talaqee')) {
+                cat = 'umum';
+            }
+
+            return {
+                ...faq,
+                category: cat,
+            };
+        });
+    }, [faqs]);
+
+    // Filter FAQs based on category and search query
+    const filteredFaqs = useMemo(() => {
+        return mappedFaqs.filter((item) => {
+            const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+            const matchesSearch = !searchQuery.trim() || 
+                item.question.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                item.answer.toLowerCase().includes(searchQuery.toLowerCase());
+            return matchesCategory && matchesSearch;
+        });
+    }, [mappedFaqs, selectedCategory, searchQuery]);
+
+    // Dynamic category counts
+    const categoryCounts = useMemo(() => {
+        const counts: Record<string, number> = { all: mappedFaqs.length };
+        mappedFaqs.forEach((item) => {
+            if (item.category) {
+                counts[item.category] = (counts[item.category] || 0) + 1;
+            }
+        });
+        return counts;
+    }, [mappedFaqs]);
 
     const toggleFaq = (id: number) => {
         setExpandedFaq(expandedFaq === id ? null : id);
     };
 
+    const handleFeedback = (id: number, type: 'yes' | 'no') => {
+        setFeedbackMap((prev) => ({ ...prev, [id]: type }));
+    };
+
     return (
-        <div className="min-h-screen bg-gray-50 font-sans selection:bg-[#7e57c2] selection:text-white pb-20">
-            <Head title="FAQ - Talaqee" />
+        <div className="min-h-screen bg-[#F8FAFC] font-sans selection:bg-[#7e57c2] selection:text-white flex flex-col justify-between">
+            <Head title="Pusat Bantuan & FAQ - Talaqee" />
 
-            {/* Mobile Header */}
-            <div className="md:hidden flex items-center px-5 py-4 bg-white sticky top-0 z-50 border-b border-gray-100">
-                <Link href={route('akun.index')} className="w-8 h-8 flex items-center justify-center -ml-2 mr-2">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#5C5AE6]"><path d="m15 18-6-6 6-6"/></svg>
-                </Link>
-                <span className="text-[18px] font-bold text-[#1E293B]">
-                    Pusat Bantuan (FAQ)
-                </span>
-            </div>
-
-            {/* Desktop Navigation */}
-            <WebDesktopNav />
-
-            {/* Hero Section */}
-            <div className="relative bg-white pt-14 pb-[130px] overflow-hidden">
-                {/* Background Image / Pattern */}
-                <div className="absolute top-0 right-0 w-full md:w-[65%] h-full hidden md:block pointer-events-none">
-                    <img 
-                        src="/images/mosque_hero.png" 
-                        alt="Mosque" 
-                        className="w-full h-full object-cover object-[center_right] opacity-95"
-                        style={{
-                            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%)',
-                            maskImage: 'linear-gradient(to right, transparent 0%, black 40%)'
-                        }}
-                    />
+            <div>
+                {/* ─── MOBILE HEADER (Preserved for Mobile View) ─── */}
+                <div className="md:hidden flex items-center justify-between px-5 py-4 bg-white sticky top-0 z-50 border-b border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <Link href={route('home')} className="w-8 h-8 flex items-center justify-center -ml-1 text-gray-700 hover:text-[#7e57c2]">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        </Link>
+                        <span className="text-[17px] font-bold text-gray-900">
+                            Pusat Bantuan & FAQ
+                        </span>
+                    </div>
+                    <Link href={route('kontak')} className="text-xs font-semibold text-[#7e57c2] bg-purple-50 px-2.5 py-1 rounded-full">
+                        Kontak
+                    </Link>
                 </div>
 
-                {/* Wavy bottom */}
-                <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20">
-                    <svg viewBox="0 0 1440 120" className="w-full h-[60px] md:h-[100px] block" preserveAspectRatio="none">
-                        <path d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,42.7C1120,32,1280,32,1360,32L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z" fill="#f9fafb"></path>
-                    </svg>
-                </div>
+                {/* ─── DESKTOP NAVIGATION ─── */}
+                <WebDesktopNav />
 
-                <div className="w-full px-6 md:px-10 lg:px-16 relative z-30 flex flex-col md:flex-row gap-10 items-center max-w-[1600px] mx-auto">
-                    
-                    {/* Left: Titles & Search */}
-                    <div className="w-full md:w-1/2">
-                        <h1 className="text-[40px] lg:text-[46px] font-extrabold text-[#111827] leading-tight mb-2 tracking-tight">
-                            Pusat Bantuan
-                        </h1>
-                        <p className="text-slate-500 text-[15px] mb-8 font-medium">
-                            Temukan jawaban atas pertanyaan yang sering diajukan.
-                        </p>
+                {/* ─── HERO BANNER (Modern Dark Gradient with Glow) ─── */}
+                <div className="relative bg-gradient-to-br from-[#0B091A] via-[#140E2E] to-[#1E123D] pt-12 pb-24 md:pt-16 md:pb-28 overflow-hidden text-white border-b border-purple-900/30">
+                    {/* Background Light Orbs */}
+                    <div className="absolute top-[-80px] left-1/4 w-96 h-96 bg-[#7C3AED]/20 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute bottom-[-100px] right-10 w-[500px] h-[500px] bg-[#6366F1]/15 rounded-full blur-3xl pointer-events-none" />
 
-                        {/* Search Bar */}
-                        <div className="relative bg-white border border-gray-200 rounded-[10px] flex items-center p-1.5 shadow-[0_2px_10px_rgb(0,0,0,0.03)] max-w-[460px]">
-                            <div className="pl-3 pr-2 text-slate-400">
-                                <Search size={18} strokeWidth={2.5} />
-                            </div>
-                            <input 
-                                type="text" 
-                                placeholder="Cari jawaban atau topik bantuan..."
-                                className="w-full border-none focus:ring-0 text-slate-700 bg-transparent py-2 placeholder:text-slate-400 text-[14px] outline-none"
-                            />
-                            <button className="bg-[#6c40e6] hover:bg-[#5b32cc] text-white px-7 py-2.5 rounded-[8px] text-[14px] font-semibold transition-colors shrink-0">
-                                Cari
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Right: Quote Block */}
-                    <div className="w-full md:w-1/2 flex justify-start md:pl-10 mt-8 md:mt-0">
-                        <div className="max-w-[320px]">
-                            <div className="text-[#8155ff] mb-4">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10 9C10 6.23858 7.76142 4 5 4C2.23858 4 0 6.23858 0 9C0 11.2312 1.45892 13.1207 3.48627 13.7915C2.65809 15.656 0.817366 17.1593 0.771965 17.1952C0.334057 17.5413 0.25875 18.1778 0.604886 18.6157C0.951022 19.0536 1.58756 19.1289 2.02547 18.7828C2.17647 18.6635 4.90807 16.4867 6.46328 13.1585C8.61111 12.027 10 9.7717 10 9ZM24 9C24 6.23858 21.7614 4 19 4C16.2386 4 14 6.23858 14 9C14 11.2312 15.4589 13.1207 17.4863 13.7915C16.6581 15.656 14.8174 17.1593 14.772 17.1952C14.3341 17.5413 14.2588 18.1778 14.6049 18.6157C14.951 19.0536 15.5876 19.1289 16.0255 18.7828C16.1765 18.6635 18.9081 16.4867 20.4633 13.1585C22.6111 12.027 24 9.7717 24 9Z" />
-                                </svg>
-                            </div>
-                            <p className="text-[15px] font-medium text-slate-700 leading-[1.6]">
-                                Bertanyalah kepada<br/>
-                                orang yang berilmu,<br/>
-                                jika kamu tidak<br/>
-                                mengetahui.
-                            </p>
-                            <p className="text-[#8155ff] font-semibold mt-4 text-[12px]">
-                                (QS. An-Nahl: 43)
-                            </p>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            {/* Main Content (2 Columns) */}
-            <div className="w-full px-6 md:px-12 lg:px-20 mt-10 flex flex-col lg:flex-row gap-8">
-                
-                {/* Left Sidebar (Kategori) */}
-                <div className="w-full lg:w-72 shrink-0 space-y-6">
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div className="p-5 border-b border-gray-100">
-                            <h3 className="font-bold text-gray-900">Kategori Pertanyaan</h3>
-                        </div>
-                        <div className="p-2">
-                            {FAQ_CATEGORIES.map((cat) => (
-                                <button
-                                    key={cat.id}
-                                    onClick={() => setSelectedCategory(cat.id)}
-                                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors mb-1 ${
-                                        selectedCategory === cat.id 
-                                        ? 'bg-[#f3eefe] text-[#7e57c2] font-semibold' 
-                                        : 'text-gray-600 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className={selectedCategory === cat.id ? 'text-[#7e57c2]' : 'text-gray-400'}>
-                                            {cat.icon}
-                                        </div>
-                                        <span className="text-[15px]">{cat.name}</span>
-                                    </div>
-                                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${
-                                        selectedCategory === cat.id ? 'bg-white text-[#7e57c2]' : 'text-gray-400'
-                                    }`}>
-                                        {cat.count}
-                                    </span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Support Card */}
-                    <div className="bg-[#f8f9fa] rounded-2xl p-6 border border-gray-100 text-center flex flex-col items-center">
-                        <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4">
-                            <Headset size={24} />
-                        </div>
-                        <h4 className="font-bold text-gray-900 mb-1">Masih butuh bantuan?</h4>
-                        <p className="text-sm text-gray-500 mb-5">Tim kami siap membantu Anda</p>
-                        <button className="w-full py-2.5 rounded-xl bg-white text-[#7e57c2] font-semibold border border-[#e9dfff] hover:bg-[#f3eefe] transition-colors shadow-sm">
-                            Hubungi Kami
-                        </button>
-                    </div>
-                </div>
-
-                {/* Right Content (FAQ List) */}
-                <div className="flex-1">
-                    
-                    {/* Search & Sort */}
-                    <div className="flex flex-col md:flex-row gap-4 mb-6">
-                        <div className="flex-1 relative bg-white rounded-xl shadow-sm border border-gray-200 flex items-center">
-                            <div className="pl-4 pr-2 text-gray-400">
-                                <Search size={20} />
-                            </div>
-                            <input 
-                                type="text" 
-                                placeholder="Cari pertanyaan..."
-                                className="w-full border-none focus:ring-0 text-gray-700 bg-transparent py-3 placeholder:text-gray-400"
-                            />
-                        </div>
-                        <div className="relative shrink-0">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10 pointer-events-none">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>
-                            </div>
-                            <select className="appearance-none bg-white border border-gray-200 rounded-xl pl-11 pr-10 py-3 text-sm font-medium text-gray-700 focus:ring-[#7e57c2] focus:border-[#7e57c2] outline-none cursor-pointer shadow-sm w-full md:w-auto">
-                                <option>Terbaru</option>
-                                <option>Terpopuler</option>
-                            </select>
-                            <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                        </div>
-                    </div>
-
-                    {/* Accordion List */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-                        {faqs.map((faq, index) => {
-                            const isExpanded = expandedFaq === faq.id;
+                    <div className="w-full max-w-[1340px] mx-auto px-6 md:px-10 relative z-10">
+                        <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
                             
-                            return (
-                                <div key={faq.id} className={`border-b border-gray-50 last:border-0 ${isExpanded ? 'bg-[#fcfaff]' : 'bg-white'}`}>
-                                    <button 
-                                        onClick={() => toggleFaq(faq.id)}
-                                        className="w-full px-6 py-5 flex items-start text-left gap-4 hover:bg-gray-50/50 transition-colors"
-                                    >
-                                        <span className="text-[15px] font-bold text-[#7e57c2] shrink-0 w-5">{index + 1}.</span>
-                                        <span className={`flex-1 text-[15px] font-bold pr-4 ${isExpanded ? 'text-[#7e57c2]' : 'text-gray-800'}`}>
-                                            {faq.question}
-                                        </span>
-                                        <div className={`shrink-0 mt-0.5 transition-transform duration-200 ${isExpanded ? 'text-[#7e57c2] rotate-180' : 'text-gray-400'}`}>
-                                            <ChevronDown size={20} />
-                                        </div>
-                                    </button>
-                                    
-                                    {isExpanded && (
-                                        <div className="px-6 pb-6 pl-[52px] pr-12 animate-in fade-in slide-in-from-top-2 duration-200">
-                                            <p className="text-[15px] text-gray-500 leading-relaxed">
-                                                {faq.answer}
-                                            </p>
-                                        </div>
-                                    )}
+                            {/* Left Text & Search */}
+                            <div className="w-full lg:max-w-2xl text-center lg:text-left">
+                                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-400/20 text-purple-300 text-xs font-semibold tracking-wide uppercase mb-4">
+                                    <Sparkles size={14} className="text-purple-400" />
+                                    Pusat Bantuan & Panduan
                                 </div>
-                            );
-                        })}
-                        {faqs.length === 0 && (
-                            <div className="px-6 py-8 text-center text-gray-500">Belum ada FAQ yang tersedia.</div>
-                        )}
-                    </div>
+                                <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
+                                    Ada yang bisa kami <br className="hidden md:inline" />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-purple-100 to-indigo-200">bantu untuk Anda?</span>
+                                </h1>
+                                <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-8 max-w-xl">
+                                    Temukan jawaban cepat seputar pembelajaran talaqqi, pembelian koin, akses video kajian, e-book islami, dan kendala akun.
+                                </p>
 
-                    {/* Load More Button */}
-                    <div className="flex justify-center">
-                        <button className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-[#7e57c2] transition-colors">
-                            Tampilkan lebih banyak <ChevronDown size={16} />
-                        </button>
+                                {/* Search Bar */}
+                                <div className="relative bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-1.5 shadow-2xl focus-within:bg-white/15 focus-within:border-purple-400 transition-all max-w-xl">
+                                    <div className="flex items-center">
+                                        <div className="pl-4 pr-3 text-purple-300">
+                                            <Search size={20} />
+                                        </div>
+                                        <input 
+                                            type="text" 
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            placeholder="Cari topik (misal: top up koin, download offline, talaqqi)..."
+                                            className="w-full bg-transparent border-none text-white placeholder-gray-400 text-sm md:text-[15px] focus:ring-0 focus:outline-none py-2.5"
+                                        />
+                                        {searchQuery && (
+                                            <button 
+                                                onClick={() => setSearchQuery('')}
+                                                className="p-1.5 mr-2 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                                title="Hapus pencarian"
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        )}
+                                        <button 
+                                            onClick={() => {}}
+                                            className="bg-gradient-to-r from-[#7C3AED] to-[#6366F1] hover:from-[#6D28D9] hover:to-[#4F46E5] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md shrink-0 flex items-center gap-1.5"
+                                        >
+                                            Cari
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Popular Search Tags */}
+                                <div className="mt-4 flex flex-wrap items-center justify-center lg:justify-start gap-2 text-xs text-gray-400">
+                                    <span className="font-medium text-gray-400">Paling sering dicari:</span>
+                                    {['Top Up Koin', 'Download Offline', 'Ganti Password', 'Beli Materi'].map((tag) => (
+                                        <button
+                                            key={tag}
+                                            onClick={() => setSearchQuery(tag)}
+                                            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-purple-200 border border-white/10 transition-colors"
+                                        >
+                                            {tag}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Right Quote & Stats Glass Card */}
+                            <div className="w-full lg:w-auto shrink-0 flex justify-center">
+                                <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-6 md:p-8 max-w-[380px] shadow-2xl relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl pointer-events-none" />
+                                    
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300">
+                                            <HelpCircle size={22} />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-white">Bimbingan Ilmu Syar'i</h4>
+                                            <p className="text-xs text-purple-200/70">Nasihat dalam bertanya</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="my-4 border-l-2 border-purple-400/50 pl-4 py-1">
+                                        <p className="text-sm text-gray-200 italic leading-relaxed">
+                                            "Bertanyalah kepada orang yang berilmu, jika kamu tidak mengetahui."
+                                        </p>
+                                        <span className="text-xs font-semibold text-purple-300 block mt-2">
+                                            (QS. An-Nahl: 43)
+                                        </span>
+                                    </div>
+
+                                    <div className="pt-4 border-t border-white/10 grid grid-cols-2 gap-4">
+                                        <div>
+                                            <div className="text-xl font-extrabold text-white">24/7</div>
+                                            <div className="text-[11px] text-gray-400">Pusat Bantuan Digital</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-xl font-extrabold text-purple-300">100%</div>
+                                            <div className="text-[11px] text-gray-400">Responsif & Terbuka</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
 
-            </div>
+                {/* ─── MAIN CONTENT SECTION ─── */}
+                <div className="w-full max-w-[1340px] mx-auto px-6 md:px-10 -mt-8 relative z-20 pb-20">
+                    <div className="flex flex-col lg:flex-row gap-8 items-start">
+                        
+                        {/* ─── LEFT SIDEBAR: CATEGORIES & QUICK CONTACT ─── */}
+                        <div className="w-full lg:w-80 shrink-0 space-y-6">
+                            
+                            {/* Category Selector Card */}
+                            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                                <div className="px-3 py-2 border-b border-gray-100 mb-2">
+                                    <h3 className="font-bold text-gray-900 text-sm flex items-center justify-between">
+                                        <span>Kategori Bantuan</span>
+                                        <span className="text-xs font-normal text-gray-500">{mappedFaqs.length} Topik</span>
+                                    </h3>
+                                </div>
+                                <div className="space-y-1">
+                                    {DEFAULT_CATEGORIES.map((cat) => {
+                                        const IconComp = cat.icon;
+                                        const isSelected = selectedCategory === cat.id;
+                                        const count = categoryCounts[cat.id] || 0;
 
-            {/* Footer Support Block */}
-            <div className="w-full px-6 md:px-12 lg:px-20 mt-16 mb-8">
-                <div className="bg-[#f8f9fa] rounded-3xl p-6 md:p-8 flex flex-col xl:flex-row items-center gap-8 justify-between border border-gray-100">
-                    
-                    {/* Left text */}
-                    <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-[#7e57c2] rounded-full flex items-center justify-center text-white shrink-0 shadow-lg shadow-[#7e57c2]/30">
-                            <MessageCircle size={28} />
+                                        return (
+                                            <button
+                                                key={cat.id}
+                                                onClick={() => {
+                                                    setSelectedCategory(cat.id);
+                                                    setSearchQuery('');
+                                                }}
+                                                className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-left transition-all ${
+                                                    isSelected 
+                                                        ? 'bg-purple-50 text-[#7C3AED] font-bold shadow-sm' 
+                                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                                                        isSelected ? 'bg-purple-600 text-white shadow-sm' : 'bg-gray-100 text-gray-500'
+                                                    }`}>
+                                                        <IconComp size={16} />
+                                                    </div>
+                                                    <span className="text-sm">{cat.name}</span>
+                                                </div>
+                                                <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
+                                                    isSelected ? 'bg-purple-200/60 text-purple-800' : 'bg-gray-100 text-gray-500'
+                                                }`}>
+                                                    {count}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Need Direct Help Card */}
+                            <div className="bg-gradient-to-br from-purple-50 to-indigo-50/60 rounded-2xl p-6 border border-purple-100 shadow-sm text-center">
+                                <div className="w-12 h-12 bg-white text-[#7C3AED] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md border border-purple-100">
+                                    <Headset size={24} />
+                                </div>
+                                <h4 className="font-bold text-gray-900 mb-1 text-base">Belum Menemukan Jawaban?</h4>
+                                <p className="text-xs text-gray-600 leading-relaxed mb-5">
+                                    Tim customer support Talaqee siap membantu keluhan Anda secara langsung.
+                                </p>
+                                <div className="space-y-2">
+                                    <a 
+                                        href="https://wa.me/6282285578390" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shadow-sm"
+                                    >
+                                        <MessageCircle size={15} />
+                                        Chat WhatsApp Resmi
+                                    </a>
+                                    <Link 
+                                        href={route('kontak')}
+                                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white hover:bg-purple-50 text-gray-700 text-xs font-semibold border border-purple-200 transition-colors"
+                                    >
+                                        Lihat Halaman Kontak
+                                        <ArrowRight size={14} />
+                                    </Link>
+                                </div>
+                            </div>
+
                         </div>
-                        <div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-1">Tidak menemukan jawaban yang Anda cari?</h3>
-                            <p className="text-gray-500 text-[15px]">Tim support kami siap membantu menjawab pertanyaan Anda.</p>
+
+                        {/* ─── RIGHT SECTION: FAQ ACCORDION LIST ─── */}
+                        <div className="flex-1 w-full space-y-4">
+                            
+                            {/* Header Status & Filters */}
+                            <div className="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                                <div>
+                                    <h2 className="text-lg font-bold text-gray-900">
+                                        {DEFAULT_CATEGORIES.find(c => c.id === selectedCategory)?.name || 'Daftar Pertanyaan'}
+                                    </h2>
+                                    <p className="text-xs text-gray-500">
+                                        Menampilkan {filteredFaqs.length} solusi bantuan
+                                        {searchQuery && <span> untuk kata kunci "<strong>{searchQuery}</strong>"</span>}
+                                    </p>
+                                </div>
+                                {searchQuery && (
+                                    <button 
+                                        onClick={() => setSearchQuery('')}
+                                        className="text-xs text-purple-600 hover:text-purple-800 font-semibold bg-purple-50 px-3 py-1.5 rounded-lg border border-purple-100"
+                                    >
+                                        Hapus Filter
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Accordion Cards */}
+                            <div className="space-y-3">
+                                {filteredFaqs.map((faq, index) => {
+                                    const isExpanded = expandedFaq === faq.id;
+                                    const feedback = feedbackMap[faq.id];
+
+                                    return (
+                                        <div 
+                                            key={faq.id} 
+                                            className={`rounded-2xl transition-all duration-200 border ${
+                                                isExpanded 
+                                                    ? 'bg-white border-purple-300 shadow-md ring-1 ring-purple-100' 
+                                                    : 'bg-white border-gray-200/80 hover:border-purple-200 shadow-sm'
+                                            }`}
+                                        >
+                                            <button 
+                                                onClick={() => toggleFaq(faq.id)}
+                                                className="w-full p-5 sm:p-6 flex items-start text-left gap-4 transition-colors"
+                                            >
+                                                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs ${
+                                                    isExpanded ? 'bg-[#7C3AED] text-white shadow-sm' : 'bg-gray-100 text-gray-500'
+                                                }`}>
+                                                    {index + 1}
+                                                </div>
+
+                                                <div className="flex-1 pr-2">
+                                                    <span className={`text-[15px] sm:text-base font-bold leading-snug block ${
+                                                        isExpanded ? 'text-[#7C3AED]' : 'text-gray-900'
+                                                    }`}>
+                                                        {faq.question}
+                                                    </span>
+                                                </div>
+
+                                                <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-transform duration-200 ${
+                                                    isExpanded ? 'bg-purple-100 text-[#7C3AED] rotate-180' : 'bg-gray-50 text-gray-400'
+                                                }`}>
+                                                    <ChevronDown size={18} />
+                                                </div>
+                                            </button>
+
+                                            {/* Expandable Answer */}
+                                            {isExpanded && (
+                                                <div className="px-5 sm:px-6 pb-6 pt-1 border-t border-gray-100">
+                                                    <div className="pl-12 text-sm sm:text-[15px] text-gray-600 leading-relaxed space-y-3">
+                                                        <p>{faq.answer}</p>
+
+                                                        {/* Interactive helpful feedback */}
+                                                        <div className="pt-4 mt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-500">
+                                                            <span>Apakah informasi ini membantu Anda?</span>
+                                                            <div className="flex items-center gap-2">
+                                                                {feedback ? (
+                                                                    <span className="text-emerald-600 font-semibold flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg">
+                                                                        <CheckCircle2 size={13} /> Terima kasih atas tanggapan Anda!
+                                                                    </span>
+                                                                ) : (
+                                                                    <>
+                                                                        <button 
+                                                                            onClick={() => handleFeedback(faq.id, 'yes')}
+                                                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
+                                                                        >
+                                                                            <ThumbsUp size={13} />
+                                                                            <span>Ya</span>
+                                                                        </button>
+                                                                        <button 
+                                                                            onClick={() => handleFeedback(faq.id, 'no')}
+                                                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                                                                        >
+                                                                            <ThumbsDown size={13} />
+                                                                            <span>Tidak</span>
+                                                                        </button>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+
+                                {/* Empty State */}
+                                {filteredFaqs.length === 0 && (
+                                    <div className="bg-white rounded-2xl p-12 text-center border border-gray-200 shadow-sm">
+                                        <div className="w-16 h-16 bg-purple-50 text-[#7C3AED] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                            <Search size={28} />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-1">Pertanyaan Tidak Ditemukan</h3>
+                                        <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
+                                            Kami tidak menemukan jawaban untuk "{searchQuery}". Coba kata kunci lain atau hubungi tim customer service kami.
+                                        </p>
+                                        <div className="flex items-center justify-center gap-3">
+                                            <button 
+                                                onClick={() => {
+                                                    setSearchQuery('');
+                                                    setSelectedCategory('all');
+                                                }}
+                                                className="px-5 py-2.5 rounded-xl bg-purple-50 text-[#7C3AED] font-semibold text-xs hover:bg-purple-100 transition-colors"
+                                            >
+                                                Reset Semua Filter
+                                            </button>
+                                            <a 
+                                                href="https://wa.me/6282285578390"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#6366F1] text-white font-semibold text-xs hover:opacity-95 transition-opacity"
+                                            >
+                                                Tanya via WhatsApp
+                                            </a>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Additional FAQ Information Card */}
+                            <div className="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+                                <div className="flex items-center gap-4 text-center sm:text-left">
+                                    <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mx-auto">
+                                        <ShieldCheck size={24} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-gray-900 text-sm">Privasi & Keamanan Terjamin</h4>
+                                        <p className="text-xs text-gray-500">Seluruh data pengguna dan transaksi tersimpan aman dengan enkripsi terkini.</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <Link 
+                                        href={route('refund.policy')}
+                                        className="text-xs font-semibold text-gray-600 hover:text-[#7C3AED] px-3 py-2 rounded-lg hover:bg-gray-50"
+                                    >
+                                        Kebijakan Refund
+                                    </Link>
+                                    <span className="text-gray-300">|</span>
+                                    <Link 
+                                        href={route('terms')}
+                                        className="text-xs font-semibold text-gray-600 hover:text-[#7C3AED] px-3 py-2 rounded-lg hover:bg-gray-50"
+                                    >
+                                        Syarat & Ketentuan
+                                    </Link>
+                                </div>
+                            </div>
+
                         </div>
+
                     </div>
-
-                    {/* Contact Cards */}
-                    <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto">
-                        <div className="bg-white p-4 rounded-2xl flex items-center gap-4 shadow-sm border border-gray-100 flex-1 min-w-[220px]">
-                            <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                                <Phone size={20} />
-                            </div>
-                            <div>
-                                <h4 className="text-sm font-bold text-gray-900">Hubungi Kami</h4>
-                                <p className="text-xs text-gray-500">Kami siap membantu</p>
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-4 rounded-2xl flex items-center gap-4 shadow-sm border border-gray-100 flex-1 min-w-[220px]">
-                            <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                                <MessageCircle size={20} />
-                            </div>
-                            <div>
-                                <h4 className="text-sm font-bold text-gray-900">WhatsApp</h4>
-                                <p className="text-[11px] text-gray-600">+62 812-3456-7890</p>
-                                <p className="text-[10px] text-gray-400">Senin - Jumat, 08.00 - 17.00 WIB</p>
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-4 rounded-2xl flex items-center gap-4 shadow-sm border border-gray-100 flex-1 min-w-[220px]">
-                            <div className="w-10 h-10 rounded-full bg-[#f3eefe] text-[#7e57c2] flex items-center justify-center shrink-0">
-                                <Mail size={20} />
-                            </div>
-                            <div>
-                                <h4 className="text-sm font-bold text-gray-900">Email</h4>
-                                <p className="text-[11px] text-gray-600">support@talaqee.com</p>
-                                <p className="text-[10px] text-gray-400">Respon dalam 1x24 jam</p>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
+            {/* ─── WEB FOOTER ─── */}
+            <WebFooter />
         </div>
     );
 }

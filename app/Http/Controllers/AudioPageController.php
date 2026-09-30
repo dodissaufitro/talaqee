@@ -8,15 +8,15 @@ class AudioPageController extends Controller
 {
     public function index()
     {
-        $categories = \Illuminate\Support\Facades\Cache::remember('categories_with_video_count', 3600, function () {
-            return \App\Models\Category::withCount('videos')->get();
+        $categories = \Illuminate\Support\Facades\Cache::remember('categories_with_audio_count', 3600, function () {
+            return \App\Models\Category::withCount('audios')->get();
         });
         
-        $audios = auth()->check() ? \App\Models\Audio::with(['category', 'user'])
-            ->where('user_id', auth()->id())
+        $audios = \App\Models\Audio::with(['category', 'author'])
+            ->where('is_active', true)
             ->orderBy('created_at', 'desc')
             ->take(30)
-            ->get() : collect();
+            ->get();
             
         $setorans = auth()->check() ? \App\Models\UserRecording::with(['ayah.surah'])
             ->where('user_id', auth()->id())

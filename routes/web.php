@@ -81,11 +81,27 @@ Route::get('/buku/{id}', function ($id) {
     if (auth()->check()) {
         session(['last_book_url' => "/buku/{$id}"]);
     }
-        
+
+    $isFavorited = auth()->check() 
+        ? \App\Models\Favorite::where('user_id', auth()->id())
+            ->where('content_type', 'book')
+            ->where('content_id', $book->id)
+            ->exists()
+        : false;
+
+    $isDownloaded = auth()->check() 
+        ? \App\Models\Download::where('user_id', auth()->id())
+            ->where('content_type', 'book')
+            ->where('content_id', $book->id)
+            ->exists()
+        : false;
+
     return Inertia::render('Book/Show', [
         'book' => $book,
         'chapters' => $chapters,
-        'purchased_chapter_ids' => $purchasedChapterIds
+        'purchased_chapter_ids' => $purchasedChapterIds,
+        'is_favorited' => $isFavorited,
+        'is_downloaded' => $isDownloaded,
     ]);
 })->name('buku.show');
 
@@ -123,13 +139,21 @@ Route::get('/buku/{id}', function ($id) {
             );
         }
 
+        $isFavorited = auth()->check() 
+            ? \App\Models\Favorite::where('user_id', auth()->id())
+                ->where('content_type', 'book')
+                ->where('content_id', $bookModel->id)
+                ->exists()
+            : false;
+
         return Inertia::render('Book/Read', [
             'book' => $bookModel,
             'book_id' => (int) $book,
             'chapter_id' => (int) $chapterId,
             'chapter' => $chapter,
             'chapters' => $allChapters,
-            'purchased_chapter_ids' => $purchasedChapterIds
+            'purchased_chapter_ids' => $purchasedChapterIds,
+            'is_favorited' => $isFavorited,
         ]);
     })->name('buku.read');
 
@@ -161,11 +185,38 @@ Route::post('/akun/topup/callback', [\App\Http\Controllers\TopUpController::clas
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/akun', function () {
-        return Inertia::render('Akun/Index');
+        $hasActiveSub = auth()->user()->activeSubscription()->exists();
+        return Inertia::render('Akun/Index', [
+            'hasActiveSubscription' => $hasActiveSub,
+        ]);
     })->name('akun.index');
 
     Route::get('/akun/edit-profil', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('akun.edit-profil');
     Route::put('/akun/edit-profil', [\App\Http\Controllers\ProfileController::class, 'update'])->name('akun.edit-profil.update');
+
+    // Riwayat Baca
+    Route::get('/akun/riwayat', [\App\Http\Controllers\ReadingProgressController::class, 'index'])->name('riwayat.index');
+    Route::delete('/akun/riwayat/clear', [\App\Http\Controllers\ReadingProgressController::class, 'clearAll'])->name('riwayat.clear');
+    Route::delete('/akun/riwayat/{id}', [\App\Http\Controllers\ReadingProgressController::class, 'destroy'])->name('riwayat.destroy');
+
+    // Favorit Saya
+    Route::get('/akun/favorit', [\App\Http\Controllers\FavoriteController::class, 'index'])->name('favorit.index');
+    Route::post('/favorit/toggle', [\App\Http\Controllers\FavoriteController::class, 'toggle'])->name('favorit.toggle');
+    Route::delete('/favorit/{id}', [\App\Http\Controllers\FavoriteController::class, 'destroy'])->name('favorit.destroy');
+
+    // Unduhan Saya
+    Route::get('/akun/unduhan', [\App\Http\Controllers\DownloadController::class, 'index'])->name('unduhan.index');
+    Route::post('/unduhan', [\App\Http\Controllers\DownloadController::class, 'store'])->name('unduhan.store');
+    Route::delete('/unduhan/{id}', [\App\Http\Controllers\DownloadController::class, 'destroy'])->name('unduhan.destroy');
+
+    // Keamanan Akun
+    Route::get('/akun/keamanan', [\App\Http\Controllers\Settings\PasswordController::class, 'editKeamanan'])->name('akun.keamanan');
+    Route::put('/akun/keamanan/password', [\App\Http\Controllers\Settings\PasswordController::class, 'updateKeamanan'])->name('akun.keamanan.update');
+
+    // Langganan Premium
+    Route::get('/akun/langganan', [\App\Http\Controllers\SubscriptionController::class, 'index'])->name('langganan.index');
+    Route::post('/akun/langganan/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'store'])->name('langganan.subscribe');
+    Route::post('/akun/langganan/cancel', [\App\Http\Controllers\SubscriptionController::class, 'cancel'])->name('langganan.cancel');
 
     // Notifications
     Route::post('/notifications/{notification}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
@@ -181,9 +232,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/akun/topup/success', [\App\Http\Controllers\TopUpController::class, 'success'])->name('topup.success');
     Route::get('/akun/topup/cancel', [\App\Http\Controllers\TopUpController::class, 'cancel'])->name('topup.cancel');
 
-    Route::get('/akun/topup', function () {
-        return Inertia::render('Akun/TopUp');
-    })->name('akun.topup');
+    Route::get('/akun/topup', [\App\Http\Controllers\TopUpController::class, 'index'])->name('akun.topup');
 
     // Katalog (Index Buku)
     Route::get('/katalog/buku', [\App\Http\Controllers\BookController::class, 'index'])->name('katalog.buku');
@@ -257,6 +306,16 @@ Route::middleware(['auth'])->group(function () {
 
     // Settings
     Route::get('/admin/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('admin.settings.index');
+
+    // Coin Packages (Khusus Super Admin)
+    Route::middleware([\App\Http\Middleware\EnsureIsSuperAdmin::class])->group(function () {
+        Route::resource('/admin/coin-packages', \App\Http\Controllers\CoinPackageController::class)->except(['create', 'show', 'edit'])->names([
+            'index' => 'admin.coin-packages.index',
+            'store' => 'admin.coin-packages.store',
+            'update' => 'admin.coin-packages.update',
+            'destroy' => 'admin.coin-packages.destroy',
+        ]);
+    });
     });
 });
 

@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             BookStoreSeeder::class,
             BookChapterSeeder::class,
             VideoSeeder::class,
+            CoinPackageSeeder::class,
         ]);
     }
 }

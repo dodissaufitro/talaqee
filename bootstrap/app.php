@@ -19,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->validateCsrfTokens(except: [
             'akun/topup/callback',
+            'favorit/toggle',
+            'unduhan',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

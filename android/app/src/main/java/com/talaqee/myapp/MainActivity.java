@@ -1,4 +1,4 @@
-package com.talaqee.app;
+package com.talaqee.myapp;
 
 import android.os.Bundle;
 import android.webkit.WebSettings;
@@ -23,4 +23,3 @@ public class MainActivity extends BridgeActivity {
         }
     }
 }
-

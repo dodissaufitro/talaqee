@@ -69,4 +69,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class)->orderBy('created_at', 'desc');
     }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class)->orderBy('created_at', 'desc');
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(Subscription::class)
+            ->where('status', 'active')
+            ->where('expired_at', '>', now())
+            ->latestOfMany();
+    }
 }
