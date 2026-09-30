@@ -16,7 +16,7 @@ class DownloadController extends Controller
     {
         $downloads = Download::where('user_id', auth()->id())
             ->where('content_type', 'book')
-            ->with(['book.author', 'book.chapters'])
+            ->with(['book.author', 'book.chapters' => fn($q) => $q->select('id', 'book_id')])
             ->orderBy('created_at', 'desc')
             ->get()
             ->filter(fn($dl) => $dl->book !== null)
@@ -62,7 +62,7 @@ class DownloadController extends Controller
             'content_id' => 'required|integer',
         ]);
 
-        $book = Book::with('chapters')->findOrFail($request->content_id);
+        $book = Book::with(['chapters' => fn($q) => $q->select('id', 'book_id')])->findOrFail($request->content_id);
         
         // Calculate estimated size or actual file size
         $estimatedBytes = max(1024 * 1024 * 2, $book->chapters->count() * 1024 * 350); // ~3.5MB to 15MB

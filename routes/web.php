@@ -65,8 +65,14 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/buku/{id}', function ($id) {
-    $book = \App\Models\Book::with(['author', 'reviews.user'])->findOrFail($id);
+    $book = \App\Models\Book::with([
+        'author', 
+        'category',
+        'reviews' => fn($q) => $q->where('is_active', true)->with('user:id,name,avatar')->latest()->take(20)
+    ])->findOrFail($id);
+
     $chapters = \App\Models\BookChapter::where('book_id', $book->id)
+        ->select('id', 'book_id', 'chapter_number', 'title', 'page_count', 'coin_price', 'is_free', 'is_active')
         ->orderBy('chapter_number', 'asc')
         ->get();
         

@@ -39,7 +39,6 @@ class HandleInertiaRequests extends Middleware
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         return array_merge(parent::share($request), [
-            ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
@@ -47,7 +46,7 @@ class HandleInertiaRequests extends Middleware
                     'roles' => $request->user()->getRoleNames(),
                     'is_super_admin' => $request->user()->hasRole('super_admin'),
                 ]) : null,
-                'unread_notifications' => $request->user() ? $request->user()->notifications()->where('is_read', false)->get() : [],
+                'unread_notifications' => $request->user() ? $request->user()->notifications()->where('is_read', false)->latest()->take(10)->get() : [],
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
