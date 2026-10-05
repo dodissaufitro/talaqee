@@ -287,15 +287,9 @@ export default function WebDesktopNav() {
                             <div className="flex items-center gap-2.5">
                                 <Link 
                                     href={route('login')} 
-                                    className="px-4 py-2 text-xs font-bold text-gray-700 hover:text-purple-700 hover:bg-purple-50 rounded-xl transition-all"
-                                >
-                                    Masuk
-                                </Link>
-                                <Link 
-                                    href={route('register')} 
                                     className="px-5 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl transition-all shadow-md shadow-purple-500/20 active:scale-95"
                                 >
-                                    Daftar Gratis
+                                    Masuk
                                 </Link>
                             </div>
                         )}

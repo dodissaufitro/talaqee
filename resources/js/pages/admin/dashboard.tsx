@@ -114,18 +114,24 @@ export default function AdminDashboard() {
                             </div>
                         </div>
 
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-start gap-4">
-                            <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                        <Link 
+                            href={route('admin.users.index')} 
+                            className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-start gap-4 hover:border-indigo-200 hover:shadow-md transition-all group"
+                        >
+                            <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                 <Users className="text-amber-600" size={24} />
                             </div>
-                            <div>
-                                <p className="text-gray-500 text-sm font-medium mb-1">Total Pelanggan</p>
+                            <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                    <p className="text-gray-500 text-sm font-medium mb-1">Total Pengguna</p>
+                                    <span className="text-[11px] text-indigo-600 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Kelola &raquo;</span>
+                                </div>
                                 <h3 className="text-xl font-bold text-gray-900 mb-2">{new Intl.NumberFormat('id-ID').format(metrics.total_pelanggan)}</h3>
                                 <p className="text-xs text-green-600 font-medium flex items-center gap-1">
-                                    <TrendingUp size={14} /> 15.7% <span className="text-gray-400 font-normal">dari periode lalu</span>
+                                    <TrendingUp size={14} /> 15.7% <span className="text-gray-400 font-normal">kelola koin & akses</span>
                                 </p>
                             </div>
-                        </div>
+                        </Link>
 
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-start gap-4">
                             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">

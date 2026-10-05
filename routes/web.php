@@ -290,6 +290,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/stock', [PlaceholderController::class, 'show'])->name('admin.stock.index');
         Route::get('/admin/promotions', [\App\Http\Controllers\PromotionController::class, 'index'])->name('admin.promotions.index');
         Route::get('/admin/users', [\App\Http\Controllers\UserController::class, 'index'])->name('admin.users.index');
+        Route::post('/admin/users', [\App\Http\Controllers\UserController::class, 'store'])->name('admin.users.store');
+        Route::put('/admin/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/admin/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('admin.users.destroy');
     // Faq
     Route::resource('/admin/faqs', \App\Http\Controllers\Admin\FaqController::class)->except(['create', 'show', 'edit'])->names([
         'index' => 'admin.faqs.index',
