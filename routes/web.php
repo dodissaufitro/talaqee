@@ -286,6 +286,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/admin/categories/{category}', [\App\Http\Controllers\CategoryController::class, 'destroy'])->name('admin.categories.destroy');
         Route::get('/admin/customers', [\App\Http\Controllers\CustomerController::class, 'index'])->name('admin.customers.index');
         Route::get('/admin/transactions', [\App\Http\Controllers\TransactionController::class, 'index'])->name('admin.transactions.index');
+        Route::post('/admin/transactions/sync', [\App\Http\Controllers\TransactionController::class, 'sync'])->name('admin.transactions.sync');
         Route::get('/admin/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('admin.reports.index');
         Route::get('/admin/stock', [PlaceholderController::class, 'show'])->name('admin.stock.index');
         Route::get('/admin/promotions', [\App\Http\Controllers\PromotionController::class, 'index'])->name('admin.promotions.index');

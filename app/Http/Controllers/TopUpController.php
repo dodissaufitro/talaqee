@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CoinPackage;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -72,6 +73,19 @@ class TopUpController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            \App\Models\Payment::updateOrCreate(
+                ['invoice_number' => $transactionId],
+                [
+                    'user_id' => $user->id,
+                    'coin_package_id' => $package->id,
+                    'amount' => (int) $package->price,
+                    'payment_method' => 'Simulasi',
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'notes' => 'Top Up ' . $package->name . ' (' . $totalCoins . ' Koin) (Simulasi)',
+                ]
+            );
 
             $targetUrl = session()->pull('topup_return_url') ?: session('last_book_url');
             if (!$targetUrl) {
@@ -152,6 +166,19 @@ class TopUpController extends Controller
                 'updated_at' => now(),
             ]);
 
+            // Save payment record as pending
+            \App\Models\Payment::updateOrCreate(
+                ['invoice_number' => $transactionId],
+                [
+                    'user_id' => $user->id,
+                    'coin_package_id' => $package->id,
+                    'amount' => $packagePrice,
+                    'payment_method' => 'iPaymu',
+                    'status' => 'pending',
+                    'notes' => 'Top Up ' . $package->name . ' (' . $totalCoins . ' Koin)',
+                ]
+            );
+
             return inertia()->location($paymentUrl);
         } else {
             // Failed
@@ -186,6 +213,14 @@ class TopUpController extends Controller
                 ->update([
                     'balance_after' => $newBalance,
                     'updated_at' => now()
+                ]);
+
+            // Update status Payment
+            \App\Models\Payment::where('invoice_number', $transaction->transaction_number)
+                ->where('status', '!=', 'paid')
+                ->update([
+                    'status' => 'paid',
+                    'paid_at' => now(),
                 ]);
         }
 
@@ -240,6 +275,14 @@ class TopUpController extends Controller
                         ]);
                 }
             }
+
+            // Update status Payment
+            \App\Models\Payment::where('invoice_number', $referenceId)
+                ->where('status', '!=', 'paid')
+                ->update([
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                ]);
         }
 
         return response()->json(['status' => 'success']);
