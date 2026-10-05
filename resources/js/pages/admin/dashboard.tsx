@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { 
-    BookOpen, LayoutDashboard, ShoppingCart, Book, Grid, Users, 
-    CreditCard, FileText, Box, Megaphone, Settings, Bell, 
-    TrendingUp, ChevronDown 
+    ShoppingCart, Book, Users, Bell, TrendingUp 
 } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
 import { 
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
     PieChart, Pie, Cell 
