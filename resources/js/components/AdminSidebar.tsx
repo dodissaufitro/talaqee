@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import {
     ChevronDown, BookOpen, Book, LogOut, Globe, LayoutDashboard,
@@ -51,6 +51,10 @@ export default function AdminSidebar({ activeItem, auth: propAuth }: AdminSideba
     const pageProps = usePage<any>().props;
     const auth = propAuth || pageProps?.auth;
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+    useEffect(() => {
+        document.documentElement.classList.remove('dark');
+    }, []);
 
     const renderIcon = (iconName: string, active: boolean) => {
         const IconComponent = ICON_MAP[iconName] || Circle;

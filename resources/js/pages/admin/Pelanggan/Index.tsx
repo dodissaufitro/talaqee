@@ -334,7 +334,7 @@ export default function PelangganIndex() {
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" 
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 bg-white text-gray-900" 
                                 />
                             </div>
                             
@@ -343,7 +343,7 @@ export default function PelangganIndex() {
                                     <select 
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
-                                        className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 appearance-none bg-white"
+                                        className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 appearance-none bg-white"
                                     >
                                         <option value="Semua Status">Semua Status</option>
                                         <option value="Aktif">Aktif</option>
@@ -682,7 +682,7 @@ export default function PelangganIndex() {
                                             type="text" 
                                             value={editForm.data.name}
                                             onChange={(e) => editForm.setData('name', e.target.value)}
-                                            className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                            className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-900 placeholder:text-gray-400"
                                             required
                                         />
                                     </div>
@@ -692,7 +692,7 @@ export default function PelangganIndex() {
                                             type="email" 
                                             value={editForm.data.email}
                                             onChange={(e) => editForm.setData('email', e.target.value)}
-                                            className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                            className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-900 placeholder:text-gray-400"
                                             required
                                         />
                                     </div>
@@ -702,7 +702,7 @@ export default function PelangganIndex() {
                                             type="text" 
                                             value={editForm.data.phone}
                                             onChange={(e) => editForm.setData('phone', e.target.value)}
-                                            className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                            className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-900 placeholder:text-gray-400"
                                         />
                                     </div>
                                     <div>
@@ -711,7 +711,7 @@ export default function PelangganIndex() {
                                             type="text" 
                                             value={editForm.data.city}
                                             onChange={(e) => editForm.setData('city', e.target.value)}
-                                            className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                            className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-900 placeholder:text-gray-400"
                                         />
                                     </div>
                                     <div>
@@ -719,7 +719,7 @@ export default function PelangganIndex() {
                                         <select 
                                             value={editForm.data.status}
                                             onChange={(e) => editForm.setData('status', e.target.value)}
-                                            className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                                            className="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-900"
                                         >
                                             <option value="Aktif">Aktif</option>
                                             <option value="Loyal">Loyal</option>

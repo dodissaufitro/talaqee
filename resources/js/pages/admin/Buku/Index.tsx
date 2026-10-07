@@ -231,12 +231,12 @@ export default function BukuIndex() {
                         <div className="flex flex-wrap items-center gap-4 mb-6 justify-between">
                             <div className="relative w-[320px]">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                <input type="text" placeholder="Cari buku, penulis, ISBN..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" />
+                                <input type="text" placeholder="Cari buku, penulis, ISBN..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 text-gray-900 bg-white" />
                             </div>
                             
                             <div className="flex items-center gap-3">
                                 <div className="w-44 relative">
-                                    <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 appearance-none bg-white">
+                                    <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 appearance-none bg-white">
                                         <option>Semua Kategori</option>
                                         <option>Pengembangan Diri</option>
                                         <option>Fiksi</option>
@@ -244,7 +244,7 @@ export default function BukuIndex() {
                                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
                                 </div>
                                 <div className="w-44 relative">
-                                    <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 appearance-none bg-white">
+                                    <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 appearance-none bg-white">
                                         <option>Semua Status</option>
                                         <option>Tersedia</option>
                                         <option>Stok Rendah</option>

@@ -5,6 +5,12 @@ export type Appearance = 'light' | 'dark' | 'system';
 const prefersDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
 
 const applyTheme = (appearance: Appearance) => {
+    // Admin / CMS pages are strictly light-themed to prevent white-on-white text issues
+    if (typeof window !== 'undefined' && (window.location.pathname.startsWith('/admin') || window.location.pathname === '/admin')) {
+        document.documentElement.classList.remove('dark');
+        return;
+    }
+
     const isDark = appearance === 'dark' || (appearance === 'system' && prefersDark());
 
     document.documentElement.classList.toggle('dark', isDark);

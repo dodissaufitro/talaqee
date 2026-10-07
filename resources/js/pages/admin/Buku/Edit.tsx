@@ -255,7 +255,7 @@ export default function BukuEdit() {
                                         name="title" 
                                         value={values.title} 
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                                         required
                                         placeholder="Masukkan judul buku"
                                     />
@@ -268,7 +268,7 @@ export default function BukuEdit() {
                                         name="coin_per_chapter" 
                                         value={values.coin_per_chapter} 
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                                         min="0"
                                     />
                                     {errors.coin_per_chapter && <p className="text-red-500 text-xs mt-1">{errors.coin_per_chapter}</p>}
@@ -282,11 +282,11 @@ export default function BukuEdit() {
                                         name="category_id" 
                                         value={values.category_id} 
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white text-gray-900"
                                     >
-                                        <option value="">Pilih Kategori</option>
+                                        <option value="" className="text-gray-500">Pilih Kategori</option>
                                         {categories.map(cat => (
-                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                            <option key={cat.id} value={cat.id} className="text-gray-900">{cat.name}</option>
                                         ))}
                                     </select>
                                     {errors.category_id && <p className="text-red-500 text-xs mt-1">{errors.category_id}</p>}
@@ -310,11 +310,11 @@ export default function BukuEdit() {
                                         name="author_id" 
                                         value={values.author_id} 
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white text-gray-900"
                                     >
-                                        <option value="">Pilih Penulis</option>
+                                        <option value="" className="text-gray-500">Pilih Penulis</option>
                                         {authorList.map(author => (
-                                            <option key={author.id} value={author.id}>{author.name}</option>
+                                            <option key={author.id} value={author.id} className="text-gray-900">{author.name}</option>
                                         ))}
                                     </select>
                                     {authorSuccessMsg && (
@@ -331,9 +331,9 @@ export default function BukuEdit() {
                                 <textarea 
                                     name="description" 
                                     value={values.description} 
-                                    onChange={handleChange}
+                                    onChange={handleChange} 
                                     rows={4}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-gray-900 bg-white placeholder:text-gray-400"
                                     placeholder="Tuliskan deskripsi singkat buku"
                                 ></textarea>
                                 {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
@@ -450,7 +450,7 @@ export default function BukuEdit() {
                                                                 type="text" 
                                                                 value={chapter.title} 
                                                                 onChange={(e) => handleChapterChange(index, 'title', e.target.value)}
-                                                                className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                                                className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                                                                 placeholder={`Contoh: Bab ${index + 1}: Pendahuluan`}
                                                             />
                                                         </div>
@@ -460,7 +460,7 @@ export default function BukuEdit() {
                                                                 type="number" 
                                                                 value={chapter.coin_price} 
                                                                 onChange={(e) => handleChapterChange(index, 'coin_price', e.target.value)}
-                                                                className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                                                className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                                                                 placeholder="Contoh: 10 atau 0 (gratis)"
                                                                 min="0"
                                                             />
@@ -533,7 +533,7 @@ export default function BukuEdit() {
                                                             value={chapter.content} 
                                                             onChange={(e) => handleChapterChange(index, 'content', e.target.value)}
                                                             rows={6}
-                                                            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y font-serif text-sm leading-relaxed"
+                                                            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y font-serif text-sm leading-relaxed text-gray-900 bg-white placeholder:text-gray-400"
                                                             placeholder="Ketik atau tempelkan (paste) isi naskah bab buku di sini. Teks akan tampil rapi saat dibaca..."
                                                         ></textarea>
                                                     </div>
@@ -588,7 +588,7 @@ export default function BukuEdit() {
                                     value={newAuthorName}
                                     onChange={(e) => setNewAuthorName(e.target.value)}
                                     placeholder="Contoh: Ustadz Dr. Firanda Andirja"
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                                     required
                                     autoFocus
                                 />
@@ -603,7 +603,7 @@ export default function BukuEdit() {
                                     value={newAuthorBio}
                                     onChange={(e) => setNewAuthorBio(e.target.value)}
                                     placeholder="Deskripsi singkat mengenai penulis..."
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-gray-900 bg-white placeholder:text-gray-400"
                                 />
                             </div>
 

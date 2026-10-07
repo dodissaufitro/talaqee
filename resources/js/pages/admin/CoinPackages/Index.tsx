@@ -259,7 +259,7 @@ export default function CoinPackagesIndex({ packages = [], auth }: PageProps) {
                                 placeholder="Cari nama, koin, atau harga..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                                className="w-full pl-10 pr-4 py-2 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                             />
                         </div>
 
@@ -471,7 +471,7 @@ export default function CoinPackagesIndex({ packages = [], auth }: PageProps) {
                                         placeholder="Contoh: Paket 100 Koin, Paket Populer..."
                                         value={data.name}
                                         onChange={e => setData('name', e.target.value)}
-                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all"
+                                        className="w-full px-4 py-2.5 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all"
                                         required
                                     />
                                     {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
@@ -490,7 +490,7 @@ export default function CoinPackagesIndex({ packages = [], auth }: PageProps) {
                                                 placeholder="100"
                                                 value={data.coin_amount}
                                                 onChange={e => setData('coin_amount', parseInt(e.target.value) || 0)}
-                                                className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none font-bold transition-all"
+                                                className="w-full pl-4 pr-10 py-2.5 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none font-bold transition-all"
                                                 required
                                             />
                                             <div className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 bg-amber-400 text-white rounded-full flex items-center justify-center text-[11px] font-extrabold shadow-sm">
@@ -510,7 +510,7 @@ export default function CoinPackagesIndex({ packages = [], auth }: PageProps) {
                                             placeholder="0"
                                             value={data.bonus_coin}
                                             onChange={e => setData('bonus_coin', parseInt(e.target.value) || 0)}
-                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all"
+                                            className="w-full px-4 py-2.5 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all"
                                         />
                                         {errors.bonus_coin && <p className="text-red-500 text-xs mt-1">{errors.bonus_coin}</p>}
                                     </div>
@@ -531,14 +531,14 @@ export default function CoinPackagesIndex({ packages = [], auth }: PageProps) {
                                             placeholder="5000"
                                             value={data.price}
                                             onChange={e => setData('price', parseFloat(e.target.value) || 0)}
-                                            className="w-full pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none font-bold transition-all"
+                                            className="w-full pl-12 pr-4 py-2.5 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none font-bold transition-all"
                                             required
                                         />
                                     </div>
                                     {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
                                     
                                     {data.coin_amount > 0 && data.price > 0 && (
-                                        <p className="text-xs text-purple-700 bg-purple-50 px-3 py-1.5 rounded-lg mt-1.5 font-medium">
+                                         <p className="text-xs text-purple-700 bg-purple-50 px-3 py-1.5 rounded-lg mt-1.5 font-medium">
                                             Nilai konversi: ≈ Rp {(Number(data.price) / (Number(data.coin_amount) + Number(data.bonus_coin || 0))).toFixed(1)} per 1 Koin
                                         </p>
                                     )}
@@ -555,7 +555,7 @@ export default function CoinPackagesIndex({ packages = [], auth }: PageProps) {
                                             placeholder="Contoh: Popular, Best Value, Promo..."
                                             value={data.badge_label}
                                             onChange={e => setData('badge_label', e.target.value)}
-                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all"
+                                            className="w-full px-4 py-2.5 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all"
                                         />
                                     </div>
 
@@ -566,7 +566,7 @@ export default function CoinPackagesIndex({ packages = [], auth }: PageProps) {
                                         <select
                                             value={data.badge_color}
                                             onChange={e => setData('badge_color', e.target.value)}
-                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all"
+                                            className="w-full px-4 py-2.5 bg-white text-gray-900 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all"
                                         >
                                             <option value="amber">Kuning / Emas (Amber)</option>
                                             <option value="emerald">Hijau (Emerald)</option>

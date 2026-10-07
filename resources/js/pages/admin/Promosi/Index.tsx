@@ -193,12 +193,12 @@ export default function PromosiIndex() {
                         <div className="flex flex-wrap items-center gap-4 mb-6 justify-between">
                             <div className="relative w-[320px]">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                <input type="text" placeholder="Cari promosi..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" />
+                                <input type="text" placeholder="Cari promosi..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 bg-white text-gray-900" />
                             </div>
                             
                             <div className="flex items-center gap-3">
                                 <div className="w-40 relative">
-                                    <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 appearance-none bg-white">
+                                    <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 appearance-none bg-white">
                                         <option>Semua Status</option>
                                         <option>Aktif</option>
                                         <option>Akan Berakhir</option>
@@ -207,7 +207,7 @@ export default function PromosiIndex() {
                                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
                                 </div>
                                 <div className="w-44 relative">
-                                    <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 appearance-none bg-white">
+                                    <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 appearance-none bg-white">
                                         <option>Semua Jenis</option>
                                         <option>Diskon Persen</option>
                                         <option>Gratis Ongkir</option>
@@ -217,7 +217,7 @@ export default function PromosiIndex() {
                                 </div>
                                 <div className="w-44 relative">
                                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
-                                    <input type="text" placeholder="Pilih Tanggal" className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 bg-white" />
+                                    <input type="text" placeholder="Pilih Tanggal" className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 bg-white" />
                                 </div>
                                 <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                                     <Filter size={16} /> Filter

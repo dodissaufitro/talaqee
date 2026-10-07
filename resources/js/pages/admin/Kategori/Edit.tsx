@@ -91,7 +91,7 @@ export default function KategoriEdit() {
                                         name="name" 
                                         value={values.name} 
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                                         required
                                         placeholder="Masukkan nama kategori"
                                     />
@@ -117,7 +117,7 @@ export default function KategoriEdit() {
                                         name="color" 
                                         value={values.color} 
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white text-gray-900 placeholder:text-gray-400"
                                         placeholder="Contoh: blue, red, emerald"
                                     />
                                     {errors.color && <p className="text-red-500 text-xs mt-1">{errors.color}</p>}
@@ -131,7 +131,7 @@ export default function KategoriEdit() {
                                     value={values.description} 
                                     onChange={handleChange}
                                     rows={4}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-gray-900 bg-white placeholder:text-gray-400"
                                     placeholder="Tuliskan deskripsi singkat kategori"
                                 ></textarea>
                                 {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}

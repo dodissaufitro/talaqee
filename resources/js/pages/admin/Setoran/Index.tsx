@@ -129,7 +129,7 @@ const CommentForm = ({ recording }: { recording: Recording }) => {
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         placeholder="Tulis komentar teks..."
-                        className="w-full text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 mb-2"
+                        className="w-full text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 mb-2 bg-white text-gray-900 placeholder:text-gray-400"
                         rows={2}
                     ></textarea>
                     

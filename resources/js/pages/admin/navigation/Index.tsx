@@ -186,7 +186,7 @@ export default function NavigationIndex() {
                                     type="text" 
                                     value={data.name} 
                                     onChange={e => setData('name', e.target.value)}
-                                    className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                    className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900 placeholder:text-gray-400"
                                     required
                                 />
                                 {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
@@ -198,7 +198,7 @@ export default function NavigationIndex() {
                                     type="text" 
                                     value={data.icon} 
                                     onChange={e => setData('icon', e.target.value)}
-                                    className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                    className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900 placeholder:text-gray-400"
                                     placeholder="e.g. LayoutDashboard"
                                 />
                                 {errors.icon && <p className="text-red-500 text-xs mt-1">{errors.icon}</p>}
@@ -210,7 +210,7 @@ export default function NavigationIndex() {
                                     type="text" 
                                     value={data.route} 
                                     onChange={e => setData('route', e.target.value)}
-                                    className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                    className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900 placeholder:text-gray-400"
                                     placeholder="e.g. admin.dashboard"
                                 />
                                 {errors.route && <p className="text-red-500 text-xs mt-1">{errors.route}</p>}
@@ -223,7 +223,7 @@ export default function NavigationIndex() {
                                         type="number" 
                                         value={data.order} 
                                         onChange={e => setData('order', parseInt(e.target.value))}
-                                        className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                        className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900 placeholder:text-gray-400"
                                     />
                                 </div>
                                 <div className="flex-1 flex items-end pb-2">

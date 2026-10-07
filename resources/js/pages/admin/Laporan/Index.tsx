@@ -151,14 +151,14 @@ export default function LaporanIndex() {
                             <label className="block text-xs text-gray-500 mb-1.5 font-medium">Periode</label>
                             <div className="relative">
                                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
-                                <input type="text" placeholder="01 Mei 2024 - 31 Mei 2024" className="w-full pl-9 pr-8 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 bg-white" />
+                                <input type="text" placeholder="01 Mei 2024 - 31 Mei 2024" className="w-full pl-9 pr-8 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 bg-white" />
                                 <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
                             </div>
                         </div>
                         <div className="flex-1 max-w-[200px]">
                             <label className="block text-xs text-gray-500 mb-1.5 font-medium">Kategori</label>
                             <div className="relative">
-                                <select className="w-full px-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 appearance-none bg-white">
+                                <select className="w-full px-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 appearance-none bg-white">
                                     <option>Semua Kategori</option>
                                 </select>
                                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
@@ -167,7 +167,7 @@ export default function LaporanIndex() {
                         <div className="flex-1 max-w-[200px]">
                             <label className="block text-xs text-gray-500 mb-1.5 font-medium">Metode Pembayaran</label>
                             <div className="relative">
-                                <select className="w-full px-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 appearance-none bg-white">
+                                <select className="w-full px-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 appearance-none bg-white">
                                     <option>Semua Metode</option>
                                 </select>
                                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
@@ -176,7 +176,7 @@ export default function LaporanIndex() {
                         <div className="flex-1 max-w-[200px]">
                             <label className="block text-xs text-gray-500 mb-1.5 font-medium">Status</label>
                             <div className="relative">
-                                <select className="w-full px-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 appearance-none bg-white">
+                                <select className="w-full px-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 appearance-none bg-white">
                                     <option>Semua Status</option>
                                 </select>
                                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
@@ -270,7 +270,7 @@ export default function LaporanIndex() {
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="font-bold text-gray-900">Grafik Penjualan</h3>
                                 <div className="relative">
-                                    <select className="pl-4 pr-8 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 appearance-none bg-white outline-none">
+                                    <select className="pl-4 pr-8 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 appearance-none bg-white outline-none">
                                         <option>Per Hari</option>
                                     </select>
                                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />

@@ -287,7 +287,7 @@ export default function VideosIndex() {
                                     type="text" 
                                     value={data.title} 
                                     onChange={e => setData('title', e.target.value)}
-                                    className="w-full border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-sm px-4 py-2.5 transition-all shadow-sm"
+                                    className="w-full border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-sm px-4 py-2.5 transition-all shadow-sm bg-white text-gray-900 placeholder:text-gray-400"
                                     required
                                 />
                                 {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
@@ -298,7 +298,7 @@ export default function VideosIndex() {
                                 <textarea 
                                     value={data.description} 
                                     onChange={e => setData('description', e.target.value)}
-                                    className="w-full border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-sm px-4 py-3 transition-all shadow-sm h-28 resize-none"
+                                    className="w-full border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-sm px-4 py-3 transition-all shadow-sm h-28 resize-none bg-white text-gray-900 placeholder:text-gray-400"
                                 />
                                 {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
                             </div>
@@ -310,7 +310,7 @@ export default function VideosIndex() {
                                         type="number" 
                                         value={data.duration} 
                                         onChange={e => setData('duration', parseInt(e.target.value))}
-                                        className="w-full border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-sm px-4 py-2.5 transition-all shadow-sm"
+                                        className="w-full border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-sm px-4 py-2.5 transition-all shadow-sm bg-white text-gray-900 placeholder:text-gray-400"
                                     />
                                     {errors.duration && <p className="text-red-500 text-xs mt-1">{errors.duration}</p>}
                                 </div>
@@ -320,7 +320,7 @@ export default function VideosIndex() {
                                         type="number" 
                                         value={data.coin_reward} 
                                         onChange={e => setData('coin_reward', parseInt(e.target.value))}
-                                        className="w-full border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-sm px-4 py-2.5 transition-all shadow-sm"
+                                        className="w-full border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-sm px-4 py-2.5 transition-all shadow-sm bg-white text-gray-900 placeholder:text-gray-400"
                                     />
                                     {errors.coin_reward && <p className="text-red-500 text-xs mt-1">{errors.coin_reward}</p>}
                                 </div>

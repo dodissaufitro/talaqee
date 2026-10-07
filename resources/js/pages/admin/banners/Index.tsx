@@ -210,7 +210,7 @@ export default function BannersIndex() {
                                 <input 
                                     type="file" 
                                     onChange={e => setData('image', e.target.files ? e.target.files[0] : null)}
-                                    className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                                    className="w-full border border-gray-200 rounded-lg p-2 text-sm bg-white text-gray-900"
                                     accept="image/*"
                                     required={!editingId} // Require image only on create
                                 />
@@ -224,7 +224,7 @@ export default function BannersIndex() {
                                     type="text" 
                                     value={data.title} 
                                     onChange={e => setData('title', e.target.value)}
-                                    className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                    className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900 placeholder:text-gray-400"
                                 />
                                 {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
                             </div>
@@ -234,7 +234,7 @@ export default function BannersIndex() {
                                 <textarea 
                                     value={data.subtitle} 
                                     onChange={e => setData('subtitle', e.target.value)}
-                                    className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm h-20"
+                                    className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm h-20 bg-white text-gray-900 placeholder:text-gray-400"
                                 />
                                 {errors.subtitle && <p className="text-red-500 text-xs mt-1">{errors.subtitle}</p>}
                             </div>
@@ -246,7 +246,7 @@ export default function BannersIndex() {
                                         type="text" 
                                         value={data.button_text} 
                                         onChange={e => setData('button_text', e.target.value)}
-                                        className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                        className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900 placeholder:text-gray-400"
                                         placeholder="Cari Buku"
                                     />
                                 </div>
@@ -256,7 +256,7 @@ export default function BannersIndex() {
                                         type="text" 
                                         value={data.link_url} 
                                         onChange={e => setData('link_url', e.target.value)}
-                                        className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                        className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900 placeholder:text-gray-400"
                                         placeholder="/katalog"
                                     />
                                 </div>
@@ -269,7 +269,7 @@ export default function BannersIndex() {
                                         type="text" 
                                         value={data.background_color} 
                                         onChange={e => setData('background_color', e.target.value)}
-                                        className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                        className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900 placeholder:text-gray-400"
                                         placeholder="bg-blue-50"
                                     />
                                 </div>
@@ -279,7 +279,7 @@ export default function BannersIndex() {
                                         type="number" 
                                         value={data.sort_order} 
                                         onChange={e => setData('sort_order', parseInt(e.target.value))}
-                                        className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                        className="w-full border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900 placeholder:text-gray-400"
                                     />
                                 </div>
                             </div>

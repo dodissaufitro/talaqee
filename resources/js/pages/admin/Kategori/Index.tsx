@@ -177,7 +177,7 @@ export default function KategoriIndex() {
                         <div className="flex flex-wrap items-center gap-4 mb-6 justify-between">
                             <div className="relative w-[320px]">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                <input type="text" placeholder="Cari kategori..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" />
+                                <input type="text" placeholder="Cari kategori..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 text-gray-900 bg-white" />
                             </div>
                             
                             <div className="flex items-center gap-3">

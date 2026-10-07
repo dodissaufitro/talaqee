@@ -44,7 +44,7 @@ export default function RefundPolicyIndex({ page, auth }: { page: PageData, auth
                                 value={data.content}
                                 onChange={e => setData('content', e.target.value)}
                                 rows={15}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none font-mono text-sm"
+                                className="w-full px-4 py-3 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none font-mono text-sm"
                                 placeholder="Masukkan kebijakan pengembalian dana di sini..."
                             />
                             {errors.content && <p className="text-red-500 text-xs mt-1">{errors.content}</p>}

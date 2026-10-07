@@ -130,7 +130,7 @@ export default function ChapterCreate() {
                                         name="chapter_number" 
                                         value={values.chapter_number} 
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                                         required
                                         min="1"
                                         placeholder="Contoh: 1"
@@ -144,7 +144,7 @@ export default function ChapterCreate() {
                                         name="title" 
                                         value={values.title} 
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                                         required
                                         placeholder="Contoh: Pendahuluan"
                                     />
@@ -160,7 +160,7 @@ export default function ChapterCreate() {
                                         name="page_count" 
                                         value={values.page_count} 
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                                         min="0"
                                     />
                                     {errors.page_count && <p className="text-red-500 text-xs mt-1">{errors.page_count}</p>}
@@ -172,7 +172,7 @@ export default function ChapterCreate() {
                                         name="coin_price" 
                                         value={values.coin_price} 
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                                         min="0"
                                     />
                                     {errors.coin_price && <p className="text-red-500 text-xs mt-1">{errors.coin_price}</p>}
@@ -186,7 +186,7 @@ export default function ChapterCreate() {
                                     value={values.description} 
                                     onChange={handleChange}
                                     rows={2}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-gray-900 bg-white placeholder:text-gray-400"
                                     placeholder="Tuliskan deskripsi singkat bab"
                                 ></textarea>
                                 {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}

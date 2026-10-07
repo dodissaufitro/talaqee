@@ -257,7 +257,7 @@ export default function PenulisIndex({ authors, filters, stats, auth, flash }: P
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Cari nama penulis atau bio..."
-                                    className="w-full pl-10 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                                    className="w-full pl-10 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition text-gray-900 placeholder:text-gray-400"
                                 />
                                 {searchTerm && (
                                     <button
@@ -447,7 +447,7 @@ export default function PenulisIndex({ authors, filters, stats, auth, flash }: P
                                     value={formData.name}
                                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                                     placeholder="Contoh: Ustadz Dr. Firanda Andirja"
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                                     required
                                 />
                                 {formErrors.name && (
@@ -465,7 +465,7 @@ export default function PenulisIndex({ authors, filters, stats, auth, flash }: P
                                     value={formData.bio}
                                     onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                                     placeholder="Deskripsi singkat mengenai latar belakang atau karya penulis..."
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-gray-900 bg-white placeholder:text-gray-400"
                                 />
                                 {formErrors.bio && (
                                     <p className="text-red-500 text-xs mt-1">{formErrors.bio}</p>

@@ -201,10 +201,10 @@ export default function PenjualanIndex() {
                         <div className="flex flex-wrap gap-4 mb-6">
                             <div className="relative flex-1 min-w-[250px]">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                <input type="text" placeholder="Cari transaksi, pelanggan, atau buku..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" />
+                                <input type="text" placeholder="Cari transaksi, pelanggan, atau buku..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border-gray-200 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 bg-white text-gray-900" />
                             </div>
                             <div className="w-48 relative">
-                                <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border-gray-200 text-sm text-gray-600 appearance-none bg-white">
+                                <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border-gray-200 text-sm text-gray-900 appearance-none bg-white">
                                     <option>Semua Status</option>
                                     <option>Selesai</option>
                                     <option>Pending</option>
@@ -212,7 +212,7 @@ export default function PenjualanIndex() {
                                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
                             </div>
                             <div className="w-48 relative">
-                                <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border-gray-200 text-sm text-gray-600 appearance-none bg-white">
+                                <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border-gray-200 text-sm text-gray-900 appearance-none bg-white">
                                     <option>Semua Metode</option>
                                     <option>Transfer Bank</option>
                                     <option>QRIS</option>
@@ -221,7 +221,7 @@ export default function PenjualanIndex() {
                             </div>
                             <div className="relative w-48">
                                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                <input type="text" placeholder="Pilih Tanggal" className="w-full pl-10 pr-4 py-2.5 rounded-xl border-gray-200 text-sm text-gray-600" />
+                                <input type="text" placeholder="Pilih Tanggal" className="w-full pl-10 pr-4 py-2.5 rounded-xl border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 bg-white" />
                             </div>
                             <button className="flex items-center gap-2 px-6 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
                                 <Filter size={16} /> Filter

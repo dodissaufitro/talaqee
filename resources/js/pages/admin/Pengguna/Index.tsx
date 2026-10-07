@@ -378,7 +378,7 @@ export default function PenggunaIndex() {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-                                        className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white" 
+                                        className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-900 placeholder:text-gray-400" 
                                     />
                                 </div>
 
@@ -386,7 +386,7 @@ export default function PenggunaIndex() {
                                     <select 
                                         value={selectedRoleFilter}
                                         onChange={(e) => setSelectedRoleFilter(e.target.value)}
-                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-700"
+                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-900"
                                     >
                                         <option value="">Semua Role</option>
                                         {roles.map(r => (
@@ -399,7 +399,7 @@ export default function PenggunaIndex() {
                                     <select 
                                         value={selectedStatusFilter}
                                         onChange={(e) => setSelectedStatusFilter(e.target.value)}
-                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-700"
+                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-900"
                                     >
                                         <option value="">Semua Status</option>
                                         <option value="Aktif">Aktif</option>
@@ -883,7 +883,7 @@ export default function PenggunaIndex() {
                                             type="text" 
                                             value={editForm.data.name}
                                             onChange={(e) => editForm.setData('name', e.target.value)}
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900 placeholder:text-gray-400"
                                             required
                                         />
                                         {editForm.errors.name && <p className="text-xs text-red-600 mt-1">{editForm.errors.name}</p>}
@@ -897,7 +897,7 @@ export default function PenggunaIndex() {
                                             type="email" 
                                             value={editForm.data.email}
                                             onChange={(e) => editForm.setData('email', e.target.value)}
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900 placeholder:text-gray-400"
                                             required
                                         />
                                         {editForm.errors.email && <p className="text-xs text-red-600 mt-1">{editForm.errors.email}</p>}
@@ -912,7 +912,7 @@ export default function PenggunaIndex() {
                                             value={editForm.data.phone}
                                             onChange={(e) => editForm.setData('phone', e.target.value)}
                                             placeholder="Contoh: 08123456789"
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900 placeholder:text-gray-400"
                                         />
                                         {editForm.errors.phone && <p className="text-xs text-red-600 mt-1">{editForm.errors.phone}</p>}
                                     </div>
@@ -926,7 +926,7 @@ export default function PenggunaIndex() {
                                             value={editForm.data.city}
                                             onChange={(e) => editForm.setData('city', e.target.value)}
                                             placeholder="Contoh: Jakarta Timur"
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900 placeholder:text-gray-400"
                                         />
                                         {editForm.errors.city && <p className="text-xs text-red-600 mt-1">{editForm.errors.city}</p>}
                                     </div>
@@ -938,7 +938,7 @@ export default function PenggunaIndex() {
                                         <select 
                                             value={editForm.data.role}
                                             onChange={(e) => editForm.setData('role', e.target.value)}
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900"
                                         >
                                             <option value="">Pilih Role</option>
                                             {roles.map(r => (
@@ -955,7 +955,7 @@ export default function PenggunaIndex() {
                                         <select 
                                             value={editForm.data.status}
                                             onChange={(e) => editForm.setData('status', e.target.value)}
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900"
                                         >
                                             <option value="Aktif">Aktif</option>
                                             <option value="Nonaktif">Nonaktif</option>
@@ -977,7 +977,7 @@ export default function PenggunaIndex() {
                                         value={editForm.data.password}
                                         onChange={(e) => editForm.setData('password', e.target.value)}
                                         placeholder="Kosongkan jika tidak ingin mengubah password pengguna"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900 placeholder:text-gray-400"
                                     />
                                     <p className="text-[11px] text-gray-400 mt-1">Hanya isi jika ingin mereset password akun pengguna ini secara langsung.</p>
                                     {editForm.errors.password && <p className="text-xs text-red-600 mt-1">{editForm.errors.password}</p>}
@@ -1053,7 +1053,7 @@ export default function PenggunaIndex() {
                                             value={createForm.data.name}
                                             onChange={(e) => createForm.setData('name', e.target.value)}
                                             placeholder="Nama lengkap"
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900 placeholder:text-gray-400"
                                             required
                                         />
                                         {createForm.errors.name && <p className="text-xs text-red-600 mt-1">{createForm.errors.name}</p>}
@@ -1068,7 +1068,7 @@ export default function PenggunaIndex() {
                                             value={createForm.data.email}
                                             onChange={(e) => createForm.setData('email', e.target.value)}
                                             placeholder="alamat@email.com"
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900 placeholder:text-gray-400"
                                             required
                                         />
                                         {createForm.errors.email && <p className="text-xs text-red-600 mt-1">{createForm.errors.email}</p>}
@@ -1083,7 +1083,7 @@ export default function PenggunaIndex() {
                                             value={createForm.data.password}
                                             onChange={(e) => createForm.setData('password', e.target.value)}
                                             placeholder="Minimal 6 karakter"
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900 placeholder:text-gray-400"
                                             required
                                         />
                                         {createForm.errors.password && <p className="text-xs text-red-600 mt-1">{createForm.errors.password}</p>}
@@ -1101,7 +1101,7 @@ export default function PenggunaIndex() {
                                                 value={createForm.data.coin_balance}
                                                 onChange={(e) => createForm.setData('coin_balance', Math.max(0, parseInt(e.target.value) || 0))}
                                                 placeholder="0"
-                                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900 placeholder:text-gray-400"
                                             />
                                         </div>
                                         {createForm.errors.coin_balance && <p className="text-xs text-red-600 mt-1">{createForm.errors.coin_balance}</p>}
@@ -1116,7 +1116,7 @@ export default function PenggunaIndex() {
                                             value={createForm.data.phone}
                                             onChange={(e) => createForm.setData('phone', e.target.value)}
                                             placeholder="08xxxxxxxxxx"
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900 placeholder:text-gray-400"
                                         />
                                     </div>
 
@@ -1129,7 +1129,7 @@ export default function PenggunaIndex() {
                                             value={createForm.data.city}
                                             onChange={(e) => createForm.setData('city', e.target.value)}
                                             placeholder="Kota tempat tinggal"
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900 placeholder:text-gray-400"
                                         />
                                     </div>
 
@@ -1140,7 +1140,7 @@ export default function PenggunaIndex() {
                                         <select 
                                             value={createForm.data.role}
                                             onChange={(e) => createForm.setData('role', e.target.value)}
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900"
                                         >
                                             {roles.map(r => (
                                                 <option key={r.id} value={r.name}>{r.name}</option>
@@ -1155,7 +1155,7 @@ export default function PenggunaIndex() {
                                         <select 
                                             value={createForm.data.status}
                                             onChange={(e) => createForm.setData('status', e.target.value)}
-                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-xs bg-white text-gray-900"
                                         >
                                             <option value="Aktif">Aktif</option>
                                             <option value="Nonaktif">Nonaktif</option>
@@ -1252,7 +1252,7 @@ export default function PenggunaIndex() {
                                     <input 
                                         type="text" 
                                         placeholder="Contoh: Manajer Operasional" 
-                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-[#6366f1] focus:border-[#6366f1] shadow-sm bg-white"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-[#6366f1] focus:border-[#6366f1] shadow-sm bg-white text-gray-900 placeholder:text-gray-400"
                                         value={newRoleName}
                                         onChange={(e) => setNewRoleName(e.target.value)}
                                     />

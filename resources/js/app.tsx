@@ -32,8 +32,16 @@ createInertiaApp({
     },
 });
 
+import { router } from '@inertiajs/react';
+
 // This will set light / dark mode on load...
 initializeTheme();
+
+router.on('navigate', (event) => {
+    if (event.detail.page.url.startsWith('/admin')) {
+        document.documentElement.classList.remove('dark');
+    }
+});
 
 // Handle Android hardware back button
 import { App as CapacitorApp } from '@capacitor/app';

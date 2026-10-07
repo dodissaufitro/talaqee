@@ -90,7 +90,7 @@ export default function FaqIndex({ faqs, auth }: { faqs: Faq[], auth: any }) {
                                 placeholder="Cari pertanyaan..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                                className="w-full pl-9 pr-4 py-2 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
                             />
                         </div>
                         <button
@@ -173,7 +173,7 @@ export default function FaqIndex({ faqs, auth }: { faqs: Faq[], auth: any }) {
                                         type="text"
                                         value={data.question}
                                         onChange={e => setData('question', e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                                        className="w-full px-4 py-2 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
                                         required
                                     />
                                     {errors.question && <p className="text-red-500 text-xs mt-1">{errors.question}</p>}
@@ -184,7 +184,7 @@ export default function FaqIndex({ faqs, auth }: { faqs: Faq[], auth: any }) {
                                         value={data.answer}
                                         onChange={e => setData('answer', e.target.value)}
                                         rows={4}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                                        className="w-full px-4 py-2 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
                                         required
                                     />
                                     {errors.answer && <p className="text-red-500 text-xs mt-1">{errors.answer}</p>}
@@ -196,7 +196,7 @@ export default function FaqIndex({ faqs, auth }: { faqs: Faq[], auth: any }) {
                                             type="number"
                                             value={data.order}
                                             onChange={e => setData('order', parseInt(e.target.value))}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                                            className="w-full px-4 py-2 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
                                         />
                                     </div>
                                     <div>
@@ -204,7 +204,7 @@ export default function FaqIndex({ faqs, auth }: { faqs: Faq[], auth: any }) {
                                         <select
                                             value={data.is_active ? '1' : '0'}
                                             onChange={e => setData('is_active', e.target.value === '1')}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                                            className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
                                         >
                                             <option value="1">Aktif</option>
                                             <option value="0">Nonaktif</option>

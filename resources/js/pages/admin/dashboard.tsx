@@ -150,7 +150,7 @@ export default function AdminDashboard() {
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="font-bold text-gray-900">Grafik Penjualan</h3>
-                                <select className="text-sm border-gray-200 rounded-lg text-gray-600 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                <select className="text-sm border-gray-200 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500 bg-white">
                                     <option>Harian</option>
                                     <option>Mingguan</option>
                                     <option>Bulanan</option>

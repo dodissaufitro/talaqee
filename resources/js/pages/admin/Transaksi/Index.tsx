@@ -297,10 +297,10 @@ export default function TransaksiIndex() {
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                 <input 
                                     type="text" 
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
+                                    value={search} 
+                                    onChange={(e) => setSearch(e.target.value)} 
                                     placeholder="Cari invoice, pelanggan, atau iPaymu ID..." 
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400" 
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 placeholder:text-gray-400 bg-white text-gray-900" 
                                 />
                             </div>
                             
@@ -309,7 +309,7 @@ export default function TransaksiIndex() {
                                     <select 
                                         value={statusFilter}
                                         onChange={(e) => handleFilterChange(e.target.value, undefined)}
-                                        className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 appearance-none bg-white focus:ring-indigo-500 focus:border-indigo-500"
+                                        className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 appearance-none bg-white focus:ring-indigo-500 focus:border-indigo-500"
                                     >
                                         <option value="Semua Status">Semua Status</option>
                                         <option value="Selesai">Selesai (Paid)</option>
@@ -323,7 +323,7 @@ export default function TransaksiIndex() {
                                     <select 
                                         value={methodFilter}
                                         onChange={(e) => handleFilterChange(undefined, e.target.value)}
-                                        className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 appearance-none bg-white focus:ring-indigo-500 focus:border-indigo-500"
+                                        className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 appearance-none bg-white focus:ring-indigo-500 focus:border-indigo-500"
                                     >
                                         <option value="Semua Metode">Semua Metode</option>
                                         <option value="iPaymu">iPaymu</option>
