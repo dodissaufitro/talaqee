@@ -1,5 +1,5 @@
 import { Head, useForm, Link } from '@inertiajs/react';
-import { LoaderCircle, User, Lock, Eye, EyeOff, BookOpen, Bookmark, Coins, Globe, Mail, Star, ShieldCheck } from 'lucide-react';
+import { LoaderCircle, User, Lock, Eye, EyeOff, BookOpen, Bookmark, Coins, Globe, Mail, Star, ShieldCheck, ChevronLeft } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import axios from 'axios';
@@ -64,126 +64,169 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
     return (
         <>
-            {/* MOBILE VIEW (Android) */}
-            <div className="block md:hidden min-h-screen font-sans bg-gradient-to-b from-[#F0F5FF] to-white pb-10">
-                {/* Header */}
-                <div className="pt-16 pb-8 px-6 relative overflow-hidden">
-                    <div className="absolute top-8 left-6 grid grid-cols-3 gap-1.5 opacity-20">
+            {/* MOBILE VIEW (Android / Mobile Web) */}
+            <div className="block md:hidden min-h-screen font-sans bg-gradient-to-b from-[#F0F5FF] via-white to-[#F8FAFC] pb-8 relative overflow-x-hidden">
+                <Head title="Masuk - BookReader" />
+
+                {/* Top Bar with Back Button */}
+                <div className="pt-5 px-5 flex items-center justify-between relative z-20">
+                    <Link 
+                        href={route('home')} 
+                        className="w-9 h-9 rounded-full bg-white/80 backdrop-blur-md border border-gray-100 shadow-xs flex items-center justify-center text-gray-600 hover:text-gray-900 active:scale-95 transition-all"
+                    >
+                        <ChevronLeft className="w-5 h-5 -ml-0.5" />
+                    </Link>
+                </div>
+
+                {/* Header with 9 Dots, Copywriting, and Silhouette Book Image */}
+                <div className="pt-3 pb-6 px-6 relative overflow-hidden">
+                    {/* 9 Dots Accent */}
+                    <div className="grid grid-cols-3 gap-1.5 opacity-25 w-fit mb-3">
                         {[...Array(9)].map((_, i) => (
-                            <div key={i} className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                            <div key={i} className="w-1.5 h-1.5 bg-[#5C5AE6] rounded-full"></div>
                         ))}
                     </div>
-                    <h1 className="text-3xl font-medium text-gray-800 leading-tight relative z-10">
-                        Sela<span className="font-bold">mat Datang</span><br/>
-                        di <span className="font-extrabold text-[#2563EB]">BookReader</span>
+
+                    {/* Headline */}
+                    <h1 className="text-[28px] font-medium text-gray-800 leading-tight relative z-10">
+                        Sela<span className="font-bold">mat Datang</span><br />
+                        di <span className="font-extrabold text-[#5C5AE6]">BookReader</span>
                     </h1>
-                    <p className="text-[13px] text-gray-500 mt-4 max-w-[200px] leading-snug relative z-10">
+
+                    {/* Subtitle */}
+                    <p className="text-[13px] text-gray-500 mt-3 max-w-[210px] leading-snug relative z-10">
                         Baca ribuan buku favoritmu kapan saja, di mana saja.
                     </p>
-                    <div className="absolute right-[-60px] top-[-20px] w-[240px] h-[300px] opacity-40 z-0 rotate-12">
-                        <img src="/images/katalog/book3.png" className="w-full h-full object-cover rounded-xl shadow-2xl [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_30%,rgba(0,0,0,0)_100%)]" alt="Books" />
+
+                    {/* Siluet Buku di Background Kanan */}
+                    <div className="absolute right-[-40px] top-[-10px] w-[230px] h-[290px] opacity-40 z-0 rotate-12 pointer-events-none">
+                        <img 
+                            src="/images/katalog/book3.png" 
+                            className="w-full h-full object-cover rounded-2xl shadow-xl [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_35%,rgba(0,0,0,0)_100%)]" 
+                            alt="Siluet Buku" 
+                        />
                     </div>
                 </div>
 
-                {/* Login Card */}
-                <div className="bg-white rounded-[24px] p-6 mx-5 shadow-sm border border-[#F1F5F9] relative z-10">
+                {/* Login Card (Clean, Sharp, Neatly Aligned) */}
+                <div className="bg-white rounded-[24px] p-6 mx-5 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] border border-gray-100 relative z-10">
                     <h2 className="text-[17px] font-bold text-gray-900">Masuk ke Akun Anda</h2>
-                    <p className="text-[12px] text-gray-500 mb-6 mt-1">Silakan masuk untuk melanjutkan</p>
+                    <p className="text-[12px] text-gray-500 mb-5 mt-1">Silakan masuk untuk melanjutkan</p>
 
-                    <form onSubmit={submit}>
-                        <div className="mb-4">
+                    <form onSubmit={submit} className="space-y-4">
+                        {/* Email / Username */}
+                        <div>
                             <label className="block text-[11px] font-bold text-gray-700 mb-1.5">Email / Username</label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" />
+                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" />
                                 <input 
-                                    type="email" 
+                                    type="text" 
                                     value={data.email} 
                                     onChange={(e) => setData('email', e.target.value)} 
                                     placeholder="Masukkan email atau username" 
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-[13px] focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-[13px] bg-slate-50/50 focus:bg-white focus:border-[#5C5AE6] focus:ring-2 focus:ring-[#5C5AE6]/10 outline-none transition-all placeholder:text-gray-400"
+                                    required
                                 />
                             </div>
                             <InputError message={errors.email} className="mt-1 text-[11px]" />
                         </div>
 
-                        <div className="mb-2">
-                            <label className="block text-[11px] font-bold text-gray-700 mb-1.5">Kata Sandi</label>
+                        {/* Password */}
+                        <div>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className="text-[11px] font-bold text-gray-700">Kata Sandi</label>
+                                {canResetPassword && (
+                                    <Link href={route('password.request')} className="text-[11px] font-bold text-[#5C5AE6] hover:text-[#4E4CD4]">
+                                        Lupa Kata Sandi?
+                                    </Link>
+                                )}
+                            </div>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" />
+                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" />
                                 <input 
                                     type={showPassword ? 'text' : 'password'} 
                                     value={data.password} 
                                     onChange={(e) => setData('password', e.target.value)} 
                                     placeholder="Masukkan kata sandi" 
-                                    className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-[13px] focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all"
+                                    className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-[13px] bg-slate-50/50 focus:bg-white focus:border-[#5C5AE6] focus:ring-2 focus:ring-[#5C5AE6]/10 outline-none transition-all placeholder:text-gray-400"
+                                    required
                                 />
-                                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 p-1">
-                                    {showPassword ? <Eye className="w-[18px] h-[18px] text-gray-400" /> : <EyeOff className="w-[18px] h-[18px] text-gray-400" />}
+                                <button 
+                                    type="button" 
+                                    onClick={() => setShowPassword(!showPassword)} 
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                                >
+                                    {showPassword ? <Eye className="w-[18px] h-[18px]" /> : <EyeOff className="w-[18px] h-[18px]" />}
                                 </button>
                             </div>
                             <InputError message={errors.password} className="mt-1 text-[11px]" />
                         </div>
 
-                        <div className="flex justify-end mb-6">
-                            {canResetPassword && (
-                                <Link href={route('password.request')} className="text-[11px] font-medium text-[#2563EB]">Lupa Kata Sandi?</Link>
-                            )}
-                        </div>
-
-                        <button type="submit" disabled={processing} className="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-[13px] transition-colors flex justify-center items-center gap-2">
+                        {/* Submit Button */}
+                        <button 
+                            type="submit" 
+                            disabled={processing} 
+                            className="w-full bg-[#5C5AE6] hover:bg-[#4E4CD4] active:scale-[0.99] text-white font-bold py-3.5 rounded-xl text-[13px] shadow-sm shadow-[#5C5AE6]/25 transition-all flex justify-center items-center gap-2 disabled:opacity-70 mt-2"
+                        >
                             {processing ? <LoaderCircle className="h-4 w-4 animate-spin" /> : null}
                             Masuk
                         </button>
                     </form>
 
-                    <div className="flex items-center gap-3 my-6">
+                    {/* Divider */}
+                    <div className="flex items-center gap-3 my-5">
                         <div className="h-px bg-gray-100 flex-1"></div>
                         <span className="text-[11px] text-gray-400">atau masuk dengan</span>
                         <div className="h-px bg-gray-100 flex-1"></div>
                     </div>
 
-                    <div className="mb-6">
-                        <button type="button" onClick={handleGoogleLogin} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
-                            <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                            <span className="text-[12px] font-bold text-gray-800">Masuk dengan Google</span>
-                        </button>
-                    </div>
+                    {/* Google Login Button */}
+                    <button 
+                        type="button" 
+                        onClick={handleGoogleLogin} 
+                        className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 active:scale-[0.99] transition-all shadow-2xs"
+                    >
+                        <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        <span className="text-[12px] font-bold text-gray-700">Masuk dengan Google</span>
+                    </button>
 
-                    <p className="text-center text-[11px] text-gray-500">
-                        Belum punya akun? <Link href={route('register')} className="text-[#2563EB] font-bold">Daftar sekarang</Link>
+                    {/* Footer Link */}
+                    <p className="text-center text-[11px] text-gray-500 mt-5">
+                        Belum punya akun?{' '}
+                        <Link href={route('register')} className="text-[#5C5AE6] hover:text-[#4E4CD4] font-bold">
+                            Daftar sekarang
+                        </Link>
                     </p>
                 </div>
 
-                {/* Bottom Features */}
-                <div className="px-6 py-10 relative overflow-hidden">
-                    {/* Background abstract shape / books */}
-                    <div className="absolute left-[-40px] bottom-[-40px] w-48 opacity-30 z-0 -rotate-12">
-                        <img src="/images/katalog/book1.png" className="w-full object-cover rounded-xl shadow-2xl [mask-image:linear-gradient(to_top,rgba(0,0,0,1)_10%,rgba(0,0,0,0)_90%)]" alt="Background Books" />
-                    </div>
-
-                    <div className="flex justify-between items-start relative z-10 pl-[70px]">
-                        <div className="flex flex-col items-center flex-1">
-                            <div className="w-10 h-10 rounded-[14px] bg-[#EEF2FF] flex items-center justify-center mb-2 shadow-sm">
-                                <BookOpen className="w-[22px] h-[22px] text-[#3B82F6]" strokeWidth={2} />
+                {/* Clean, Non-clipped Bottom Features (Neatly Centered, No Cut-offs) */}
+                <div className="px-6 pt-7 pb-4">
+                    <div className="grid grid-cols-3 gap-2">
+                        <div className="flex flex-col items-center">
+                            <div className="w-9 h-9 rounded-xl bg-[#EEF2FF] flex items-center justify-center mb-1.5 shadow-2xs">
+                                <BookOpen className="w-4 h-4 text-[#5C5AE6]" strokeWidth={2} />
                             </div>
-                            <span className="text-[10px] font-extrabold text-gray-800 text-center mb-0.5">Banyak Pilihan</span>
-                            <span className="text-[9px] font-medium text-gray-500 text-center leading-tight">Ribuan buku<br/>menarik</span>
+                            <span className="text-[10px] font-extrabold text-gray-800 text-center">Banyak Pilihan</span>
+                            <span className="text-[8px] font-medium text-gray-400 text-center leading-tight">Ribuan buku</span>
                         </div>
-                        <div className="flex flex-col items-center flex-1">
-                            <div className="w-10 h-10 rounded-[14px] bg-[#FFFBEB] flex items-center justify-center mb-2 shadow-sm">
-                                <div className="w-5 h-5 bg-[#F59E0B] rounded-full flex items-center justify-center">
-                                    <Star className="w-3 h-3 text-white fill-white" />
-                                </div>
+                        <div className="flex flex-col items-center">
+                            <div className="w-9 h-9 rounded-xl bg-[#FFFBEB] flex items-center justify-center mb-1.5 shadow-2xs">
+                                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                             </div>
-                            <span className="text-[10px] font-extrabold text-gray-800 text-center mb-0.5">Hemat & Praktis</span>
-                            <span className="text-[9px] font-medium text-gray-500 text-center leading-tight">Beli per bab<br/>dengan koin</span>
+                            <span className="text-[10px] font-extrabold text-gray-800 text-center">Hemat & Praktis</span>
+                            <span className="text-[8px] font-medium text-gray-400 text-center leading-tight">Beli per bab</span>
                         </div>
-                        <div className="flex flex-col items-center flex-1">
-                            <div className="w-10 h-10 rounded-[14px] bg-[#ECFDF5] flex items-center justify-center mb-2 shadow-sm">
-                                <ShieldCheck className="w-[22px] h-[22px] text-[#10B981]" strokeWidth={2} />
+                        <div className="flex flex-col items-center">
+                            <div className="w-9 h-9 rounded-xl bg-[#ECFDF5] flex items-center justify-center mb-1.5 shadow-2xs">
+                                <ShieldCheck className="w-4 h-4 text-emerald-600" strokeWidth={2} />
                             </div>
-                            <span className="text-[10px] font-extrabold text-gray-800 text-center mb-0.5">Aman & Nyaman</span>
-                            <span className="text-[9px] font-medium text-gray-500 text-center leading-tight">Transaksi aman,<br/>data terjaga</span>
+                            <span className="text-[10px] font-extrabold text-gray-800 text-center">Aman & Nyaman</span>
+                            <span className="text-[8px] font-medium text-gray-400 text-center leading-tight">Data terjaga</span>
                         </div>
                     </div>
                 </div>

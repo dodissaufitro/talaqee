@@ -6,7 +6,7 @@ import {
     BookOpen, Heart, Activity, Globe, Users, Smile, Shield, ShieldCheck,
     Bell, List, PlaySquare, Headphones, Play, Home, LayoutGrid, 
     CircleUserRound, Library, Bookmark, Filter, Crown, Sparkles, 
-    Coins, Zap, Compass, Feather, ArrowUpRight
+    Coins, Zap, Compass, Feather, ArrowUpRight, Loader2
 } from 'lucide-react';
 import NotificationBell from '@/components/NotificationBell';
 import JadwalSholat from '@/components/JadwalSholat';
@@ -118,6 +118,36 @@ export default function Welcome({
             router.visit(route('katalog.index'));
         }
     };
+
+    // Mobile Pagination & Loading Management for Koleksi Buku Populer (Shopee-Style Grid)
+    const [visibleMobileBooksCount, setVisibleMobileBooksCount] = useState(6);
+    const [isLoadingMoreMobileBooks, setIsLoadingMoreMobileBooks] = useState(false);
+    const mobileLoadMoreRef = useRef<HTMLDivElement | null>(null);
+
+    const allMobilePopularBooks = (koleksiBuku && koleksiBuku.length > 0) ? koleksiBuku : popularBooks;
+
+    const handleLoadMoreMobileBooks = () => {
+        if (isLoadingMoreMobileBooks || visibleMobileBooksCount >= allMobilePopularBooks.length) return;
+        setIsLoadingMoreMobileBooks(true);
+        setTimeout(() => {
+            setVisibleMobileBooksCount((prev) => Math.min(prev + 6, allMobilePopularBooks.length));
+            setIsLoadingMoreMobileBooks(false);
+        }, 500);
+    };
+
+    useEffect(() => {
+        if (!mobileLoadMoreRef.current) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && !isLoadingMoreMobileBooks && visibleMobileBooksCount < allMobilePopularBooks.length) {
+                    handleLoadMoreMobileBooks();
+                }
+            },
+            { threshold: 0.1, rootMargin: '120px' }
+        );
+        observer.observe(mobileLoadMoreRef.current);
+        return () => observer.disconnect();
+    }, [isLoadingMoreMobileBooks, visibleMobileBooksCount, allMobilePopularBooks.length]);
 
     // Filter books based on active tab and category
     const displayedBooks = React.useMemo(() => {
@@ -1003,120 +1033,322 @@ export default function Welcome({
 
                 {/* Search Bar */}
                 <div className="px-5 mb-5">
-                    <div className="bg-white border border-gray-200 rounded-2xl p-3 flex items-center gap-3 shadow-sm">
-                        <Search className="w-5 h-5 text-gray-400" />
+                    <form onSubmit={handleHeroSearch} className="bg-white border border-gray-200 rounded-2xl px-3.5 py-3 flex items-center gap-3 shadow-xs hover:border-gray-300 focus-within:border-[#5C5AE6] focus-within:ring-2 focus-within:ring-[#5C5AE6]/15 transition-all">
+                        <Search className="w-5 h-5 text-gray-400 shrink-0" />
                         <input
                             type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Cari buku, video, audio..."
-                            className="flex-1 bg-transparent border-none text-[13px] font-medium placeholder:text-gray-400 focus:ring-0 p-0 text-gray-700 outline-none"
+                            className="flex-1 bg-transparent border-none text-[13px] font-medium placeholder:text-gray-400 focus:ring-0 p-0 text-gray-800 outline-none"
                         />
-                    </div>
+                    </form>
                 </div>
 
                 {/* Jadwal Sholat */}
                 <JadwalSholat />
 
-                {/* Buku Rekomendasi */}
-                <div className="mb-8">
-                    <div className="px-5 flex items-center justify-between mb-4">
-                        <h3 className="text-[15px] font-bold text-gray-900">Rekomendasi Buku</h3>
-                        <Link href={route('katalog.index')} className="text-[11px] font-bold text-blue-600 flex items-center gap-0.5">
+                {/* Rekomendasi Buku (Horizontal Scroll dengan Margin Sisi Terjaga) */}
+                <div className="px-5 mb-11">
+                    <div className="flex items-center justify-between mb-3.5">
+                        <div>
+                            <h3 className="text-[16px] font-extrabold text-gray-900 tracking-tight">Rekomendasi Buku</h3>
+                            <p className="text-[11px] text-gray-500 font-medium">Buku pilihan untuk menambah wawasan</p>
+                        </div>
+                        <Link href={route('katalog.index')} className="text-[12px] font-bold text-[#5C5AE6] hover:text-[#4E4CD4] flex items-center gap-0.5">
                             Lihat Katalog <ChevronRight className="w-3.5 h-3.5" />
                         </Link>
                     </div>
 
-                    <div className="px-5 grid grid-cols-4 gap-2.5 pb-2">
-                        {koleksiBuku.length > 0 ? koleksiBuku.slice(0, 4).map((book) => (
-                            <Link href={`/buku/${book.id}`} key={book.id} className="flex flex-col w-full block">
-                                <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-2 border border-gray-100 shadow-sm relative">
-                                    <img src={getBookCoverUrl(book.cover)} alt={book.title} loading="lazy" className="w-full h-full object-cover" />
-                                    {book.coins_price > 0 && (
-                                        <div className="absolute top-1.5 right-1.5 bg-white/90 backdrop-blur-sm rounded-full px-1 py-0.5 flex items-center gap-0.5 shadow-sm">
-                                            <div className="w-2 h-2 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[4px] font-bold">C</div>
-                                            <span className="text-[7px] font-bold text-gray-900">{book.coins_price}</span>
-                                        </div>
-                                    )}
+                    <div className="overflow-x-auto hide-scrollbar pb-3">
+                        <div className="flex gap-3.5 w-max">
+                            {koleksiBuku.length > 0 ? koleksiBuku.slice(0, 8).map((book) => (
+                                <Link 
+                                    href={`/buku/${book.id}`} 
+                                    key={book.id} 
+                                    className="w-[132px] flex flex-col group"
+                                >
+                                    <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-2 border border-gray-100 shadow-sm relative group-active:scale-95 transition-transform">
+                                        <img 
+                                            src={getBookCoverUrl(book.cover)} 
+                                            alt={book.title} 
+                                            loading="lazy" 
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                                        />
+                                        {book.coins_price > 0 && (
+                                            <div className="absolute top-2 right-2 bg-black/75 backdrop-blur-md rounded-full px-2 py-0.5 flex items-center gap-1 shadow-sm border border-white/10">
+                                                <div className="w-2.5 h-2.5 bg-amber-400 rounded-full flex items-center justify-center text-gray-900 text-[6px] font-black">C</div>
+                                                <span className="text-[9px] font-extrabold text-white">{book.coins_price}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <h4 className="font-bold text-[12px] text-gray-900 leading-snug line-clamp-2 group-hover:text-[#5C5AE6] transition-colors">
+                                        {book.title}
+                                    </h4>
+                                    <p className="text-[11px] font-medium text-gray-500 truncate mt-0.5">
+                                        {book.author?.name || 'Penulis'}
+                                    </p>
+                                    <div className="flex items-center gap-1 mt-1">
+                                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                        <span className="text-[10px] font-bold text-gray-700">{book.average_rating ? Number(book.average_rating).toFixed(1) : '4.9'}</span>
+                                    </div>
+                                </Link>
+                            )) : (
+                                <div className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-center text-gray-500 text-[11px]">
+                                    Belum ada buku rekomendasi
                                 </div>
-                                <h4 className="font-bold text-[9px] text-gray-900 leading-[1.3] mb-1 line-clamp-2 min-h-[24px]">{book.title}</h4>
-                                <p className="text-[8px] font-medium text-gray-500 truncate">{book.author?.name || 'Penulis'}</p>
-                            </Link>
-                        )) : (
-                            <div className="col-span-4 w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-center text-gray-500 text-[11px]">
-                                Belum ada buku rekomendasi
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                {/* Video Kajian Terbaru */}
-                <div className="mb-8">
-                    <div className="px-5 flex items-center justify-between mb-4">
-                        <h3 className="text-[15px] font-bold text-gray-900">Video Kajian Terbaru</h3>
-                        <Link href={route('videos.index')} className="text-[11px] font-bold text-blue-600 flex items-center gap-0.5">
+                {/* Video Kajian Terbaru (Horizontal Scroll dengan Margin Sisi Terjaga) */}
+                <div className="px-5 mb-11">
+                    <div className="flex items-center justify-between mb-3.5">
+                        <div>
+                            <h3 className="text-[16px] font-extrabold text-gray-900 tracking-tight">Video Kajian Pilihan</h3>
+                            <p className="text-[11px] text-gray-500 font-medium">Kajian tematik dan ceramah asatidz</p>
+                        </div>
+                        <Link href={route('videos.index')} className="text-[12px] font-bold text-[#5C5AE6] hover:text-[#4E4CD4] flex items-center gap-0.5">
                             Lihat Semua <ChevronRight className="w-3.5 h-3.5" />
                         </Link>
                     </div>
-                    <div className="px-5 grid grid-cols-3 gap-2 pb-2">
-                        {koleksiVideo.length > 0 ? koleksiVideo.slice(0, 3).map((video) => (
-                            <Link href={`/videos/${video.id}`} key={video.id} className="flex flex-col group block w-full">
-                                <div className="w-full aspect-video bg-gray-100 rounded-lg overflow-hidden relative mb-1.5 shadow-sm border border-gray-100">
-                                    <img src={getVideoThumbnailUrl(video.thumbnail)} alt={video.title} loading="lazy" className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                        <div className="w-6 h-6 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white">
-                                            <Play className="w-2.5 h-2.5 ml-0.5 fill-current" />
+                    <div className="overflow-x-auto hide-scrollbar pb-3">
+                        <div className="flex gap-3.5 w-max">
+                            {koleksiVideo.length > 0 ? koleksiVideo.slice(0, 6).map((video) => (
+                                <Link 
+                                    href={`/videos/${video.id}`} 
+                                    key={video.id} 
+                                    className="w-[210px] flex flex-col group"
+                                >
+                                    <div className="w-full aspect-video bg-gray-100 rounded-xl overflow-hidden relative mb-2 shadow-xs border border-gray-100">
+                                        <img src={getVideoThumbnailUrl(video.thumbnail)} alt={video.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                        <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                                            <div className="w-8 h-8 bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+                                                <Play className="w-3.5 h-3.5 ml-0.5 fill-current" />
+                                            </div>
+                                        </div>
+                                        <div className="absolute bottom-1.5 right-1.5 bg-black/75 backdrop-blur-xs text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                                            {Math.floor(video.duration / 60)}:{String(video.duration % 60).padStart(2, '0')}
                                         </div>
                                     </div>
-                                    <div className="absolute bottom-1 right-1 bg-black/70 backdrop-blur-sm text-white text-[7px] font-bold px-1 py-0.5 rounded">
-                                        {Math.floor(video.duration / 60)}:{String(video.duration % 60).padStart(2, '0')}
-                                    </div>
+                                    <h4 className="font-bold text-[12px] text-gray-900 leading-snug line-clamp-2 group-hover:text-[#5C5AE6] transition-colors">
+                                        {video.title}
+                                    </h4>
+                                    <p className="text-[11px] font-medium text-gray-500 truncate mt-0.5">
+                                        {video.author?.name || 'Ustadz Talaqee'}
+                                    </p>
+                                </Link>
+                            )) : (
+                                <div className="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-center text-gray-500 text-[11px]">
+                                    Belum ada video kajian
                                 </div>
-                                <h4 className="font-bold text-[9px] text-gray-900 leading-[1.3] mb-0.5 line-clamp-2">{video.title}</h4>
-                                <p className="text-[7px] font-medium text-gray-500 truncate">{video.author?.name || 'Ustadz'}</p>
-                            </Link>
-                        )) : (
-                            <div className="col-span-3 w-full bg-gray-50 border border-gray-100 rounded-xl p-6 text-center text-gray-500 text-[12px]">
-                                Belum ada video kajian
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                {/* Koleksi Buku */}
-                <div className="mb-10">
-                    <div className="px-5 flex items-center justify-between mb-4">
-                        <h3 className="text-[15px] font-bold text-gray-900">Koleksi Buku</h3>
-                        <Link href={route('katalog.index')} className="text-[11px] font-bold text-blue-600 flex items-center gap-0.5">
+                {/* Koleksi Buku Populer (Grid 2 Kolom ala Shopee Modern dengan Infinite Scroll & Skeleton Shimmer) */}
+                <div className="mb-12">
+                    <div className="px-5 flex items-center justify-between mb-3.5">
+                        <div>
+                            <h3 className="text-[16px] font-extrabold text-gray-900 tracking-tight">Koleksi Buku Populer</h3>
+                            <p className="text-[11px] text-gray-500 font-medium">Buku terlengkap untuk referensi belajar</p>
+                        </div>
+                        <Link href={route('katalog.index')} className="text-[12px] font-bold text-[#5C5AE6] hover:text-[#4E4CD4] flex items-center gap-0.5">
                             Lihat Semua <ChevronRight className="w-3.5 h-3.5" />
                         </Link>
                     </div>
                     
-                    <div className="px-5 grid grid-cols-2 gap-2">
-                        {koleksiBuku.length > 0 ? koleksiBuku.slice(0, 10).map((book) => (
-                            <Link href={`/buku/${book.id}`} key={book.id} className="group flex flex-col w-full bg-white rounded-xl p-2.5 border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                                <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-2.5 border border-gray-50 shadow-inner relative">
-                                    <img 
-                                        src={getBookCoverUrl(book.cover)} 
-                                        alt={book.title} 
-                                        loading="lazy" 
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
-                                    />
-                                    {book.coins_price > 0 ? (
-                                        <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1 shadow-sm border border-black/5">
-                                            <div className="w-3 h-3 bg-[#FBBF24] rounded-full flex items-center justify-center text-white text-[7px] font-bold">C</div>
-                                            <span className="text-[9px] font-bold text-gray-900">{book.coins_price}</span>
+                    {/* Masonry / Waterfall Staggered 2-Column Grid ala Shopee */}
+                    {allMobilePopularBooks.length > 0 ? (
+                        <div className="px-5 grid grid-cols-2 gap-3.5 items-start">
+                            {/* Kolom 1 (Kiri) */}
+                            <div className="flex flex-col gap-3.5">
+                                {allMobilePopularBooks.slice(0, visibleMobileBooksCount).filter((_, idx) => idx % 2 === 0).map((book) => (
+                                    <Link 
+                                        href={`/buku/${book.id}`} 
+                                        key={book.id} 
+                                        className="group flex flex-col w-full bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-md hover:border-[#5C5AE6]/20 active:scale-[0.98] transition-all duration-200"
+                                    >
+                                        {/* Cover Full-Bleed ala Shopee */}
+                                        <div className="w-full aspect-[3/4] bg-gray-100 relative overflow-hidden">
+                                            <img 
+                                                src={getBookCoverUrl(book.cover)} 
+                                                alt={book.title} 
+                                                loading="lazy" 
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                                            />
+                                            {/* Spine subtle shadow on left */}
+                                            <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-r from-black/20 to-transparent pointer-events-none" />
+
+                                            {/* Floating Badge ala Shopee (Koin / Gratis) */}
+                                            {book.coins_price > 0 ? (
+                                                <div className="absolute top-2 left-2 bg-black/75 backdrop-blur-md rounded-full px-2 py-0.5 flex items-center gap-1 shadow-sm border border-white/10">
+                                                    <div className="w-2.5 h-2.5 bg-amber-400 rounded-full flex items-center justify-center text-gray-900 text-[6px] font-black">C</div>
+                                                    <span className="text-[9px] font-extrabold text-white">{book.coins_price}</span>
+                                                </div>
+                                            ) : (
+                                                <div className="absolute top-2 left-2 bg-emerald-600/90 backdrop-blur-md text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-sm">
+                                                    Gratis
+                                                </div>
+                                            )}
+
+                                            {/* Kategori Badge di pojok kanan atas */}
+                                            {book.category?.name && (
+                                                <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md text-gray-700 text-[8px] font-bold px-1.5 py-0.5 rounded-md shadow-xs max-w-[75px] truncate border border-black/5">
+                                                    {book.category.name}
+                                                </div>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <div className="absolute top-2 right-2 bg-emerald-500/90 backdrop-blur-sm text-white text-[9px] font-bold rounded-full px-2 py-0.5 shadow-sm">
-                                            Gratis
+
+                                        {/* Card Body ala Shopee (Natural Height) */}
+                                        <div className="p-2.5 flex flex-col bg-white">
+                                            <h4 className="font-bold text-[12px] text-gray-900 leading-snug line-clamp-2 group-hover:text-[#5C5AE6] transition-colors">
+                                                {book.title}
+                                            </h4>
+                                            <p className="text-[10px] font-medium text-gray-500 truncate mt-0.5">
+                                                {book.author?.name || 'Penulis'}
+                                            </p>
+
+                                            <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-gray-50">
+                                                <div className="flex items-center gap-1 text-[10px] font-bold text-gray-700">
+                                                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                                    <span>{book.average_rating ? Number(book.average_rating).toFixed(1) : '4.9'}</span>
+                                                </div>
+                                                <span className="text-[10px] font-extrabold text-[#5C5AE6]">
+                                                    {book.coins_price > 0 ? `${book.coins_price} Koin` : 'Gratis'}
+                                                </span>
+                                            </div>
                                         </div>
-                                    )}
-                                </div>
-                                <h4 className="font-bold text-[12px] text-gray-900 leading-[1.35] mb-1 line-clamp-2 min-h-[32px] group-hover:text-blue-600 transition-colors">{book.title}</h4>
-                                <p className="text-[10px] font-medium text-gray-500 truncate">{book.author?.name || 'Penulis'}</p>
-                            </Link>
-                        )) : (
-                            <div className="col-span-2 w-full bg-gray-50 border border-gray-100 rounded-xl p-6 text-center text-gray-500 text-xs">
-                                Belum ada buku
+                                    </Link>
+                                ))}
+
+                                {isLoadingMoreMobileBooks && (
+                                    <div className="flex flex-col w-full bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-xs animate-pulse">
+                                        <div className="w-full aspect-[3/4] bg-gray-200" />
+                                        <div className="p-2.5 flex flex-col gap-2">
+                                            <div className="h-3.5 bg-gray-200 rounded-md w-4/5" />
+                                            <div className="h-3 bg-gray-100 rounded-md w-1/2" />
+                                            <div className="flex items-center justify-between pt-2 mt-1 border-t border-gray-50">
+                                                <div className="h-3 bg-gray-100 rounded w-10" />
+                                                <div className="h-3 bg-gray-200 rounded w-8" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Kolom 2 (Kanan) */}
+                            <div className="flex flex-col gap-3.5">
+                                {allMobilePopularBooks.slice(0, visibleMobileBooksCount).filter((_, idx) => idx % 2 === 1).map((book) => (
+                                    <Link 
+                                        href={`/buku/${book.id}`} 
+                                        key={book.id} 
+                                        className="group flex flex-col w-full bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-md hover:border-[#5C5AE6]/20 active:scale-[0.98] transition-all duration-200"
+                                    >
+                                        {/* Cover Full-Bleed ala Shopee */}
+                                        <div className="w-full aspect-[3/4] bg-gray-100 relative overflow-hidden">
+                                            <img 
+                                                src={getBookCoverUrl(book.cover)} 
+                                                alt={book.title} 
+                                                loading="lazy" 
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                                            />
+                                            {/* Spine subtle shadow on left */}
+                                            <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-r from-black/20 to-transparent pointer-events-none" />
+
+                                            {/* Floating Badge ala Shopee (Koin / Gratis) */}
+                                            {book.coins_price > 0 ? (
+                                                <div className="absolute top-2 left-2 bg-black/75 backdrop-blur-md rounded-full px-2 py-0.5 flex items-center gap-1 shadow-sm border border-white/10">
+                                                    <div className="w-2.5 h-2.5 bg-amber-400 rounded-full flex items-center justify-center text-gray-900 text-[6px] font-black">C</div>
+                                                    <span className="text-[9px] font-extrabold text-white">{book.coins_price}</span>
+                                                </div>
+                                            ) : (
+                                                <div className="absolute top-2 left-2 bg-emerald-600/90 backdrop-blur-md text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-sm">
+                                                    Gratis
+                                                </div>
+                                            )}
+
+                                            {/* Kategori Badge di pojok kanan atas */}
+                                            {book.category?.name && (
+                                                <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md text-gray-700 text-[8px] font-bold px-1.5 py-0.5 rounded-md shadow-xs max-w-[75px] truncate border border-black/5">
+                                                    {book.category.name}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Card Body ala Shopee (Natural Height) */}
+                                        <div className="p-2.5 flex flex-col bg-white">
+                                            <h4 className="font-bold text-[12px] text-gray-900 leading-snug line-clamp-2 group-hover:text-[#5C5AE6] transition-colors">
+                                                {book.title}
+                                            </h4>
+                                            <p className="text-[10px] font-medium text-gray-500 truncate mt-0.5">
+                                                {book.author?.name || 'Penulis'}
+                                            </p>
+
+                                            <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-gray-50">
+                                                <div className="flex items-center gap-1 text-[10px] font-bold text-gray-700">
+                                                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                                    <span>{book.average_rating ? Number(book.average_rating).toFixed(1) : '4.9'}</span>
+                                                </div>
+                                                <span className="text-[10px] font-extrabold text-[#5C5AE6]">
+                                                    {book.coins_price > 0 ? `${book.coins_price} Koin` : 'Gratis'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+
+                                {isLoadingMoreMobileBooks && (
+                                    <div className="flex flex-col w-full bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-xs animate-pulse">
+                                        <div className="w-full aspect-[3/4] bg-gray-200" />
+                                        <div className="p-2.5 flex flex-col gap-2">
+                                            <div className="h-3.5 bg-gray-200 rounded-md w-4/5" />
+                                            <div className="h-3 bg-gray-100 rounded-md w-1/2" />
+                                            <div className="flex items-center justify-between pt-2 mt-1 border-t border-gray-50">
+                                                <div className="h-3 bg-gray-100 rounded w-10" />
+                                                <div className="h-3 bg-gray-200 rounded w-8" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="mx-5 bg-gray-50 border border-gray-100 rounded-xl p-6 text-center text-gray-500 text-xs">
+                            Belum ada buku
+                        </div>
+                    )}
+
+                    {/* Infinite Scroll Trigger Sentinel */}
+                    <div ref={mobileLoadMoreRef} className="h-1 w-full" />
+
+                    {/* Action Bar / Loading Status */}
+                    <div className="px-5 mt-4 text-center">
+                        {isLoadingMoreMobileBooks ? (
+                            <div className="flex items-center justify-center gap-2 py-2 text-xs font-bold text-[#5C5AE6]">
+                                <Loader2 className="w-4 h-4 animate-spin text-[#5C5AE6]" />
+                                <span>Memuat buku lainnya...</span>
+                            </div>
+                        ) : visibleMobileBooksCount < allMobilePopularBooks.length ? (
+                            <button
+                                onClick={handleLoadMoreMobileBooks}
+                                className="w-full bg-[#EEF2FF] hover:bg-[#E0E7FF] active:scale-[0.99] text-[#5C5AE6] font-bold text-[12px] py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-xs"
+                            >
+                                Muat Lebih Banyak Buku
+                            </button>
+                        ) : (
+                            <div className="py-2 flex flex-col items-center gap-2">
+                                <span className="text-[11px] font-medium text-gray-400">
+                                    Semua buku populer telah dimuat ({allMobilePopularBooks.length} buku)
+                                </span>
+                                <Link 
+                                    href={route('katalog.index')} 
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#5C5AE6] bg-[#5C5AE6]/8 px-3 py-1.5 rounded-full hover:bg-[#5C5AE6]/15 transition-colors"
+                                >
+                                    Jelajahi Seluruh Katalog Buku <ChevronRight className="w-3 h-3" />
+                                </Link>
                             </div>
                         )}
                     </div>
@@ -1132,25 +1364,25 @@ export default function Welcome({
                         WhatsApp: +62 822 8557 8390 • Email: saufitrod@gmail.com
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mb-3 text-[11px] font-bold text-gray-500">
-                        <Link href={route('faq.index')} className="hover:text-blue-600">FAQ</Link>
-                        <Link href={route('refund.policy')} className="hover:text-blue-600">Refund Policy</Link>
-                        <Link href={route('terms')} className="hover:text-blue-600">Syarat & Ketentuan</Link>
-                        <Link href={route('kontak')} className="hover:text-blue-600">Kontak</Link>
+                        <Link href={route('faq.index')} className="hover:text-[#5C5AE6]">FAQ</Link>
+                        <Link href={route('refund.policy')} className="hover:text-[#5C5AE6]">Refund Policy</Link>
+                        <Link href={route('terms')} className="hover:text-[#5C5AE6]">Syarat & Ketentuan</Link>
+                        <Link href={route('kontak')} className="hover:text-[#5C5AE6]">Kontak</Link>
                     </div>
                     <p className="text-[10px] text-gray-400">© 2026 Talaqee. All rights reserved.</p>
                 </div>
 
-                {/* Bottom Navigation Mobile */}
+                {/* Bottom Navigation Mobile (Clean Native Talaqee Style) */}
                 <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#F1F5F9] md:max-w-md md:mx-auto z-50">
                     <div className="flex justify-around items-center h-[70px] pb-2">
                         {[
                             { id: 'home', label: 'Beranda', icon: Home, active: true, route: '/' },
+                            { id: 'alquran', label: "Al-Qur'an", icon: BookOpen, route: '/alquran' },
                             { id: 'katalog', label: 'Katalog', icon: LayoutGrid, route: '/katalog' },
-                            { id: 'video', label: 'Video Saya', icon: PlaySquare, route: '/videos' },
-                            { id: 'rekaman', label: 'Rekaman', icon: Headphones, route: '/audios' },
+                            { id: 'audio', label: 'Audio', icon: Headphones, route: '/audios' },
                             { id: 'akun', label: 'Akun', icon: CircleUserRound, route: (typeof auth !== 'undefined' && auth?.user) ? '/akun' : '/login' }
                         ].map((item) => (
-                            <Link prefetch="hover" href={item.route} key={item.id} className="flex flex-col items-center justify-center w-16 gap-1 relative mt-1">
+                            <Link prefetch="hover" href={item.route} key={item.id} className="flex flex-col items-center justify-center w-[20%] gap-1 relative mt-1">
                                 {item.active ? (
                                     <>
                                         <div className="w-10 h-10 flex items-center justify-center">

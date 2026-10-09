@@ -212,55 +212,75 @@ export default function JadwalSholat() {
 
     }, [currentTime, prayerTimes]);
 
+    const cleanLocationName = (name: string) => {
+        if (!name) return 'Jakarta';
+        if (/jakarta/i.test(name)) return 'DKI Jakarta';
+        return name
+            .replace(/^Special Capital Region of\s*/i, '')
+            .replace(/^Daerah Khusus Ibukota\s*/i, '')
+            .replace(/^Kota Administrasi\s*/i, '')
+            .replace(/^Kota\s*/i, '')
+            .replace(/^Kabupaten\s*/i, 'Kab. ')
+            .trim() || 'Lokasi Anda';
+    };
+
     if (loading && !prayerTimes) {
         return (
-            <div className="bg-gradient-to-br from-[#0F172A] to-[#1E293B] rounded-[20px] p-4 flex flex-col justify-center items-center min-h-[140px] shadow-sm animate-pulse mx-5 mb-8">
-                <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mb-3"></div>
-                <p className="text-white/60 text-[11px] font-medium">Menyesuaikan lokasi...</p>
+            <div className="bg-gradient-to-br from-[#0F172A] via-[#132238] to-[#0A2621] rounded-2xl p-4 flex flex-col justify-center items-center min-h-[130px] shadow-sm animate-pulse mx-5 mb-6">
+                <div className="w-7 h-7 border-2 border-emerald-400/20 border-t-emerald-400 rounded-full animate-spin mb-2.5"></div>
+                <p className="text-white/70 text-[11px] font-medium">Menyesuaikan jadwal sholat...</p>
             </div>
         );
     }
 
     if (error && !prayerTimes) {
         return (
-            <div className="bg-red-50 rounded-[20px] p-4 flex flex-col justify-center items-center min-h-[120px] border border-red-100 mx-5 mb-8">
+            <div className="bg-red-50 rounded-2xl p-4 flex flex-col justify-center items-center min-h-[100px] border border-red-100 mx-5 mb-6">
                 <p className="text-red-500 text-[12px] font-medium">{error}</p>
             </div>
         );
     }
 
+    const displayLocation = cleanLocationName(locationName);
+
     return (
-        <div className="px-5 mb-8">
-            <div className="bg-gradient-to-br from-[#0F172A] to-[#1E293B] rounded-[20px] p-4 shadow-[0_8px_16px_rgba(15,23,42,0.15)] text-white relative overflow-hidden">
-                {/* Background decoration */}
-                <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-                <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-[#6366F1]/20 rounded-full blur-xl"></div>
+        <div className="px-5 mb-6">
+            <div className="bg-gradient-to-br from-[#0F172A] via-[#14233D] to-[#0C2B24] rounded-2xl p-4 shadow-[0_6px_20px_rgba(15,23,42,0.12)] text-white relative overflow-hidden border border-white/5">
+                {/* Background ambient Islamic glowing decorations */}
+                <div className="absolute -top-12 -right-12 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div className="absolute -bottom-10 -left-10 w-28 h-28 bg-sky-500/15 rounded-full blur-2xl pointer-events-none"></div>
                 
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4 relative z-10">
-                    <div className="flex items-center gap-1.5 bg-white/10 px-2.5 py-1 rounded-full backdrop-blur-md border border-white/5">
-                        <MapPin className="w-3 h-3 text-[#38BDF8]" />
-                        <span className="text-[10px] font-medium text-white/90 truncate max-w-[120px]">
-                            {locationName}
+                {/* Top Header: Location & Live Clock */}
+                <div className="flex items-center justify-between mb-3.5 relative z-10">
+                    <div className="flex items-center gap-1.5 bg-white/10 px-2.5 py-1 rounded-full backdrop-blur-md border border-white/10 max-w-[65%]">
+                        <MapPin className="w-3 h-3 text-emerald-400 shrink-0" />
+                        <span className="text-[11px] font-semibold text-white/95 truncate">
+                            {displayLocation}
                         </span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-white/90">
-                        <Clock className="w-3.5 h-3.5 text-[#FBBF24]" />
-                        <span className="text-[12px] font-bold tracking-wide">
+                    <div className="flex items-center gap-1.5 bg-white/10 px-2.5 py-1 rounded-full backdrop-blur-md border border-white/5 text-white/90">
+                        <Clock className="w-3 h-3 text-amber-400" />
+                        <span className="text-[11px] font-bold tracking-wider">
                             {currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                     </div>
                 </div>
 
-                {/* Next Prayer Highlight */}
+                {/* Next Prayer Highlight Banner */}
                 {nextPrayer && (
-                    <div className="mb-5 relative z-10">
-                        <p className="text-[10px] text-white/70 mb-0.5">Menuju {nextPrayer.name}</p>
-                        <div className="flex items-end gap-2">
-                            <h2 className="text-[24px] font-extrabold leading-none tracking-tight text-white drop-shadow-sm">
-                                {nextPrayer.time}
-                            </h2>
-                            <span className="text-[11px] font-bold text-[#FBBF24] bg-[#FBBF24]/10 px-2 py-0.5 rounded-md mb-0.5">
+                    <div className="mb-3.5 relative z-10 flex items-center justify-between bg-white/[0.04] p-2.5 px-3 rounded-xl border border-white/5">
+                        <div>
+                            <p className="text-[10px] text-white/60 font-medium mb-0.5">Waktu Berikutnya</p>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-[14px] font-bold text-white">{nextPrayer.name}</span>
+                                <span className="text-[20px] font-extrabold text-emerald-300 tracking-tight leading-none drop-shadow-sm">
+                                    {nextPrayer.time}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <span className="text-[9px] text-white/50 block mb-0.5">Menuju Sholat</span>
+                            <span className="inline-flex items-center text-[10px] font-bold text-amber-300 bg-amber-400/15 border border-amber-400/25 px-2 py-0.5 rounded-full">
                                 {nextPrayer.diffStr}
                             </span>
                         </div>
@@ -280,16 +300,16 @@ export default function JadwalSholat() {
                         return (
                             <div 
                                 key={prayer.name} 
-                                className={`flex flex-col items-center justify-center py-2 rounded-xl border transition-all ${
+                                className={`flex flex-col items-center justify-center py-2 rounded-xl transition-all ${
                                     isNext 
-                                    ? 'bg-gradient-to-b from-[#38BDF8]/20 to-[#38BDF8]/5 border-[#38BDF8]/30 shadow-[0_0_12px_rgba(56,189,248,0.15)]' 
-                                    : 'bg-white/5 border-white/5'
+                                    ? 'bg-gradient-to-b from-emerald-500/25 to-teal-500/15 border border-emerald-400/40 shadow-[0_0_12px_rgba(16,185,129,0.2)]' 
+                                    : 'bg-white/[0.05] border border-white/[0.05]'
                                 }`}
                             >
-                                <span className={`text-[9px] font-medium mb-1 ${isNext ? 'text-[#38BDF8]' : 'text-white/60'}`}>
+                                <span className={`text-[9px] font-medium mb-0.5 ${isNext ? 'text-emerald-300 font-bold' : 'text-white/60'}`}>
                                     {prayer.name}
                                 </span>
-                                <span className={`text-[11px] ${isNext ? 'font-bold text-white' : 'font-semibold text-white/90'}`}>
+                                <span className={`text-[11px] ${isNext ? 'font-black text-white' : 'font-semibold text-white/90'}`}>
                                     {prayer.time}
                                 </span>
                             </div>

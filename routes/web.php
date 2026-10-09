@@ -18,7 +18,7 @@ Route::get('/', function () {
     });
 
     $koleksiBuku = \Illuminate\Support\Facades\Cache::remember('homepage_koleksi_buku', 1800, function () {
-        return Book::with('author')->withAvg('reviews', 'rating')->latest()->take(15)->get();
+        return Book::with(['author', 'category'])->withAvg('reviews', 'rating')->latest()->take(24)->get();
     });
     $koleksiVideo = \Illuminate\Support\Facades\Cache::remember('homepage_koleksi_video', 1800, function () {
         return \App\Models\Video::with('author')->take(3)->get();
